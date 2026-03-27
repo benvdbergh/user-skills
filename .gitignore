@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Local logs/debug artifacts
+debug.log
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
