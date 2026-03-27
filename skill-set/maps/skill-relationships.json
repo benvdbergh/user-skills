@@ -1,0 +1,925 @@
+{
+  "title": "Skill Relationship Map",
+  "version": 2,
+  "updated": "2026-03-17T00:00:00Z",
+  "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage).",
+  "sources": {
+    "user_level_skill_index": "c:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
+    "project_level_inventory": "c:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json",
+    "agent_graph_spec": "c:\\Users\\vandenbb\\.claude\\self\\spec\\northstart-agent_graph_architecture.md"
+  },
+  "edge_vocabulary_reference": {
+    "agent_graph_edges_seen_in_spec": [
+      "SKILL_MAY_USE_TOOL",
+      "SKILL_USES_WORKFLOW",
+      "SKILL_MAY_CALL_AGENT",
+      "SKILL_HAS_INPUT"
+    ],
+    "notes": [
+      "The Agent Graph spec currently enumerates Tool/Workflow/Agent edges from a Skill node, but does not explicitly define a Skill→Skill edge type. This map therefore uses candidate edges like `depends_on` (mentioned as an example in Story-01-05) to represent Skill→Skill relationships, and marks those mappings as approximate."
+    ]
+  },
+  "relationship_type_catalog": [
+    {
+      "relationship_type": "may_call_or_wrap",
+      "meaning": "Skill A may invoke Skill B as part of its execution, or conceptually wraps B as a sub-capability.",
+      "candidate_agent_graph_edge_types": [
+        {
+          "edge_type": "SKILL_USES_WORKFLOW",
+          "mapping_note": "Approximate: Skill B may be implemented as workflow steps rather than a formal Skill node call."
+        },
+        {
+          "edge_type": "depends_on",
+          "mapping_note": "Approximate Skill→Skill edge; not explicitly defined in the current Agent Graph spec."
+        }
+      ]
+    },
+    {
+      "relationship_type": "shares_mcp_tool_script",
+      "meaning": "Skills share the same MCP server/tools, scripts, or external config (.env, shared paths), implying coupled changes.",
+      "candidate_agent_graph_edge_types": [
+        {
+          "edge_type": "SKILL_MAY_USE_TOOL",
+          "mapping_note": "Direct when the shared item is modeled as a Tool node (MCP tool, script)."
+        },
+        {
+          "edge_type": "depends_on",
+          "mapping_note": "Approximate when the shared coupling is via config or conventions rather than a discrete Tool node."
+        }
+      ]
+    },
+    {
+      "relationship_type": "overlaps_or_duplicates_capability",
+      "meaning": "Skills cover similar capability areas, potentially creating duplication, user confusion, or refactor/migration needs.",
+      "candidate_agent_graph_edge_types": [
+        {
+          "edge_type": "depends_on",
+          "mapping_note": "Approximate placeholder; a dedicated `OVERLAPS_WITH`/`DUPLICATES` edge is likely an ontology gap for the Agent Graph."
+        }
+      ]
+    },
+    {
+      "relationship_type": "specialized_version_of",
+      "meaning": "Skill A is a specialization of Skill B (narrower scope, adds domain constraints, or provides tokens/guidelines consumed by B).",
+      "candidate_agent_graph_edge_types": [
+        {
+          "edge_type": "depends_on",
+          "mapping_note": "Approximate Skill→Skill edge; could become a dedicated `SPECIALIZES` edge in the Agent Graph."
+        }
+      ]
+    }
+  ],
+  "skills": {
+    "user_level": [
+      "deep-research",
+      "architecture",
+      "minimalist-coding",
+      "project-planning",
+      "prompting",
+      "research-analysis",
+      "skill-set",
+      "specification",
+      "version-control",
+      "diagram",
+      "web-visual",
+      "document-deep-merge",
+      "tech-documentation",
+      "docx-documentation",
+      "code-discovery-for-docs",
+      "product-knowledge-catalog",
+      "documentation-governance",
+      "pdf-to-markdown",
+      "office-pptx",
+      "office-docx",
+      "office-xlsx",
+      "office-pdf"
+    ],
+    "project_level_ai_vault": [
+      "documentation",
+      "enterprise-model-store",
+      "kion-design",
+      "market-segmentation-research",
+      "obsidian-confluence-sync",
+      "search-company-knowledge"
+    ]
+  },
+  "relationships": [
+    {
+      "id": "rel-0001",
+      "from_skill": "documentation",
+      "to_skill": "diagram",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\documentation\\SKILL.md",
+        "quote": "Other skills such as `diagram` and `deep-research` for diagrams and research integration."
+      },
+      "confidence_score": 0.85,
+      "notes": "Documentation explicitly composes with diagram for visual enrichment."
+    },
+    {
+      "id": "rel-0029",
+      "from_skill": "documentation",
+      "to_skill": "enterprise-architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\documentation\\SKILL.md",
+        "quote": "Architecture and capability docs SHOULD draw on the enterprise model (via the `enterprise-architecture` skill) when available, and treat it as the canonical source for structured views (e.g. capabilities, value streams, organization, applications), using the integration patterns from `IntegrationPatterns-DiagramDocsEA.md`."
+      },
+      "confidence_score": 0.85,
+      "notes": "Ai-Vault documentation relies on enterprise-architecture for canonical enterprise views (capabilities, org, applications) used in architecture and capability documentation. Migrated from enterprise-modeling (Epic-6)."
+    },
+    {
+      "id": "rel-0002",
+      "from_skill": "documentation",
+      "to_skill": "deep-research",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\documentation\\SKILL.md",
+        "quote": "Use /deep-research when sections require factual grounding, external data, or source validation."
+      },
+      "confidence_score": 0.85,
+      "notes": "Documentation explicitly composes with deep-research to ground claims and add citations."
+    },
+    {
+      "id": "rel-0003",
+      "from_skill": "documentation",
+      "to_skill": "word-document-server",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": false,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\documentation\\SKILL.md",
+        "quote": "When a `word-document-server` MCP is available, the skill MAY use it to: ... get_document_outline ... convert_to_pdf"
+      },
+      "confidence_score": 0.8,
+      "notes": "This is a Skill→Tool relationship represented here to capture shared MCP coupling (Story-01-05 requirement)."
+    },
+    {
+      "id": "rel-0004",
+      "from_skill": "market-segmentation-research",
+      "to_skill": "deep-research",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\market-segmentation-research\\SKILL.md",
+        "quote": "Until such MCPs are installed, the skill will approximate these capabilities via built-in tools like WebSearch/WebFetch and the `deep-research` / `research-analysis` skills."
+      },
+      "confidence_score": 0.9,
+      "notes": "Market segmentation skill explicitly delegates research execution to deep-research."
+    },
+    {
+      "id": "rel-0005",
+      "from_skill": "market-segmentation-research",
+      "to_skill": "research-analysis",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\market-segmentation-research\\SKILL.md",
+        "quote": "Until such MCPs are installed, the skill will approximate these capabilities via ... `research-analysis` skills."
+      },
+      "confidence_score": 0.85,
+      "notes": "Market segmentation uses research-analysis as a research execution/storage capability."
+    },
+    {
+      "id": "rel-0006",
+      "from_skill": "market-segmentation-research",
+      "to_skill": "user-excalidraw",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": false,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\market-segmentation-research\\SKILL.md",
+        "quote": "At present, the only discovered MCP server is `user-excalidraw`, which is optional for this skill and used purely for visualization."
+      },
+      "confidence_score": 0.9,
+      "notes": "Captures shared MCP/tool dependency for visualization."
+    },
+    {
+      "id": "rel-0007",
+      "from_skill": "market-segmentation-research",
+      "to_skill": "diagram",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\market-segmentation-research\\SKILL.md",
+        "quote": "Outputs should be easy to store as notes, tables, or diagrams and should align with the broader enterprise modeling and KION design skills where relevant."
+      },
+      "confidence_score": 0.6,
+      "notes": "Implicit composition: segmentation outputs are intended to be visualized; diagram skill is the generic visualization capability."
+    },
+    {
+      "id": "rel-0008",
+      "from_skill": "obsidian-confluence-sync",
+      "to_skill": "user-mcp-atlassian",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": false,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\obsidian-confluence-sync\\SKILL.md",
+        "quote": "MCP Dependencies — Server: `user-mcp-atlassian`."
+      },
+      "confidence_score": 0.95,
+      "notes": "Direct MCP dependency for Confluence sync operations."
+    },
+    {
+      "id": "rel-0009",
+      "from_skill": "search-company-knowledge",
+      "to_skill": "user-mcp-atlassian",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\search-company-knowledge\\SKILL.md",
+        "quote": "Search across Confluence and Jira ... use the `search` tool (Rovo Search) ... getConfluencePage ... getJiraIssue."
+      },
+      "confidence_score": 0.7,
+      "notes": "The skill describes Atlassian search/fetch tool usage; in this environment those capabilities typically come from `user-mcp-atlassian` (confirm tool names if wiring differs)."
+    },
+    {
+      "id": "rel-0010",
+      "from_skill": "obsidian-confluence-sync",
+      "to_skill": "search-company-knowledge",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\obsidian-confluence-sync\\SKILL.md",
+        "quote": "MCP Dependencies — Server: `user-mcp-atlassian`."
+      },
+      "confidence_score": 0.75,
+      "notes": "High coupling via shared Atlassian/Confluence capabilities; refactors to the Atlassian MCP wiring affect both skills."
+    },
+    {
+      "id": "rel-0011",
+      "from_skill": "enterprise-model-store",
+      "to_skill": "neo4j",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": false,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\enterprise-model-store\\SKILL.md",
+        "quote": "MCP Dependencies — Server: `neo4j` (Neo4j MCP server). Primary Tools: `read-cypher`, `write-cypher`."
+      },
+      "confidence_score": 0.95,
+      "notes": "Enterprise model store is tightly coupled to Neo4j MCP tool semantics. Migrated from enterprise-modeling (Epic-6)."
+    },
+    {
+      "id": "rel-0012",
+      "from_skill": "kion-design",
+      "to_skill": "diagram",
+      "relationship_type": "specialized_version_of",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\kion-design\\SKILL.md",
+        "quote": "Integration with Other Skills: diagram: Apply KION colors to draw.io diagrams."
+      },
+      "confidence_score": 0.85,
+      "notes": "kion-design provides brand tokens consumed by diagram outputs; specialization is about output styling, not diagram semantics."
+    },
+    {
+      "id": "rel-0013",
+      "from_skill": "kion-design",
+      "to_skill": "web-visual",
+      "relationship_type": "specialized_version_of",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\kion-design\\SKILL.md",
+        "quote": "Integration with Other Skills: web-visual: Use KION palette for HTML visualizations."
+      },
+      "confidence_score": 0.85,
+      "notes": "kion-design provides design tokens that can be applied to web-visual outputs."
+    },
+    {
+      "id": "rel-0014",
+      "from_skill": "kion-design",
+      "to_skill": "architecture",
+      "relationship_type": "specialized_version_of",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\kion-design\\SKILL.md",
+        "quote": "Integration with Other Skills: Architecture: Brand ArchiMate and system diagrams."
+      },
+      "confidence_score": 0.75,
+      "notes": "Architecture outputs (diagrams/docs) may consume KION design tokens for branded deliverables."
+    },
+    {
+      "id": "rel-0015",
+      "from_skill": "kion-design",
+      "to_skill": "specification",
+      "relationship_type": "specialized_version_of",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\kion-design\\SKILL.md",
+        "quote": "Integration with Other Skills: Specification: Style PRD and technical documents."
+      },
+      "confidence_score": 0.75,
+      "notes": "Brand constraints apply to specification deliverables."
+    },
+    {
+      "id": "rel-0016",
+      "from_skill": "web-visual",
+      "to_skill": "research-analysis",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\web-visual\\SKILL.md",
+        "quote": "Integration Points: research-analysis: Visualize research outputs and topic comparisons."
+      },
+      "confidence_score": 0.75,
+      "notes": "web-visual is commonly downstream of research-analysis outputs."
+    },
+    {
+      "id": "rel-0017",
+      "from_skill": "web-visual",
+      "to_skill": "deep-research",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\web-visual\\SKILL.md",
+        "quote": "Integration Points: deep-research: Transform multi-source research reports into navigable HTML."
+      },
+      "confidence_score": 0.7,
+      "notes": "web-visual can visualize deep-research reports."
+    },
+    {
+      "id": "rel-0018",
+      "from_skill": "web-visual",
+      "to_skill": "architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\web-visual\\SKILL.md",
+        "quote": "Integration Points: Architecture: Generate interactive views of architecture diagrams."
+      },
+      "confidence_score": 0.65,
+      "notes": "web-visual may be used to present architecture artifacts interactively."
+    },
+    {
+      "id": "rel-0019",
+      "from_skill": "web-visual",
+      "to_skill": "specification",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\web-visual\\SKILL.md",
+        "quote": "Integration Points: Specification: Visual PRD summaries and feature comparison pages."
+      },
+      "confidence_score": 0.65,
+      "notes": "web-visual outputs are often derived from spec/PRD content."
+    },
+    {
+      "id": "rel-0020",
+      "from_skill": "project-planning",
+      "to_skill": "specification",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\project-planning\\SKILL.md",
+        "quote": "Integration Points: Specification Skill - Uses PRD/Architecture from Specification."
+      },
+      "confidence_score": 0.8,
+      "notes": "Planning consumes spec artifacts to shard into epics/stories."
+    },
+    {
+      "id": "rel-0021",
+      "from_skill": "project-planning",
+      "to_skill": "version-control",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\project-planning\\SKILL.md",
+        "quote": "Integration Points: VersionControl Skill - All planning artifacts version controlled."
+      },
+      "confidence_score": 0.7,
+      "notes": "Planning artifacts are expected to be under VC; changes to version-control flows are downstream-risk."
+    },
+    {
+      "id": "rel-0022",
+      "from_skill": "specification",
+      "to_skill": "prompting",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\specification\\SKILL.md",
+        "quote": "Integration Points: Prompting Skill - Uses templates for document generation."
+      },
+      "confidence_score": 0.75,
+      "notes": "Specification generation delegates prompt composition/rendering to prompting."
+    },
+    {
+      "id": "rel-0023",
+      "from_skill": "specification",
+      "to_skill": "version-control",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\specification\\SKILL.md",
+        "quote": "Integration Points: VersionControl Skill - All specs are version controlled."
+      },
+      "confidence_score": 0.75,
+      "notes": "Specification lifecycle depends on version-control for persistence and rollback."
+    },
+    {
+      "id": "rel-0024",
+      "from_skill": "research-analysis",
+      "to_skill": "deep-research",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\deep-research\\SKILL.md",
+        "quote": "Compose the two: use deep-research for execution, then store results via research-analysis's topic management."
+      },
+      "confidence_score": 0.75,
+      "notes": "deep-research and research-analysis are designed to compose: execution engine + storage/knowledge mgmt."
+    },
+    {
+      "id": "rel-0025",
+      "from_skill": "document-deep-merge",
+      "to_skill": "diagram",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\document-deep-merge\\SKILL.md",
+        "quote": "when composed with the diagram skill ... use the diagram skill for Interpret/Revise as needed."
+      },
+      "confidence_score": 0.85,
+      "notes": "Document merge explicitly composes with diagram for diagram-aware integration."
+    },
+    {
+      "id": "rel-0026",
+      "from_skill": "document-deep-merge",
+      "to_skill": "deep-research",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\document-deep-merge\\SKILL.md",
+        "quote": "With deep-research / research-analysis: Use when sub-documents are research outputs; this skill handles the merge/integration step after research is done."
+      },
+      "confidence_score": 0.7,
+      "notes": "Downstream of deep-research outputs (integration step)."
+    },
+    {
+      "id": "rel-0027",
+      "from_skill": "document-deep-merge",
+      "to_skill": "research-analysis",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\document-deep-merge\\SKILL.md",
+        "quote": "With deep-research / research-analysis: Use when sub-documents are research outputs."
+      },
+      "confidence_score": 0.65,
+      "notes": "Downstream of research-analysis topic outputs (integration step)."
+    },
+    {
+      "id": "rel-0028",
+      "from_skill": "search-company-knowledge",
+      "to_skill": "research-analysis",
+      "relationship_type": "overlaps_or_duplicates_capability",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\search-company-knowledge\\SKILL.md",
+        "quote": "Search across siloed company knowledge systems ... and synthesizes results with proper citations."
+      },
+      "confidence_score": 0.55,
+      "notes": "Both cover research/synthesis, but search-company-knowledge is constrained to internal systems (Confluence/Jira)."
+    },
+    {
+      "id": "rel-0030",
+      "from_skill": "tech-documentation",
+      "to_skill": "docx-documentation",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "For .docx import/export and sync, delegate to docx-documentation; for PDF import delegate to pdf-to-markdown."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation delegates DOCX handling to docx-documentation and PDF-to-Markdown ingestion to pdf-to-markdown."
+    },
+    {
+      "id": "rel-0030b",
+      "from_skill": "tech-documentation",
+      "to_skill": "pdf-to-markdown",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "For PDF sources: delegate to pdf-to-markdown (markdrop-based conversion with optional images, tables, and AI descriptions)."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation delegates PDF-to-Markdown import to pdf-to-markdown (markdrop)."
+    },
+    {
+      "id": "rel-0031",
+      "from_skill": "tech-documentation",
+      "to_skill": "diagram",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Use the Diagram-Only Flow pattern when no enterprise model is present or desired: call `diagram` with a plain-language description, requested diagram type, and embedding context to produce draw.io/Excalidraw/Mermaid artifacts."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation orchestrates both diagram-only and model-backed visualization flows by delegating all diagram semantics and formats to the global diagram skill."
+    },
+    {
+      "id": "rel-0032",
+      "from_skill": "tech-documentation",
+      "to_skill": "enterprise-architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "For architecture and capability docs, call `enterprise-architecture` with curated enterprise text and a viewpoint request to obtain viewpoint text plus diagram-ready graph slices with stable entity IDs."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation uses enterprise-architecture as the source of truth for model-backed architecture/capability views and for model-driven diagram refresh flows. Migrated from enterprise-modeling (Epic-6)."
+    },
+    {
+      "id": "rel-0033",
+      "from_skill": "tech-documentation",
+      "to_skill": "deep-research",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Use `deep-research` to execute multi-source research tasks when sections must be research-backed."
+      },
+      "confidence_score": 0.85,
+      "notes": "tech-documentation relies on deep-research for execution of research tasks behind documentation."
+    },
+    {
+      "id": "rel-0034",
+      "from_skill": "tech-documentation",
+      "to_skill": "research-analysis",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Use `research-analysis` to store and organize research by topic and reuse prior research across multiple documents."
+      },
+      "confidence_score": 0.8,
+      "notes": "tech-documentation composes with research-analysis for research storage/reuse across docs."
+    },
+    {
+      "id": "rel-0035",
+      "from_skill": "docx-documentation",
+      "to_skill": "word-document-server",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": false,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\docx-documentation\\SKILL.md",
+        "quote": "When the `user-word-document-server` MCP is available, `docx-documentation` MAY use it as follows."
+      },
+      "confidence_score": 0.9,
+      "notes": "docx-documentation depends on the user-word-document-server MCP for DOCX/PDF operations where available."
+    },
+    {
+      "id": "rel-0036",
+      "from_skill": "documentation",
+      "to_skill": "tech-documentation",
+      "relationship_type": "specialized_version_of",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\documentation\\SKILL.md",
+        "quote": "Ai-Vault-local documentation orchestrator that applies CAI-specific conventions ... while delegating core, vault-agnostic documentation workflows to the global `tech-documentation` and `docx-documentation` skills."
+      },
+      "confidence_score": 0.9,
+      "notes": "Ai-Vault documentation is a vault-specific specialization/wrapper around the global tech-documentation orchestrator."
+    },
+    {
+      "id": "rel-0037",
+      "from_skill": "deep-research",
+      "to_skill": "vault-research-integration",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\deep-research\\SKILL.md",
+        "quote": "Vault-local adapters such as `vault-research-integration` are responsible for actually calling those skills and managing paths/notes; deep-research only signals where such calls are useful."
+      },
+      "confidence_score": 0.9,
+      "notes": "deep-research is vault-agnostic and surfaces structured hooks and signals, while vault-research-integration owns the concrete calls into enterprise-modeling, diagram, and KB storage inside Ai-Vault."
+    },
+    {
+      "id": "rel-0039",
+      "from_skill": "deep-research",
+      "to_skill": "enterprise-architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\deep-research\\SKILL.md",
+        "quote": "deep-research does not perform enterprise modeling itself; instead it exposes `implications_for_enterprise_model` with candidate entities and relationships that enterprise-architecture can consume as input hints."
+      },
+      "confidence_score": 0.85,
+      "notes": "deep-research produces structured implications_for_enterprise_model sections designed to feed into enterprise-architecture workflows via vault-local adapters. Migrated from enterprise-modeling (Epic-6)."
+    },
+    {
+      "id": "rel-0040",
+      "from_skill": "deep-research",
+      "to_skill": "diagram",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\deep-research\\SKILL.md",
+        "quote": "deep-research exposes `suggested_visualizations` with diagram_type, scope, key_nodes, key_edges, and priority so that downstream skills can call `diagram` to render the recommended visuals."
+      },
+      "confidence_score": 0.85,
+      "notes": "deep-research suggests but does not render diagrams; it defines suggested_visualizations hooks specifically for consumption by diagram and documentation skills."
+    },
+    {
+      "id": "rel-0038",
+      "from_skill": "research-analysis",
+      "to_skill": "vault-research-integration",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\research-analysis\\SKILL.md",
+        "quote": "In environments with a vault-local research integration skill (e.g. an Ai-Vault `vault-research-integration` skill), research-analysis SHOULD delegate path resolution, note placement, and vault-specific metadata to the vault-local adapter."
+      },
+      "confidence_score": 0.85,
+      "notes": "research-analysis treats vault-research-integration as the authority on Ai-Vault-specific topic and project storage, while keeping its own SKILL vault-agnostic."
+    },
+    {
+      "id": "rel-0041",
+      "from_skill": "tech-documentation",
+      "to_skill": "code-discovery-for-docs",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "`tech-documentation` is designed to integrate with additional documentation-adjacent skills as they mature: **code-discovery-for-docs** (planned) discovers code, tests, and configuration relevant to a document’s topic and provides code-based evidence or examples for design/architecture docs."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation will orchestrate documentation workflows that invoke code-discovery-for-docs to build module/API maps and feature traces used in docs."
+    },
+    {
+      "id": "rel-0042",
+      "from_skill": "documentation-governance",
+      "to_skill": "code-discovery-for-docs",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\self\\improvement\\skill-refactoring\\Stories\\Story-02-07-Documentation-Governance.md",
+        "quote": "documentation-governance relies on `code-discovery-for-docs` for coverage baselines (what code exists) and on `product-knowledge-catalog` for canonical terminology, products, and capabilities; it, in turn, provides governance hooks and assessment outputs back to `tech-documentation` and other skills."
+      },
+      "confidence_score": 0.85,
+      "notes": "documentation-governance uses discovery outputs such as ModuleMap, APIIndex, and change-impact views from code-discovery-for-docs to compute documentation coverage and change-impact baselines."
+    },
+    {
+      "id": "rel-0043",
+      "from_skill": "documentation-governance",
+      "to_skill": "product-knowledge-catalog",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\self\\improvement\\skill-refactoring\\Stories\\Story-02-07-Documentation-Governance.md",
+        "quote": "documentation-governance relies on `code-discovery-for-docs` for coverage baselines (what code exists) and on `product-knowledge-catalog` for canonical terminology, products, and capabilities; it, in turn, provides governance hooks and assessment outputs back to `tech-documentation` and other skills."
+      },
+      "confidence_score": 0.85,
+      "notes": "documentation-governance uses catalog outputs such as DomainTerm, products, capabilities, and features from product-knowledge-catalog to enforce terminology rules and product/capability coverage expectations."
+    },
+    {
+      "id": "rel-0044",
+      "from_skill": "tech-documentation",
+      "to_skill": "documentation-governance",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Future Skills (Hooks): documentation-governance (planned): Enforce documentation standards, review gates, and lifecycle rules across documents."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation is expected to call documentation-governance as the standards and quality-gate engine before publish/export and within audit workflows."
+    },
+    {
+      "id": "rel-0045",
+      "from_skill": "tech-documentation",
+      "to_skill": "product-knowledge-catalog",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Future Skills (Hooks): `product-knowledge-catalog` (planned): Surface product and capability definitions, customer journeys, and feature catalogs."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation will call product-knowledge-catalog to retrieve catalog-backed product, capability, feature, and journey semantics for scaffolding and impact analysis."
+    },
+    {
+      "id": "rel-0046",
+      "from_skill": "product-knowledge-catalog",
+      "to_skill": "code-discovery-for-docs",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\product-knowledge-catalog\\SKILL.md",
+        "quote": "`code-discovery-for-docs` is expected to discover and index code artifacts using contracts such as `ModuleMap`, `APIIndex`, and `ArtifactRef`. `product-knowledge-catalog` consumes `ArtifactRef` entries attached to Feature, Capability, or Product entities to track source modules, APIs, configuration, tests, and infra pieces."
+      },
+      "confidence_score": 0.9,
+      "notes": "product-knowledge-catalog depends on code-discovery-for-docs for code artifact discovery and uses shared ArtifactRef contracts for traceability."
+    },
+    {
+      "id": "rel-0047",
+      "from_skill": "product-knowledge-catalog",
+      "to_skill": "enterprise-architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\product-knowledge-catalog\\SKILL.md",
+        "quote": "For organizations that maintain an enterprise model, Capability and Product entries MAY carry optional references to `enterprise-architecture` entities and, when requested, the skill MAY export catalog slices (e.g. capabilities and products for a given domain or journey) in a form that `enterprise-architecture` can ingest or compare."
+      },
+      "confidence_score": 0.8,
+      "notes": "product-knowledge-catalog can optionally align capabilities and products with the enterprise model and export catalog slices for enterprise-architecture to ingest or reconcile. Migrated from enterprise-modeling (Epic-6)."
+    },
+    {
+      "id": "rel-0048",
+      "from_skill": "enterprise-model-store",
+      "to_skill": "enterprise-architecture",
+      "relationship_type": "references_methodology_from",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\Knowledge\\Projects\\skill-ecosystem-migration\\Epics\\Epic-6-update-claudemd-and-catalog.md",
+        "quote": "Update skill-relationships.json: add enterprise-architecture↔enterprise-model-store relationship"
+      },
+      "confidence_score": 0.95,
+      "notes": "enterprise-model-store (Ai-Vault storage backend) references methodology from enterprise-architecture (global ArchiMate/arc42 skill) for classification, extraction, and relationship workflows. The store owns Neo4j persistence and Obsidian note generation; the architecture skill owns the methodology."
+    },
+    {
+      "id": "rel-0049",
+      "from_skill": "tech-documentation",
+      "to_skill": "office-docx",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Delegate to `office-docx` for Word exports, and `office-pptx` for decks."
+      },
+      "confidence_score": 0.9,
+      "notes": "tech-documentation delegates DOCX import/export/sync responsibilities to office-docx."
+    },
+    {
+      "id": "rel-0050",
+      "from_skill": "tech-documentation",
+      "to_skill": "office-pdf",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "For PDF sources: delegate to `office-pdf` (PDF → Markdown ingestion workflow)."
+      },
+      "confidence_score": 0.85,
+      "notes": "tech-documentation routes PDF import/ingestion to office-pdf."
+    },
+    {
+      "id": "rel-0051",
+      "from_skill": "tech-documentation",
+      "to_skill": "office-pptx",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\tech-documentation\\SKILL.md",
+        "quote": "Delegate to `office-docx` for Word exports, and `office-pptx` for decks."
+      },
+      "confidence_score": 0.85,
+      "notes": "tech-documentation routes PowerPoint deck creation/editing to office-pptx."
+    },
+    {
+      "id": "rel-0052",
+      "from_skill": "office-docx",
+      "to_skill": "docx-documentation",
+      "relationship_type": "overlaps_or_duplicates_capability",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.cursor\\plans\\integrate_office_document_skills_e420b5ed.plan.md",
+        "quote": "`office-docx` (single DOCX skill: MD↔DOCX + redlining / OOXML tracked changes)"
+      },
+      "confidence_score": 0.75,
+      "notes": "office-docx is intended as the consolidated DOCX capability owner; docx-documentation becomes a candidate deprecation once adoption/migration is complete."
+    },
+    {
+      "id": "rel-0053",
+      "from_skill": "office-pdf",
+      "to_skill": "pdf-to-markdown",
+      "relationship_type": "overlaps_or_duplicates_capability",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "c:\\Users\\vandenbb\\.cursor\\plans\\integrate_office_document_skills_e420b5ed.plan.md",
+        "quote": "`office-pdf` becomes the single owner of **PDF ↔ Markdown** plus PDF manipulation workflows; `pdf-to-markdown` becomes redundant once the new skill is adopted."
+      },
+      "confidence_score": 0.75,
+      "notes": "office-pdf overlaps with pdf-to-markdown for PDF→Markdown ingestion; pdf-to-markdown is a candidate deprecation once office-pdf is fully adopted."
+    }
+  ],
+  "high_risk_refactor_sequences": [
+    {
+      "id": "risk-0001",
+      "shared_capability": "deep-research (execution engine)",
+      "why_high_risk": "Multiple downstream skills explicitly compose with deep-research; refactoring deep-research workflows/tooling likely breaks many consumers.",
+      "downstream_skills": [
+        "documentation",
+        "market-segmentation-research",
+        "research-analysis",
+        "web-visual",
+        "document-deep-merge"
+      ],
+      "suggested_safe_sequence": [
+        "Add compatibility shim layer to deep-research outputs (stable report schema / template).",
+        "Refactor and validate downstream consumers one-by-one (documentation → web-visual → market-segmentation → document-deep-merge → research-analysis).",
+        "Only then change deep-research core prompts/workflow steps."
+      ]
+    },
+    {
+      "id": "risk-0002",
+      "shared_capability": "Atlassian/Confluence/Jira MCP wiring (user-mcp-atlassian or equivalent tool surface)",
+      "why_high_risk": "At least two skills rely on Confluence/Jira search/fetch/create/update semantics; changing tool names/parameters breaks both sync and knowledge-search flows.",
+      "downstream_skills": [
+        "obsidian-confluence-sync",
+        "search-company-knowledge"
+      ],
+      "suggested_safe_sequence": [
+        "Introduce a stable adapter interface for Atlassian operations (search/get/update/create) and migrate both skills to that adapter.",
+        "Refactor obsidian-confluence-sync scripts/MCP workflows with integration tests (diff/push/pull) before changing any destructive operations.",
+        "Then refactor search-company-knowledge tool invocation naming (search/getConfluencePage/getJiraIssue) to match the adapter."
+      ]
+    },
+    {
+      "id": "risk-0003",
+      "shared_capability": "diagram + branded outputs",
+      "why_high_risk": "diagram is a common visualization dependency; kion-design and documentation/document-deep-merge rely on it for diagram lifecycle steps, making format/adapter changes broadly impactful.",
+      "downstream_skills": [
+        "documentation",
+        "document-deep-merge",
+        "kion-design",
+        "market-segmentation-research"
+      ],
+      "suggested_safe_sequence": [
+        "Stabilize the diagram semantic model and adapter contracts first (draw.io default, Excalidraw fallback).",
+        "Then validate branding overlays (kion-design tokens) and doc embedding flows (documentation, document-deep-merge)."
+      ]
+    },
+    {
+      "id": "risk-0004",
+      "shared_capability": "specification → planning toolchain",
+      "why_high_risk": "project-planning consumes specification artifacts; changes to spec storage layout or output conventions cascade into planning workflows and downstream VC expectations.",
+      "downstream_skills": [
+        "project-planning",
+        "web-visual"
+      ],
+      "suggested_safe_sequence": [
+        "Keep spec output paths and templates backward compatible (or provide migration scripts).",
+        "Update project-planning sharding workflows to accept both old and new spec layouts during transition."
+      ]
+    }
+  ]
+}

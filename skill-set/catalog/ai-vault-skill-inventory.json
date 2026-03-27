@@ -1,0 +1,406 @@
+{
+  "version": 2,
+  "updated": "2026-03-17T00:00:00Z",
+  "description": "Canonical project-level skill inventory for Ai-Vault. Source: Ai-Vault .claude/skills/skill-index.json. Used by Stories 01-04, 01-05, 01-06 and skill-set workflows for mapping, relationships, and artifact generation.",
+  "environment_id": "ai-vault",
+  "source_index_path": "c:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\skill-index.json",
+  "schema": {
+    "indication_values": [
+      "ai-vault-cai-specific",
+      "generic-capability-globalizable",
+      "thin-wrapper-user-level-or-external"
+    ]
+  },
+  "skills": [
+    {
+      "name": "documentation",
+      "path": "skills/documentation",
+      "purpose_summary": "Ai-Vault-local wrapper for documentation that applies CAI/vault conventions while delegating core Markdown-first workflows to global tech-documentation and DOCX/PDF handling to docx-documentation.",
+      "primary_triggers": [
+        "white paper",
+        "spec",
+        "report",
+        "runbook",
+        "guide",
+        "proposal",
+        "README",
+        "architecture doc",
+        "documentation",
+        "tables",
+        "diagrams",
+        "images",
+        "document quality",
+        "import Word",
+        "export Word",
+        "Markdown to Word",
+        "sync Markdown Word"
+      ],
+      "workflows": [
+        "create (via tech-documentation)",
+        "edit (via tech-documentation)",
+        "enrich (via tech-documentation)",
+        "audit (via tech-documentation)",
+        "impact-analysis (via tech-documentation)",
+        "import (via tech-documentation → docx-documentation)",
+        "export (via tech-documentation → docx-documentation)",
+        "sync (via tech-documentation → docx-documentation)"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "thin-wrapper-user-level-or-external"
+    },
+    {
+      "name": "tech-documentation",
+      "path": "..\\\\..\\\\..\\\\.claude\\\\skills\\\\tech-documentation",
+      "purpose_summary": "Global Markdown-first technical documentation orchestrator that coordinates create/edit/enrich/audit/import/export/sync workflows across vaults and delegates Word/PDF behavior to docx-documentation.",
+      "primary_triggers": [
+        "technical document",
+        "design doc",
+        "architecture doc",
+        "runbook",
+        "spec",
+        "report",
+        "guide",
+        "README",
+        "documentation",
+        "export to Word",
+        "export to PDF",
+        "import Word"
+      ],
+      "workflows": [
+        "create",
+        "edit",
+        "enrich",
+        "audit",
+        "impact-analysis",
+        "import",
+        "export",
+        "sync"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    },
+    {
+      "name": "docx-documentation",
+      "path": "..\\\\..\\\\..\\\\.claude\\\\skills\\\\docx-documentation",
+      "purpose_summary": "Global Word/DOCX/PDF documentation helper that converts between Markdown and DOCX, runs post-export validation, and performs light structural edits while keeping Markdown canonical.",
+      "primary_triggers": [
+        "import Word",
+        "Word to Markdown",
+        "Markdown to Word",
+        "export DOCX",
+        "export PDF",
+        "fix Word formatting",
+        "inspect Word outline"
+      ],
+      "workflows": [
+        "import-docx-to-md",
+        "export-md-to-docx",
+        "export-docx-to-pdf",
+        "sync-md-docx",
+        "light-structural-edit"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    },
+    {
+      "name": "pdf-to-markdown",
+      "path": "..\\\\..\\\\..\\\\.claude\\\\skills\\\\pdf-to-markdown",
+      "purpose_summary": "Converts PDFs to full Markdown (text, links, images, tables) and optional HTML using markdrop; supports AI-powered image/table descriptions via six LLM providers. Use for PDF import into the vault.",
+      "primary_triggers": [
+        "convert PDF to Markdown",
+        "import PDF",
+        "PDF to Markdown",
+        "PDF to MD",
+        "extract content from PDF",
+        "AI descriptions for images in PDF",
+        "markdrop"
+      ],
+      "workflows": [
+        "convert",
+        "describe",
+        "analyze",
+        "batch"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    },
+    {
+      "name": "product-knowledge-catalog",
+      "path": "..\\\\..\\\\..\\\\.claude\\\\skills\\\\product-knowledge-catalog",
+      "purpose_summary": "Global, vault-agnostic product and domain catalog that maintains DomainTerms, Products, Capabilities, Features, and UserJourneys with traceability hooks to code and documentation.",
+      "primary_triggers": [
+        "product catalog",
+        "capability catalog",
+        "domain glossary",
+        "normalize terminology",
+        "catalog impact analysis",
+        "scaffold docs from catalog",
+        "user journey catalog"
+      ],
+      "workflows": [
+        "catalog-initialization",
+        "term-normalization",
+        "catalog-query-impact-analysis",
+        "catalog-to-docs-scaffolding"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    },
+    {
+      "name": "enterprise-architecture",
+      "path": "$PAI_DIR/skills/enterprise-architecture",
+      "purpose_summary": "Global ArchiMate-aligned enterprise architecture methodology skill: classification, entity extraction, relationship proposals, gap analysis, arc42 documentation, and quality review.",
+      "primary_triggers": [
+        "enterprise modeling",
+        "extract entities",
+        "classify text",
+        "propose relationships",
+        "gap analysis",
+        "archimate",
+        "enterprise architecture",
+        "arc42",
+        "ontology",
+        "entity extraction",
+        "text-to-model",
+        "architecture quality review"
+      ],
+      "workflows": [
+        "ClassifyText",
+        "ExtractEntities",
+        "ProposeRelationships",
+        "DetectModelGaps",
+        "QualityReview"
+      ],
+      "tier": "always-considered",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    },
+    {
+      "name": "enterprise-model-store",
+      "path": "skills/enterprise-model-store",
+      "purpose_summary": "Ai-Vault project-level storage backend for the enterprise model: Neo4j read/write, ProposeModelUpdate, ValidationWorkflow, Obsidian note generation, and human-validation workflow.",
+      "primary_triggers": [
+        "model update",
+        "propose model update",
+        "apply update",
+        "write-cypher",
+        "Neo4j",
+        "obsidian notes",
+        "validate model update",
+        "create obsidian note",
+        "entity note"
+      ],
+      "workflows": [
+        "ProposeModelUpdate",
+        "ValidationWorkflow",
+        "CreateObsidianNotes"
+      ],
+      "tier": "always-considered",
+      "standard_version": "agent-skills-v1",
+      "indication": "ai-vault-cai-specific"
+    },
+    {
+      "name": "kion-design",
+      "path": "skills/kion-design",
+      "purpose_summary": "KION Group brand design system: color palettes, typography, and styling for branded documents, diagrams, and visual content.",
+      "primary_triggers": [
+        "KION",
+        "brand",
+        "branding",
+        "color palette",
+        "typography",
+        "design system",
+        "corporate identity",
+        "KION Red",
+        "Linde",
+        "STILL",
+        "Dematic",
+        "Baoli",
+        "Fenwick",
+        "OM",
+        "sub-brand"
+      ],
+      "workflows": [
+        "color-palette",
+        "typography",
+        "sub-brands"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "ai-vault-cai-specific"
+    },
+    {
+      "name": "market-segmentation-research",
+      "path": "skills/market-segmentation-research",
+      "purpose_summary": "Analyzes and cross-links market, customer, product, and competitor segmentations; researches quantitative metrics (revenue, CAGR, etc.) via multi-agent workflows.",
+      "primary_triggers": [
+        "market segmentation",
+        "customer segments",
+        "product segmentation",
+        "competitor segmentation",
+        "market metrics",
+        "revenue",
+        "CAGR",
+        "TAM",
+        "SAM",
+        "SOM",
+        "segment definition",
+        "market values",
+        "cross-segmentation"
+      ],
+      "workflows": [
+        "segment-analysis",
+        "cross-segmentation",
+        "research-metrics",
+        "synthesize"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable"
+    },
+    {
+      "name": "obsidian-confluence-sync",
+      "path": "skills/obsidian-confluence-sync",
+      "purpose_summary": "Syncs Obsidian/Markdown folder structure with Confluence page hierarchy via user-mcp-atlassian; diff first, then push or pull.",
+      "primary_triggers": [
+        "sync to Confluence",
+        "diff with Confluence",
+        "push to Confluence",
+        "pull from Confluence",
+        "initialize Confluence sync",
+        "Confluence sync"
+      ],
+      "workflows": [
+        "diff",
+        "push",
+        "pull",
+        "init"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "thin-wrapper-user-level-or-external"
+    },
+    {
+      "name": "search-company-knowledge",
+      "path": "skills/search-company-knowledge",
+      "purpose_summary": "Search across company knowledge bases (Confluence, Jira, internal docs) to find and explain internal concepts, processes, and technical details with cited answers.",
+      "primary_triggers": [
+        "find information",
+        "search company knowledge",
+        "look up",
+        "what is",
+        "explain",
+        "company docs",
+        "internal documentation",
+        "Confluence search",
+        "Jira search",
+        "knowledge base",
+        "search for",
+        "tell me about",
+        "deployment",
+        "authentication",
+        "infrastructure",
+        "architecture",
+        "our systems",
+        "our processes",
+        "technical documentation"
+      ],
+      "workflows": [
+        "identify-query",
+        "execute-search",
+        "synthesize",
+        "cite"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable"
+    },
+    {
+      "name": "vault-research-integration",
+      "path": "skills/vault-research-integration",
+      "purpose_summary": "Ai-Vault-local research integration layer that adapts global deep-research and research-analysis skills to Ai-Vault's CAI knowledge base layout, topic conventions, and persistence rules.",
+      "primary_triggers": [
+        "store research in Ai-Vault",
+        "map topic into Ai-Vault",
+        "persist deep research",
+        "Ai-Vault research integration",
+        "intelligence note",
+        "project research summary"
+      ],
+      "workflows": [
+        "resolve-topic",
+        "persist-research",
+        "lookup-sources"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "ai-vault-cai-specific"
+    },
+    {
+      "name": "code-discovery-for-docs",
+      "path": "..\\\\..\\\\..\\\\.claude\\\\skills\\\\code-discovery-for-docs",
+      "purpose_summary": "Global, vault-agnostic code discovery orchestrator that builds module maps, API indices, feature traces, architecture-relevant views, and change-impact summaries to support documentation, diagrams, catalogs, and governance.",
+      "primary_triggers": [
+        "where is this implemented",
+        "where is X implemented",
+        "build module map",
+        "module map",
+        "API index",
+        "API indices",
+        "feature trace",
+        "trace feature to code",
+        "change impact",
+        "what changed for this PR",
+        "code discovery for docs",
+        "code discovery for documentation"
+      ],
+      "workflows": [
+        "codebase-survey",
+        "feature-oriented-discovery",
+        "api-interface-indexing",
+        "architecture-view-extraction",
+        "diff-change-impact"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    },
+    {
+      "name": "documentation-governance",
+      "path": "..\\\\..\\\\..\\\\.claude\\\\skills\\\\documentation-governance",
+      "purpose_summary": "Global documentation governance and coverage orchestrator that defines reusable policies, quality gates, and assessment reporting across single documents and portfolios, integrating with tech-documentation, discovery, and catalog skills.",
+      "primary_triggers": [
+        "documentation standards",
+        "governance policy",
+        "documentation governance",
+        "coverage scan",
+        "coverage report",
+        "quality gates",
+        "PR documentation impact",
+        "governance report"
+      ],
+      "workflows": [
+        "define-policies",
+        "assess-doc",
+        "scan-portfolio",
+        "pr-impact-check",
+        "governance-report"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "generic-capability-globalizable",
+      "scope": "user-global"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+# Frontmatter Strategy for Knowledge Documents
+# Defines common and template-specific frontmatter properties
+
+# Common properties for ALL documents in Knowledge/
+common:
+  required:
+    - title
+    - type
+    - created
+    - updated
+  optional:
+    - project
+    - status
+    - version
+    - tags
+    - aliases
+    - related
+    - author
+    - source
+
+templates:
+  brief:
+    required: [project, status]
+    optional: [timeline, team]
+  constitution:
+    required: [project, version, status]
+    optional: [enforced_by, last_reviewed]
+  spec:
+    required: [project, version, status]
+    optional: [source_prd]
+  prd:
+    required: [product, version, status]
+    optional: [target_users, success_metrics]
+  plan:
+    required: [project, version, status, source_document]
+    optional: [phases]
+  epic:
+    required: [epic_id, project, status, priority]
+    optional: [parent_prd, dependencies, estimated_effort]
+  story:
+    required: [story_id, epic, project, status, priority]
+    optional: [user_type, acceptance_criteria, estimated_effort]
+  brain:
+    required: [project, initialized]
+    optional: [decision_count, last_decision]
+  research:
+    required: [title, type, category, created]
+    optional: [status, updated, version, researcher, agents_used, sources, related_topics, tags]
+
+format:
+  style: yaml
+  delimiter: "---"
+  position: top
+  spacing: true
+
+validation:
+  date_format: ISO8601
+  version_format: semver
+  status_values: [draft, active, archived, deprecated, planning, in-progress, completed, cancelled]
+
+migration:
+  old_pattern: /\*\*(\w+):\*\*\s*(.+)/g
+  converter: "ExtractKeyValuePairs"
+  preserve_old: false

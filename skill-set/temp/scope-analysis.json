@@ -1,0 +1,306 @@
+{
+  "version": 1,
+  "generated": "2026-03-11T00:00:00Z",
+  "description": "Scope analysis for skills across user-level and Ai-Vault project inventories. Source inventories: (1) user skill-index.json (environment: user), (2) ai-vault-skill-inventory.json (environment: ai-vault). Produced for Story 01-04; usable by Epic 2 refactoring prioritization and Story 01-06 Agent Graph alignment.",
+  "sources": [
+    {
+      "environment_id": "user",
+      "scope": "user",
+      "inventory_type": "skill-index",
+      "path": "c:\\Users\\vandenbb\\.claude\\skills\\skill-index.json"
+    },
+    {
+      "environment_id": "ai-vault",
+      "scope": "project",
+      "inventory_type": "skill-inventory",
+      "path": "c:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json"
+    }
+  ],
+  "scope_conventions_ref": "c:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\scope-and-conventions.md",
+  "agent_graph_spec_ref": "c:\\Users\\vandenbb\\.claude\\self\\spec\\northstart-agent_graph_architecture.md",
+  "schema": {
+    "assessment_values": ["yes", "no", "unclear"],
+    "recommendation_actions": ["move-to-user", "move-to-project", "split", "merge", "reformat"],
+    "agent_graph_roles": ["Skill", "Workflow", "Tool-wrapper", "Context", "Governance"]
+  },
+  "skills_analyzed_count": 18,
+  "skills": [
+    {
+      "reference": {
+        "name": "documentation",
+        "path": "skills/documentation",
+        "scope": "project",
+        "environment_id": "ai-vault"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Likely present in Ai-Vault because documentation output and conventions are core day-to-day needs of this vault.",
+        "Inventory indication marks it as generic/globalizable, suggesting the capability is broadly reusable beyond Ai-Vault."
+      ],
+      "assessment": "no",
+      "recommendation": {
+        "action": "move-to-user",
+        "justification": "Per scope conventions, domain-agnostic documentation authoring should be user-level to avoid duplication across vaults; keep any Ai‑Vault-specific templates or repo conventions as separate project artifacts if needed."
+      }
+    },
+    {
+      "reference": {
+        "name": "enterprise-modeling",
+        "path": "skills/enterprise-modeling",
+        "scope": "project",
+        "environment_id": "ai-vault"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Capability is explicitly CAI/Ai‑Vault specific: ArchiMate ontology + Neo4j graph storage + Obsidian integration are wired to this vault’s conventions and infrastructure.",
+        "Scope conventions recommend project-level placement when a skill depends on project-specific configuration, tooling, or domain process."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "kion-design",
+        "path": "skills/kion-design",
+        "scope": "project",
+        "environment_id": "ai-vault"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Brand/design guidance is organization-specific and may be included as part of Ai‑Vault’s CAI-oriented document/diagram workflows.",
+        "Project placement can be justified if the skill’s assets, templates, and usage assumptions are tightly coupled to this vault’s documentation practices."
+      ],
+      "assessment": "unclear",
+      "recommendation": {
+        "action": "split",
+        "justification": "If the skill is broadly reusable across multiple vaults, move the core brand-system guidance to user-level and keep only Ai‑Vault-specific document templates or examples in project scope."
+      }
+    },
+    {
+      "reference": {
+        "name": "market-segmentation-research",
+        "path": "skills/market-segmentation-research",
+        "scope": "project",
+        "environment_id": "ai-vault"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Inventory indication marks it as generic/globalizable, implying it is not inherently tied to Ai‑Vault.",
+        "Research procedures and analysis workflows are typically reusable across workspaces unless bound to a specific knowledge base or dataset."
+      ],
+      "assessment": "no",
+      "recommendation": {
+        "action": "move-to-user",
+        "justification": "Per conventions, general research workflows should be user-level; keep only Ai‑Vault-specific segmentation taxonomies or internal sources as project context (not as the skill’s home)."
+      }
+    },
+    {
+      "reference": {
+        "name": "obsidian-confluence-sync",
+        "path": "skills/obsidian-confluence-sync",
+        "scope": "project",
+        "environment_id": "ai-vault"
+      },
+      "agent_graph_role": "Tool-wrapper",
+      "rationale": [
+        "Inventory indication suggests a thin wrapper around user-level or external tooling (user-mcp-atlassian).",
+        "Project placement could be justified if the sync logic is tightly bound to this vault’s folder structure and Confluence hierarchy."
+      ],
+      "assessment": "unclear",
+      "recommendation": {
+        "action": "split",
+        "justification": "Split into (a) user-level, vault-agnostic Confluence sync/diff mechanics and (b) project-level mapping/config for Ai‑Vault’s folder/page hierarchy."
+      }
+    },
+    {
+      "reference": {
+        "name": "search-company-knowledge",
+        "path": "skills/search-company-knowledge",
+        "scope": "project",
+        "environment_id": "ai-vault"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Inventory indication marks it as generic/globalizable; searching internal knowledge bases is typically a user-level capability.",
+        "If tied to a specific company’s Confluence/Jira instance, it may still be reusable across multiple vaults for the same user."
+      ],
+      "assessment": "no",
+      "recommendation": {
+        "action": "move-to-user",
+        "justification": "Place cross-vault knowledge-base search at user level; keep any Ai‑Vault-specific query presets or domain glossaries as project artifacts if needed."
+      }
+    },
+    {
+      "reference": {
+        "name": "deep-research",
+        "path": "deep-research/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Domain-agnostic multi-agent research capability; not bound to a specific project’s layout or tooling.",
+        "Matches conventions for reusable workflows living at user level."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "Architecture",
+        "path": "Architecture/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "General-purpose architecture modeling workflows are reusable across projects and vaults.",
+        "Conventions recommend user-level placement for domain-agnostic modeling procedures."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "minimalist-coding",
+        "path": "minimalist-coding/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Workflow",
+      "rationale": [
+        "A general coding workflow/pattern (Locate→Modify→Create) applicable across repositories.",
+        "Not tied to any single project’s conventions; suitable for user-level reuse."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "project-planning",
+        "path": "project-planning/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Workflow",
+      "rationale": [
+        "Orchestration/planning patterns (epics, stories, sharding) are broadly reusable across workspaces.",
+        "Conventions place general-purpose orchestration capabilities at user level."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "prompting",
+        "path": "prompting/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Meta-prompting and template-based prompt composition are general-purpose capabilities.",
+        "No evidence of vault-specific coupling; aligns with user-level conventions."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "research-analysis",
+        "path": "research-analysis/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "General research and analysis procedures are reusable across domains and repositories.",
+        "Conventions place such capabilities at user level unless bound to a project-only knowledge base."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "skill-set",
+        "path": "skill-set/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Governance",
+      "rationale": [
+        "Skill lifecycle management (validate/lint/canonicalize) is governance-oriented and benefits from being consistent across all workspaces.",
+        "User-level placement avoids fragmenting the standards across vaults."
+      ],
+      "assessment": "yes",
+      "recommendation": {
+        "action": "reformat",
+        "justification": "If this skill is also duplicated in project scope, ensure a single canonical user-level source and treat project catalogs/inventories as data (not alternate implementations)."
+      }
+    },
+    {
+      "reference": {
+        "name": "specification",
+        "path": "specification/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Workflow",
+      "rationale": [
+        "Specification-driven development patterns are broadly reusable and not inherently project-bound.",
+        "Fits user-level conventions for reusable authoring/planning workflows."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "version-control",
+        "path": "version-control/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Governance",
+      "rationale": [
+        "Governance of agent framework changes (checkpointing, revert guidance) is cross-project for a given user.",
+        "Conventions support user-level placement for reusable governance procedures."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "diagram",
+        "path": "diagram/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Diagramming procedures are domain-agnostic and reusable across projects.",
+        "No evidence of vault-specific coupling; aligns with user-level conventions."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "web-visual",
+        "path": "web-visual/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Reusable capability for producing single-file HTML visualizations from text/data.",
+        "Not inherently tied to Ai‑Vault; fits user-level conventions."
+      ],
+      "assessment": "yes"
+    },
+    {
+      "reference": {
+        "name": "document-deep-merge",
+        "path": "document-deep-merge/SKILL.md",
+        "scope": "user",
+        "environment_id": "user"
+      },
+      "agent_graph_role": "Skill",
+      "rationale": [
+        "Reusable document consolidation workflow; independent of a specific project structure.",
+        "Matches user-level conventions for cross-vault document procedures."
+      ],
+      "assessment": "yes"
+    }
+  ]
+}
+
