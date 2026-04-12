@@ -9,6 +9,6 @@ WorkflowInit and other project-planning workflows assume **StateManagement** and
 
 These steps are **optional** for the planning workflows to complete; the agent can produce a full project layout and epic/story files without them.
 
-## Shared PAI infrastructure
+## Other skills
 
-`scripts/CleanupPrompts.ts` imports from `$PAI_DIR/Tools/DocumentationUtils` (path traversal `../` from the skill). That utility is shared across multiple PAI skills so prompt-cleanup behavior stays consistent. The import is intentional; lint S4 (no path traversal) is waived for this known shared dependency.
+**research-analysis** may still use `CleanupPrompts` and `DocumentationUtils` for topic/research notes; that path is unrelated to project-planning work items.

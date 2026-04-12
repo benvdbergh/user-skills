@@ -1,55 +1,20 @@
-# PlanReview Workflow
+# PlanReview workflow
 
-Review and validate planning phase completeness.
+## When to use
 
-## When to Use
+- "review plan", "validate planning", "planning review"
 
-- User requests: "review plan", "validate planning", "planning review"
-- Planning phase is complete
-- Need to validate planning artifacts before implementation
+## Steps
 
-## Workflow Steps
+1. Run **WorkflowInit** `--action review` for a quick file/directory check.
+2. Run **LintPlan.ts** on the project root for frontmatter, `depends_on` DAG, and `traces_to` for `ready` items.
+3. Walk the full checklist in [plan-quality-review.md](plan-quality-review.md).
 
-1. **Load Planning Artifacts**
-   - Read project brief
-   - Read PRD
-   - Read all epics
-   - Read all stories
-
-2. **Validate Completeness**
-   - Check all PRD requirements are covered by epics
-   - Check all epics have stories
-   - Verify story acceptance criteria are defined
-
-3. **Check Dependencies**
-   - Identify epic dependencies
-   - Identify story dependencies
-   - Verify dependency order is valid
-
-4. **Validate State**
-   - Check state management is initialized
-   - Verify architectural decisions are recorded
-   - Check constraints are defined
-
-5. **Generate Review Report**
-   - Create planning review report
-   - List issues and recommendations
-   - Provide planning phase summary
-
-## CLI Usage
+## CLI
 
 ```bash
-bun run $PAI_DIR/skills/project-planning/scripts/WorkflowInit.ts \
-  --project <project-name> \
-  --action review
+bun run $PAI_DIR/skills/project-planning/scripts/WorkflowInit.ts --project <name> --action review
+bun run $PAI_DIR/skills/project-planning/scripts/LintPlan.ts --root <path>
 ```
 
-## Output
-
-Generates planning review report with validation results.
-
-## Integration
-
-- Validates Specification skill outputs
-- Validates StateManagement skill state
-- Ensures readiness for implementation phase
+The detailed checklist lives in **plan-quality-review.md** (canonical).

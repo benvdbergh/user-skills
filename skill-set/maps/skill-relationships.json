@@ -1,7 +1,7 @@
 {
   "title": "Skill Relationship Map",
   "version": 2,
-  "updated": "2026-04-12T16:43:00.534554Z",
+  "updated": "2026-04-12T18:14:14.736297Z",
   "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage).",
   "sources": {
     "user_level_skill_index": "C:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
@@ -399,10 +399,10 @@
       "mapping_is_approximate": true,
       "evidence": {
         "source_file": "c:\\Users\\vandenbb\\.claude\\skills\\project-planning\\SKILL.md",
-        "quote": "Integration Points: Specification Skill - Uses PRD/Architecture from Specification."
+        "quote": "specification — consumes PRD/plan artifacts; link paths in manifest and traces_to (handoff contract)."
       },
       "confidence_score": 0.8,
-      "notes": "Planning consumes spec artifacts to shard into epics/stories."
+      "notes": "Handoff contract: .project-planning.yaml source_globs + work-item traces_to point at specification outputs; legacy Knowledge/Projects still supported."
     },
     {
       "id": "rel-0021",
@@ -952,7 +952,7 @@
       ],
       "suggested_safe_sequence": [
         "Keep spec output paths and templates backward compatible (or provide migration scripts).",
-        "Update project-planning sharding workflows to accept both old and new spec layouts during transition."
+        "When changing spec output paths, update manifest source_globs and sample traces_to; keep legacy --project layout working."
       ]
     }
   ]

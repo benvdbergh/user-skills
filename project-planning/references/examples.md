@@ -1,22 +1,20 @@
-# Additional Examples
-
-Examples below are preserved from the main SKILL.md for reference; the skill body keeps exactly three examples (Initialize workflow, Shard PRD, Create story).
+# Additional examples
 
 ---
 
-**Example: Create epic**
+**Create epic**
+
 ```
 User: "Create an epic for authentication"
-→ Invokes CreateEpic workflow
-→ Uses EpicTemplate.md
-→ Creates Epic-Authentication.md
+→ CreateEpic workflow + EpicManager --action create
+→ Epic file under manifest epics_dir (default Epics/)
 ```
 
-**Example: Cleanup prompt files**
+**Manifest-based repo**
+
 ```
-User: "Clean up prompt files after populating epics"
-→ Invokes CleanupPrompts workflow
-→ Scans all epics and stories
-→ Removes .prompt.md files for fully populated items
-→ Preserves prompts for items with remaining TODOs
+User: "Plan from docs in this service"
+→ ScanSources.ts --root .
+→ ShardFromSources or manual epics with traces_to → docs/...
+→ LintPlan.ts --root .
 ```

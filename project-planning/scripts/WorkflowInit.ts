@@ -1,56 +1,63 @@
 #!/usr/bin/env bun
 
 /**
- * WorkflowInit.ts - Initialize BMAD-style project workflow
- *
- * Sets up project structure and planning phase.
+ * WorkflowInit.ts — Initialize planning workspace (manifest + dirs + brief).
  *
  * Usage:
- *   bun run WorkflowInit.ts --project <name> --brief <description> [--action <init|review>]
+ *   bun run WorkflowInit.ts --project <name> --brief <description> [--action init|review]
+ *   bun run WorkflowInit.ts --root <path> --brief <description>
+ *   bun run WorkflowInit.ts --config <path/.project-planning.yaml> --brief <description>
  */
 
 import { parseArgs } from "util";
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
-import { join } from "path";
+import { join, basename } from "path";
 import { $ } from "bun";
+import { contextFromArgs } from "./lib/cliShared";
+import type { PlanningContext } from "./lib/types";
+import { getEpicsDir, getStoriesDir, getBriefPath } from "./lib/planningPaths";
+import { getPaiDir } from "./lib/paiDir";
+import { MANIFEST_FILENAME } from "./lib/loadManifest";
 
-const KNOWLEDGE_DIR = process.env.KNOWLEDGE_DIR || "/home/ben/Knowledge";
-const PROJECTS_DIR = join(KNOWLEDGE_DIR, "Projects");
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
-
-function getProjectDir(project: string): string {
-  return join(PROJECTS_DIR, project);
-}
-
-function getBriefPath(project: string): string {
-  return join(getProjectDir(project), "brief.md");
-}
-
-function getEpicsDir(project: string): string {
-  return join(getProjectDir(project), "Epics");
-}
-
-function getStoriesDir(project: string): string {
-  return join(getProjectDir(project), "Stories");
+function projectNameForState(ctx: PlanningContext): string {
+  return ctx.legacyProjectName ?? basename(ctx.projectRoot);
 }
 
 function loadTemplate(templateName: string): string {
-  const templatePath = join(PAI_DIR, "skills", "project-planning", "assets", templateName);
+  const paiDir = getPaiDir();
+  const templatePath = join(paiDir, "skills", "project-planning", "assets", templateName);
   if (!existsSync(templatePath)) {
     throw new Error(`Template not found: ${templatePath}`);
   }
   return readFileSync(templatePath, "utf-8");
 }
 
-function generateBrief(project: string, brief: string): string {
+function ensureManifest(ctx: PlanningContext): void {
+  const manifestPath = join(ctx.projectRoot, MANIFEST_FILENAME);
+  if (existsSync(manifestPath)) {
+    return;
+  }
+  const defaultPath = join(
+    getPaiDir(),
+    "skills",
+    "project-planning",
+    "assets",
+    "default.project-planning.yaml"
+  );
+  if (existsSync(defaultPath)) {
+    const content = readFileSync(defaultPath, "utf-8");
+    writeFileSync(manifestPath, content, "utf-8");
+    console.log(`✓ Created ${MANIFEST_FILENAME}`);
+  }
+}
+
+function generateBrief(projectLabel: string, brief: string): string {
   const template = loadTemplate("ProjectBriefTemplate.md");
   const date = new Date().toISOString().split("T")[0];
-
-  // Handle frontmatter and body separately
   const frontmatterMatch = template.match(/^---\n([\s\S]*?)\n---\n\n([\s\S]*)$/);
   if (frontmatterMatch) {
     const frontmatter = frontmatterMatch[1]
-      .replace(/\{\{projectName\}\}/g, project)
+      .replace(/\{\{projectName\}\}/g, projectLabel)
       .replace(/\{\{date\}\}/g, date);
     const body = frontmatterMatch[2]
       .replace(/\{\{projectOverview\}\}/g, brief)
@@ -60,70 +67,66 @@ function generateBrief(project: string, brief: string): string {
       .replace(/\{\{timeline\}\}/g, "<!-- TODO: Define timeline -->")
       .replace(/\{\{team\}\}/g, "<!-- TODO: Define team -->")
       .replace(/\{\{notes\}\}/g, "<!-- TODO: Add notes -->");
-    
     return `---\n${frontmatter}\n---\n\n${body}`;
-  } else {
-    // Old format (backward compatibility)
-    return template
-      .replace(/\{\{projectName\}\}/g, project)
-      .replace(/\{\{date\}\}/g, date)
-      .replace(/\{\{projectOverview\}\}/g, brief)
-      .replace(/\{\{goals\}\}/g, "<!-- TODO: Define project goals -->")
-      .replace(/\{\{scope\}\}/g, "<!-- TODO: Define project scope -->")
-      .replace(/\{\{successCriteria\}\}/g, "<!-- TODO: Define success criteria -->")
-      .replace(/\{\{timeline\}\}/g, "<!-- TODO: Define timeline -->")
-      .replace(/\{\{team\}\}/g, "<!-- TODO: Define team -->")
-      .replace(/\{\{notes\}\}/g, "<!-- TODO: Add notes -->");
   }
+  return template
+    .replace(/\{\{projectName\}\}/g, projectLabel)
+    .replace(/\{\{date\}\}/g, date)
+    .replace(/\{\{projectOverview\}\}/g, brief)
+    .replace(/\{\{goals\}\}/g, "<!-- TODO: Define project goals -->")
+    .replace(/\{\{scope\}\}/g, "<!-- TODO: Define project scope -->")
+    .replace(/\{\{successCriteria\}\}/g, "<!-- TODO: Define success criteria -->")
+    .replace(/\{\{timeline\}\}/g, "<!-- TODO: Define timeline -->")
+    .replace(/\{\{team\}\}/g, "<!-- TODO: Define team -->")
+    .replace(/\{\{notes\}\}/g, "<!-- TODO: Add notes -->");
 }
 
-async function initializeWorkflow(project: string, brief: string): Promise<void> {
-  const projectDir = getProjectDir(project);
+async function initializeWorkflow(ctx: PlanningContext, brief: string): Promise<void> {
+  const projectDir = ctx.projectRoot;
+  const projectLabel = projectNameForState(ctx);
 
-  // Create project directory structure
   if (!existsSync(projectDir)) {
     mkdirSync(projectDir, { recursive: true });
     console.log(`✓ Created project directory: ${projectDir}`);
   }
 
-  // Create Epics directory
-  const epicsDir = getEpicsDir(project);
+  ensureManifest(ctx);
+
+  const epicsDir = getEpicsDir(ctx);
   if (!existsSync(epicsDir)) {
     mkdirSync(epicsDir, { recursive: true });
-    console.log(`✓ Created Epics directory`);
+    console.log(`✓ Created epics directory: ${epicsDir}`);
   }
 
-  // Create Stories directory
-  const storiesDir = getStoriesDir(project);
+  const storiesDir = getStoriesDir(ctx);
   if (!existsSync(storiesDir)) {
     mkdirSync(storiesDir, { recursive: true });
-    console.log(`✓ Created Stories directory`);
+    console.log(`✓ Created stories directory: ${storiesDir}`);
   }
 
-  // Create specs directory
   const specsDir = join(projectDir, "specs");
   if (!existsSync(specsDir)) {
     mkdirSync(specsDir, { recursive: true });
     console.log(`✓ Created specs directory`);
   }
 
-  // Generate brief.md
-  const briefPath = getBriefPath(project);
+  const briefPath = getBriefPath(ctx);
   if (!existsSync(briefPath)) {
-    const briefContent = generateBrief(project, brief);
-    writeFileSync(briefPath, briefContent, "utf-8");
+    writeFileSync(briefPath, generateBrief(projectLabel, brief), "utf-8");
     console.log(`✓ Created brief.md`);
   }
 
-  // Initialize state management
-  try {
-    await $`bun run ${PAI_DIR}/skills/StateManagement/Tools/StateManager.ts --project ${project} --action init`.quiet();
-    console.log(`✓ Initialized state management`);
-  } catch (error) {
-    console.warn(`Warning: Could not initialize state: ${error}`);
+  const paiDir = getPaiDir();
+  const stateScript = join(paiDir, "skills", "StateManagement", "Tools", "StateManager.ts");
+  if (existsSync(stateScript)) {
+    try {
+      await $`bun run ${stateScript} --project ${projectLabel} --action init`.quiet();
+      console.log(`✓ Initialized state management`);
+    } catch (error) {
+      console.warn(`Warning: Could not initialize state: ${error}`);
+    }
   }
 
-  // Initialize git if not exists
   const gitDir = join(projectDir, ".git");
   if (!existsSync(gitDir)) {
     try {
@@ -134,26 +137,27 @@ async function initializeWorkflow(project: string, brief: string): Promise<void>
     }
   }
 
-  console.log(`\n✓ Workflow initialized for project: ${project}`);
-  console.log(`\n💡 Next steps:`);
-  console.log(`  1. Create PRD: bun run $PAI_DIR/skills/specification/scripts/Specify.ts --project ${project} --type prd`);
-  console.log(`  2. Shard PRD: bun run $PAI_DIR/skills/project-planning/scripts/ShardPRD.ts --project ${project}`);
+  console.log(`\n✓ Workflow initialized at: ${projectDir}`);
+  console.log(`\nNext steps:`);
+  console.log(`  1. PRD/spec: specification skill or add PRD.md under root`);
+  console.log(
+    `  2. Shard: bun run ${paiDir}/skills/project-planning/scripts/ShardFromSources.ts --root "${projectDir}"`
+  );
 }
 
-function reviewPlanning(project: string): void {
-  const projectDir = getProjectDir(project);
+function reviewPlanning(ctx: PlanningContext): void {
+  const projectDir = ctx.projectRoot;
+  const projectLabel = projectNameForState(ctx);
   if (!existsSync(projectDir)) {
-    console.error(`Project not found: ${project}`);
+    console.error(`Project not found: ${projectDir}`);
     process.exit(1);
   }
 
-  console.log(`\nPlanning Review for: ${project}`);
-  console.log("=" .repeat(50));
+  console.log(`\nPlanning review: ${projectLabel}`);
+  console.log("=".repeat(50));
 
-  // Check for required files
   const requiredFiles = ["brief.md", "PRD.md"];
   const missingFiles: string[] = [];
-
   for (const file of requiredFiles) {
     const filePath = join(projectDir, file);
     if (!existsSync(filePath)) {
@@ -163,37 +167,34 @@ function reviewPlanning(project: string): void {
     }
   }
 
-  // Check for epics
-  const epicsDir = getEpicsDir(project);
+  const epicsDir = getEpicsDir(ctx);
   if (existsSync(epicsDir)) {
-    // Count epic files (simplified - would need proper file listing)
     console.log(`✓ Epics directory exists`);
   } else {
     console.log(`⚠️  Epics directory missing`);
   }
 
-  // Check for stories
-  const storiesDir = getStoriesDir(project);
+  const storiesDir = getStoriesDir(ctx);
   if (existsSync(storiesDir)) {
     console.log(`✓ Stories directory exists`);
   } else {
     console.log(`⚠️  Stories directory missing`);
   }
 
-  // Check state
   const stateDir = join(projectDir, ".state");
   if (existsSync(stateDir)) {
-    console.log(`✓ State management initialized`);
+    console.log(`✓ State directory present`);
   } else {
-    console.log(`⚠️  State management not initialized`);
+    console.log(`⚠️  State directory missing`);
   }
+
+  console.log(`\nRun LintPlan.ts and see references/plan-quality-review.md for full gates.`);
 
   if (missingFiles.length > 0) {
     console.log(`\n❌ Missing files: ${missingFiles.join(", ")}`);
     process.exit(1);
-  } else {
-    console.log(`\n✓ Planning structure is complete`);
   }
+  console.log(`\n✓ Basic planning structure present`);
 }
 
 function main(): void {
@@ -201,6 +202,8 @@ function main(): void {
     args: Bun.argv.slice(2),
     options: {
       project: { type: "string" },
+      root: { type: "string" },
+      config: { type: "string" },
       brief: { type: "string" },
       action: { type: "string" },
       help: { type: "boolean", short: "h" },
@@ -211,47 +214,51 @@ function main(): void {
 
   if (values.help) {
     console.log(`
-WorkflowInit - Initialize BMAD-Style Project Workflow
+WorkflowInit — Initialize planning workspace
 
 Usage:
-  bun run WorkflowInit.ts --project <name> --brief <description> [--action <init|review>]
+  bun run WorkflowInit.ts --project <name> --brief <text> [--action init|review]
+  bun run WorkflowInit.ts --root <dir> --brief <text>
+  bun run WorkflowInit.ts --config <path/.project-planning.yaml> --brief <text>
 
 Options:
-  --project <name>        Project name
-  --brief <description>   Project brief description
-  --action <action>       Action: init (default) or review
-  -h, --help              Show this help
-
-Examples:
-  bun run WorkflowInit.ts --project my-app --brief "Task management application"
-  bun run WorkflowInit.ts --project my-app --action review
+  --project <name>   Legacy: \$KNOWLEDGE_DIR/Projects/<name>
+  --root <dir>       Project root
+  --config <file>    Manifest path (root = dirname)
+  --brief <text>     Required for init
+  --action <name>    init (default) | review
+  -h, --help
 `);
     process.exit(0);
   }
 
-  if (!values.project) {
-    console.error("--project is required");
-    process.exit(1);
-  }
+  const ctx = contextFromArgs({
+    project: values.project,
+    root: values.root,
+    config: values.config,
+  });
 
   const action = (values.action as string) || "init";
-  const project = values.project as string;
 
   if (action === "review") {
-    reviewPlanning(project);
-  } else if (action === "init") {
-    if (!values.brief) {
-      console.error("--brief is required for init action");
-      process.exit(1);
-    }
-    initializeWorkflow(project, values.brief as string).catch((error) => {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exit(1);
-    });
-  } else {
+    reviewPlanning(ctx);
+    return;
+  }
+
+  if (action !== "init") {
     console.error(`Unknown action: ${action}`);
     process.exit(1);
   }
+
+  if (!values.brief) {
+    console.error("--brief is required for init");
+    process.exit(1);
+  }
+
+  initializeWorkflow(ctx, values.brief as string).catch((error) => {
+    console.error(`Error: ${(error as Error).message}`);
+    process.exit(1);
+  });
 }
 
 if (import.meta.main) {

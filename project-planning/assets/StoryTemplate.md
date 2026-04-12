@@ -1,13 +1,23 @@
 ---
-title: Story - {{epicNumber}}-{{storyNumber}} - {{storyName}}
-type: story
-story_id: {{storyId}}
-epic: {{epicName}}
-epic_number: {{epicNumber}}
-story_number: {{storyNumber}}
+kind: story
+id: STORY-{{epicNumber}}-{{storyNumber}}
+title: "{{storyName}}"
+status: planned
+priority: medium
+parent: EPIC-{{epicNumber}}
+depends_on: []
+traces_to: []
+slice: vertical
+invest_check:
+  independent: true
+  negotiable: true
+  valuable: true
+  estimable: true
+  small: true
+  testable: true
+acceptance_criteria: []
+epic_title: "{{epicName}}"
 project: {{projectName}}
-status: {{status}}
-priority: {{priority}}
 created: {{date}}
 updated: {{date}}
 ---
@@ -18,23 +28,23 @@ updated: {{date}}
 
 {{description}}
 
-## User Story
+## User story
 
 As a {{userType}}, I want {{action}} so that {{benefit}}.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 {{acceptanceCriteria}}
 
-## Technical Notes
+## Technical notes
 
 {{technicalNotes}}
 
-## Dependencies
+## Dependencies (narrative)
 
 {{dependencies}}
 
-## Related Stories
+## Related stories
 
 {{relatedStories}}
 

@@ -1,11 +1,22 @@
 ---
-title: Epic - {{epicNumber}} - {{epicName}}
-type: epic
-epic_id: {{epicId}}
-epic_number: {{epicNumber}}
+kind: epic
+id: EPIC-{{epicNumber}}
+title: "{{epicName}}"
+status: planned
+priority: medium
+parent: ""
+depends_on: []
+traces_to: []
+slice: vertical
+invest_check:
+  independent: true
+  negotiable: true
+  valuable: true
+  estimable: true
+  small: false
+  testable: true
+acceptance_criteria: []
 project: {{projectName}}
-status: {{status}}
-priority: {{priority}}
 created: {{date}}
 updated: {{date}}
 ---
@@ -20,19 +31,19 @@ updated: {{date}}
 
 {{objectives}}
 
-## User Stories
+## User stories (links)
 
 {{userStories}}
 
-## Acceptance Criteria
+## Acceptance criteria
 
 {{acceptanceCriteria}}
 
-## Dependencies
+## Dependencies (narrative)
 
 {{dependencies}}
 
-## Related PRD Sections
+## Related sources (PRD, ADR, specs)
 
 {{prdSections}}
 

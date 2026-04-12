@@ -1,56 +1,28 @@
-# WorkflowInit Workflow
+# WorkflowInit workflow
 
-Initialize BMAD-style project workflow and planning structure.
+## When to use
 
-## When to Use
+- "workflow init", "initialize project", "start planning"
 
-- User requests: "workflow init", "initialize project", "start planning"
-- Starting a new project with BMAD Method
-- Need structured project planning setup
+## Steps
 
-## Workflow Steps
+1. Choose **context**: legacy `--project <name>` (`$KNOWLEDGE_DIR/Projects/<name>`), or `--root <dir>`, or `--config <manifest.yaml>`, or cwd with `.project-planning.yaml`.
+2. Run **WorkflowInit** with `--brief` — creates dirs from manifest (default `Epics/`, `Stories/`), `brief.md`, optional `.project-planning.yaml` from skill default.
+3. Add or generate PRD/spec; run [artifact-discovery.md](artifact-discovery.md) / **ScanSources.ts** as needed.
+4. Shard with [ShardFromSources.md](ShardFromSources.md).
 
-1. **Create Project Structure**
-   - Create `~/Knowledge/Projects/{project-name}/` directory
-   - Create `Epics/` subdirectory
-   - Create `Stories/` subdirectory
-   - Create `specs/` subdirectory (if not exists)
-
-2. **Generate Project Brief**
-   - Use `assets/ProjectBriefTemplate.md`
-   - Extract project information from user request
-   - Create `brief.md` in project directory
-
-3. **Initialize State Management**
-   - Run StateManagement InitializeState workflow
-   - Set up state tracking for planning phase
-
-4. **Create Planning Checklist**
-   - Generate initial planning checklist
-   - Mark planning phase as active
-
-5. **Version Control Setup**
-   - Initialize git repository if not exists
-   - Create initial commit
-
-## CLI Usage
+## CLI
 
 ```bash
 bun run $PAI_DIR/skills/project-planning/scripts/WorkflowInit.ts \
-  --project <project-name> \
-  --brief <brief-description>
+  --project <name> \
+  --brief "<description>"
+
+bun run .../WorkflowInit.ts --root <path> --brief "<description>"
+
+bun run .../WorkflowInit.ts --project <name> --action review
 ```
 
-## Output
+## Legacy profile
 
-Creates project structure with:
-- `brief.md` - Project brief
-- `Epics/` - Directory for epics
-- `Stories/` - Directory for stories
-- `.state/` - State management files
-
-## Integration
-
-- Uses Specification skill for spec generation
-- Uses StateManagement skill for state initialization
-- Uses VersionControl skill for versioning
+`--project` only → same folder layout as before (`Epics/`, `Stories/`, `specs/`, `brief.md`). See [quick-start.md](quick-start.md).

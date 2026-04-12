@@ -1,58 +1,35 @@
-# CreateEpic Workflow
+# CreateEpic workflow
 
-Create a new epic for project planning.
+## When to use
 
-## When to Use
+- "create epic", "new epic", "add epic"
+- Manual epic creation outside of sharding
 
-- User requests: "create epic", "new epic", "add epic"
-- Need to add a new epic to project
-- Manually creating epics outside of PRD sharding
+## Quality bar
 
-## Workflow Steps
+Read [agile-foundations.md](agile-foundations.md) and [decomposition-patterns.md](decomposition-patterns.md). Set `traces_to` and `slice` in frontmatter per [frontmatter-schema.md](frontmatter-schema.md).
 
-1. **Gather Epic Information**
-   - Extract epic name and description from user request
-   - Identify epic scope and objectives
-   - Determine epic priority
+## Steps
 
-2. **Generate Epic File**
-   - Use `assets/EpicTemplate.md`
-   - Fill in epic details
-   - Create file in `Epics/` directory
+1. Resolve planning context (`--project`, `--root`, or `--config`).
+2. Gather epic name, description, priority.
+3. Run **EpicManager** `create` (writes template under manifest `epics_dir`).
+4. Edit the epic `.md` in place (replace `<!-- TODO -->`, set `traces_to`, etc.).
+5. Run **LintPlan.ts** before marking items `ready`.
 
-3. **Link to PRD**
-   - If PRD exists, link epic to relevant PRD sections
-   - Update PRD with epic references
-
-4. **Update State**
-   - Record epic creation in state
-   - Update knowledge map
-
-5. **Create Epic Directory**
-   - Create epic-specific directory for stories
-   - Set up epic structure
-
-6. **Populate & Cleanup** (Agent Action)
-   - Auto-populate epic content from `Epic-{Name}.prompt.md`
-   - Replace all `<!-- TODO: ... -->` comments with detailed content
-   - After population, run cleanup to remove prompt file
-
-## CLI Usage
+## CLI
 
 ```bash
 bun run $PAI_DIR/skills/project-planning/scripts/EpicManager.ts \
-  --project <project-name> \
+  --root <path> \
   --action create \
-  --epic <epic-name> \
-  --description <description>
+  --epic "<name>" \
+  --description "<text>"
+# Legacy:
+bun run .../EpicManager.ts --project <name> --action create --epic "..." --description "..."
 ```
-
-## Output
-
-Creates epic file in `Epics/` directory. Auto-generates `Epic-{Name}.prompt.md` for content population, removed after completion.
 
 ## Integration
 
-- Links to Specification skill (PRD.md)
-- Updates StateManagement skill
-- Ready for story creation
+- **specification** — PRD/spec paths belong in `traces_to`.
+- **StateManagement** — optional decision tracking.
