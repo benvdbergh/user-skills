@@ -1,9 +1,23 @@
 {
-  "generated": "2026-03-03T00:00:00.000Z",
-  "totalSkills": 17,
+  "generated": "2026-04-12T15:00:58.202012Z",
+  "totalSkills": 26,
   "alwaysLoadedCount": 0,
-  "deferredCount": 16,
+  "deferredCount": 26,
   "skills": {
+    "code-discovery-for-docs": {
+      "name": "code-discovery-for-docs",
+      "path": "code-discovery-for-docs/SKILL.md",
+      "fullDescription": "Global, vault-agnostic code discovery orchestrator that builds module maps, API indices, feature traces, architecture-relevant views, and change-impact summaries to support documentation and architecture work. Use when the user asks where code for a concept lives, needs a module/API map for docs or diagrams, wants to trace features to code artifacts, or requests documentation-aware change impact for a branch or PR.",
+      "triggers": [
+        "the user asks where code for a concept lives",
+        "needs a module/API map for docs",
+        "diagrams",
+        "wants to trace features to code artifacts",
+        "requests documentation-aware change impact for a branch"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
     "deep-research": {
       "name": "deep-research",
       "path": "deep-research/SKILL.md",
@@ -16,82 +30,281 @@
         "research report",
         "deep dive",
         "exhaustive research",
-        "long-running research",
-        "citations"
+        "user needs a long-running research task with citations"
       ],
       "workflows": [
-        "research"
+        "research-workflow",
+        "agent-prompts"
       ],
       "tier": "deferred"
     },
-    "architecture": {
-      "name": "Architecture",
-      "path": "Architecture/SKILL.md",
-      "fullDescription": "Professional architecture modeling workflows focusing on topology research, visual best practices, and gap analysis. USE WHEN architecture modeling, create architecture, update architecture, read architecture, archimate model, enterprise architecture, system design, architecture diagram, topology research, pattern selection, visual layout, gap analysis.",
+    "diagram": {
+      "name": "diagram",
+      "path": "diagram/SKILL.md",
+      "fullDescription": "Translates textual content into diagrammatic form and back using a format-agnostic semantic model. Supports Author (create), Revise (update), Verify (validate), and Interpret (extract insights). Default output: draw.io. USE WHEN create diagram, update diagram, validate diagram, diagram from text, text from diagram, draw.io, Excalidraw, PlantUML, ArchiMate, flowchart, sequence diagram, entity-relationship, visual model.",
       "triggers": [
-        "architecture",
-        "modeling",
-        "create",
-        "update",
-        "read",
-        "archimate",
-        "model",
-        "enterprise",
-        "system",
-        "design",
-        "diagram",
-        "topology",
-        "research",
-        "pattern",
-        "selection",
-        "visual",
-        "layout",
-        "gap",
-        "analysis"
+        "create diagram",
+        "update diagram",
+        "validate diagram",
+        "diagram from text",
+        "text from diagram",
+        "draw.io",
+        "Excalidraw",
+        "PlantUML",
+        "ArchiMate",
+        "flowchart",
+        "sequence diagram",
+        "entity-relationship",
+        "visual model"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "document-deep-merge": {
+      "name": "document-deep-merge",
+      "path": "document-deep-merge/SKILL.md",
+      "fullDescription": "Deep-merges or fully integrates learnings from one or more sub-documents (sub-researches, extensions) into a main document. Answers: how do sub-document findings impact the main, and what would the main have looked like if those findings were known upfront? Use when merging sub-research into main report, integrating extended sections, consolidating research documents, or combining diagram content with prose (with diagram skill).",
+      "triggers": [
+        "merging sub-research into main report",
+        "integrating extended sections",
+        "consolidating research documents",
+        "combining diagram content with prose (with diagram skill)"
       ],
       "workflows": [
-        "ResearchTopology",
+        "document-deep-merge"
+      ],
+      "tier": "deferred"
+    },
+    "documentation-governance": {
+      "name": "documentation-governance",
+      "path": "documentation-governance/SKILL.md",
+      "fullDescription": "Global documentation governance and coverage orchestrator that defines reusable policies, quality gates, and assessment reporting for technical and professional documentation. Use when the user asks to define documentation standards, run governance checks on a document or portfolio, assess coverage against code/products, or enforce review gates before publish/merge.",
+      "triggers": [
+        "the user asks to define documentation standards",
+        "run governance checks on a document",
+        "portfolio",
+        "assess coverage against code/products",
+        "enforce review gates before publish/merge"
+      ],
+      "workflows": [
+        "policy-schema"
+      ],
+      "tier": "deferred"
+    },
+    "docx-documentation": {
+      "name": "docx-documentation",
+      "path": "docx-documentation/SKILL.md",
+      "fullDescription": "Global skill for Word/.docx and PDF export: Markdown↔DOCX conversion, DOCX→PDF export, light structural edits, and export pipelines. Use when the user needs to import from or export to Word, export to PDF from DOCX, inspect or tweak DOCX structure, or run post-processing on generated documents, while keeping Markdown as canonical. For PDF-to-Markdown ingestion use the pdf-to-markdown skill instead.",
+      "triggers": [
+        "the user needs to import from",
+        "export to Word",
+        "export to PDF from DOCX",
+        "inspect",
+        "tweak DOCX structure",
+        "run post-processing on generated documents",
+        "while keeping Markdown as canonical. For PDF-to-Markdown ingestion use the pdf-to-markdown skill instead"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "enterprise-architecture": {
+      "name": "enterprise-architecture",
+      "path": "enterprise-architecture/SKILL.md",
+      "fullDescription": "Global, tool-agnostic enterprise architecture skill combining ArchiMate ontology, arc42 documentation framework, and model quality workflows. USE WHEN enterprise architecture modeling, ArchiMate entity classification, entity extraction, relationship proposals, gap analysis, arc42 documentation, visual layout best practices, model quality review, metamodel design, architecture process, ontology-guided modeling.",
+      "triggers": [
+        "enterprise architecture modeling",
+        "ArchiMate entity classification",
+        "entity extraction",
+        "relationship proposals",
+        "gap analysis",
+        "arc42 documentation",
+        "visual layout best practices",
+        "model quality review",
+        "metamodel design",
+        "architecture process",
+        "ontology-guided modeling"
+      ],
+      "workflows": [
+        "ClassifyText",
+        "ExtractEntities",
+        "ProposeRelationships",
+        "DetectModelGaps",
         "ApplyVisualBestPractices",
         "QualityReview"
       ],
       "tier": "deferred"
     },
-    "minimalistcoding": {
-      "name": "minimalist-coding",
-      "path": "minimalist-coding/SKILL.md",
-      "fullDescription": "Search-first coding workflow enforcing YAGNI principles. USE WHEN implementing features, writing code, modifying codebase, OR user requests code changes. Enforces Locate→Modify→Create hierarchy, two-phase coding loop, and automatic refactoring.",
+    "low-poly-gen-mcp": {
+      "name": "low-poly-gen-mcp",
+      "path": "low-poly-gen-mcp/SKILL.md",
+      "fullDescription": "Orchestrate the low-poly-gen MCP to create/edit low-poly assets, compose scenes, and export PNG renders. Use when you need to call low-poly-gen tools like create_object, edit_object, list_objects, save_object, load_object, create_scene, add_instance, remove_instance, save_scene, load_scene, or export_png; and when you want a safe, repeatable workflow for building low-poly objects and scenes for vision-in-the-loop.",
       "triggers": [
-        "implementing",
-        "features",
-        "writing",
-        "code",
-        "modifying",
-        "codebase",
-        "user",
-        "requests",
-        "changes"
+        "you need to call low-poly-gen tools like create_object",
+        "edit_object",
+        "list_objects",
+        "save_object",
+        "load_object",
+        "create_scene",
+        "add_instance",
+        "remove_instance",
+        "save_scene",
+        "load_scene",
+        "export_png; and when you want a safe",
+        "repeatable workflow for building low-poly objects and scenes for vision-in-the-loop"
       ],
       "workflows": [],
       "tier": "deferred"
     },
-    "projectplanning": {
+    "minimalist-coding": {
+      "name": "minimalist-coding",
+      "path": "minimalist-coding/SKILL.md",
+      "fullDescription": "Search-first coding workflow enforcing YAGNI principles, Clean Architecture layering, and DDD structural standards. USE WHEN implementing features, writing code, modifying codebase, structuring layers, applying clean architecture, DDD, naming conventions, library-first approach, OR user requests code changes. Enforces Locate→Modify→Create hierarchy, two-phase coding loop, and automatic refactoring.",
+      "triggers": [
+        "implementing features",
+        "writing code",
+        "modifying codebase",
+        "structuring layers",
+        "applying clean architecture",
+        "DDD",
+        "naming conventions",
+        "library-first approach",
+        "user requests code changes. Enforces Locate→Modify→Create hierarchy",
+        "two-phase coding loop",
+        "and automatic refactoring"
+      ],
+      "workflows": [
+        "SearchPlanImplement",
+        "RefactorPass",
+        "clean-architecture-and-ddd"
+      ],
+      "tier": "deferred"
+    },
+    "office-docx": {
+      "name": "office-docx",
+      "path": "office-docx/SKILL.md",
+      "fullDescription": "Word (.docx) automation skill for Markdown↔DOCX workflows and OOXML-based redlining/tracked-changes editing patterns. Use when the user says \"export to Word\", \"import this .docx\", \"apply tracked changes\", \"redline this document\", \"unpack/edit/pack docx\", or needs safe DOCX editing without losing formatting.",
+      "triggers": [
+        "the user says \"export to Word",
+        "import this .docx",
+        "apply tracked changes",
+        "redline this document",
+        "unpack/edit/pack docx",
+        "needs safe DOCX editing without losing formatting"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "office-pdf": {
+      "name": "office-pdf",
+      "path": "office-pdf/SKILL.md",
+      "fullDescription": "PDF automation skill for importing PDFs into Markdown, extracting text/tables/images, and performing common PDF operations (merge/split/rotate/forms). Use when the user says \"convert PDF to Markdown\", \"extract tables from PDF\", \"merge PDFs\", \"split PDF\", \"fill a PDF form\", or needs PDF inspection workflows.",
+      "triggers": [
+        "the user says \"convert PDF to Markdown",
+        "extract tables from PDF",
+        "merge PDFs",
+        "split PDF",
+        "fill a PDF form",
+        "needs PDF inspection workflows"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "office-pptx": {
+      "name": "office-pptx",
+      "path": "office-pptx/SKILL.md",
+      "fullDescription": "PowerPoint (.pptx) creation, editing, and analysis for Office automation, including template-based slide duplication/reordering, text inventory + safe replacement, and HTML→PPTX generation with visual validation. Use when the user says \"create a deck\", \"update this PowerPoint\", \"replace text in PPTX\", \"reorder slides\", \"generate slide thumbnails\", or needs PPTX OOXML unpack/edit/pack workflows.",
+      "triggers": [
+        "the user says \"create a deck",
+        "update this PowerPoint",
+        "replace text in PPTX",
+        "reorder slides",
+        "generate slide thumbnails",
+        "needs PPTX OOXML unpack/edit/pack workflows"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "office-xlsx": {
+      "name": "office-xlsx",
+      "path": "office-xlsx/SKILL.md",
+      "fullDescription": "Excel / spreadsheet automation skill for creating, editing, and validating `.xlsx` models with formula integrity checks and LibreOffice-backed recalculation. Use when the user asks to \"update an Excel file\", \"build a spreadsheet model\", \"recalculate formulas\", \"fix #REF/#DIV errors\", or wants spreadsheet conventions (inputs vs formulas) enforced.",
+      "triggers": [
+        "the user asks to \"update an Excel file",
+        "build a spreadsheet model",
+        "recalculate formulas",
+        "fix #REF/#DIV errors",
+        "wants spreadsheet conventions (inputs vs formulas) enforced"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "pdf-to-markdown": {
+      "name": "pdf-to-markdown",
+      "path": "pdf-to-markdown/SKILL.md",
+      "fullDescription": "Converts PDFs to full Markdown (text, links, images, tables) and optional interactive HTML using the markdrop library. Supports PDF files and URLs, table detection, image extraction, and optional AI-powered image/table descriptions via six LLM providers. Use when the user wants to convert a PDF to Markdown, import a PDF into the vault, extract content from a PDF with images and tables, or add AI descriptions to PDF-derived Markdown.",
+      "triggers": [
+        "the user wants to convert a PDF to Markdown",
+        "import a PDF into the vault",
+        "extract content from a PDF with images and tables",
+        "add AI descriptions to PDF-derived Markdown"
+      ],
+      "workflows": [
+        "workflows"
+      ],
+      "tier": "deferred"
+    },
+    "physio-fitness-coach": {
+      "name": "physio-fitness-coach",
+      "path": "physio-fitness-coach/SKILL.md",
+      "fullDescription": "Physio-grade fitness coaching that designs periodized training programs, prescribes clinical exercises with contraindication checking, generates daily workout sessions, and documents everything to Notion as the system of record. Combines sports physiotherapist and strength coach expertise. USE WHEN planning a workout program, building a training schedule, requesting physio-quality exercise prescriptions, generating today's workout, updating a fitness profile, asking about exercises for a specific injury or muscle group, or seeking muscle balance and recovery guidance.",
+      "triggers": [
+        "planning a workout program",
+        "building a training schedule",
+        "requesting physio-quality exercise prescriptions",
+        "generating today's workout",
+        "updating a fitness profile",
+        "asking about exercises for a specific injury",
+        "muscle group",
+        "seeking muscle balance and recovery guidance"
+      ],
+      "workflows": [
+        "assess",
+        "program",
+        "prescribe",
+        "session",
+        "document"
+      ],
+      "tier": "deferred"
+    },
+    "product-knowledge-catalog": {
+      "name": "product-knowledge-catalog",
+      "path": "product-knowledge-catalog/SKILL.md",
+      "fullDescription": "Maintains a global, vault-agnostic catalog of domain terms, products, capabilities, features, and user journeys with traceability to code and documentation. Use when the user wants to seed or normalize a product/domain glossary, query product/capability/feature impact across docs and code, or scaffold documentation and governance rules from a single, canonical catalog.",
+      "triggers": [
+        "the user wants to seed",
+        "normalize a product/domain glossary",
+        "query product/capability/feature impact across docs and code",
+        "scaffold documentation and governance rules from a single",
+        "canonical catalog"
+      ],
+      "workflows": [
+        "workflows"
+      ],
+      "tier": "deferred"
+    },
+    "project-planning": {
       "name": "project-planning",
       "path": "project-planning/SKILL.md",
       "fullDescription": "BMAD-style project planning workflow for sharding PRDs into epics and stories, managing project structure, and workflow initialization. USE WHEN project planning, shard PRD, create epic, create story, workflow init, break down requirements, epic management, story management.",
       "triggers": [
-        "project",
-        "planning",
-        "shard",
-        "prd",
-        "create",
-        "epic",
-        "story",
-        "workflow",
-        "init",
-        "break",
-        "down",
-        "requirements",
-        "management"
+        "project planning",
+        "shard PRD",
+        "create epic",
+        "create story",
+        "workflow init",
+        "break down requirements",
+        "epic management",
+        "story management"
       ],
       "workflows": [
         "WorkflowInit",
@@ -106,22 +319,16 @@
     "prompting": {
       "name": "prompting",
       "path": "prompting/SKILL.md",
-      "fullDescription": "Meta-prompting system for dynamic prompt generation using Handlebars templates, prompt engineering standards, and reusable primitives. Use when meta-prompting, template generation, template rendering, prompt optimization, or programmatic prompt composition.",
+      "fullDescription": "Meta-prompting system for dynamic prompt generation using Handlebars templates, prompt engineering standards, and reusable primitives. USE WHEN meta-prompting, template generation, template rendering, prompt optimization, or programmatic prompt composition.",
       "triggers": [
         "meta-prompting",
-        "template",
-        "generation",
-        "rendering",
-        "prompt",
-        "optimization",
-        "programmatic",
-        "composition",
-        "handlebars"
+        "template generation",
+        "template rendering",
+        "prompt optimization",
+        "programmatic prompt composition"
       ],
       "workflows": [
-        "RenderTemplate",
-        "ValidateTemplate",
-        "ApplyStandards"
+        "standards"
       ],
       "tier": "deferred"
     },
@@ -130,56 +337,68 @@
       "path": "research-analysis/SKILL.md",
       "fullDescription": "Comprehensive research and analysis system for technical topics, frameworks, and ecosystems. USE WHEN user requests research, analysis, topic lookup, framework comparison, market research, technical analysis, OR needs to check for existing research topics before conducting new research.",
       "triggers": [
-        "research",
+        "user requests research",
         "analysis",
-        "topic",
-        "lookup",
-        "framework",
-        "comparison",
-        "market",
-        "technical",
-        "existing",
-        "topics"
+        "topic lookup",
+        "framework comparison",
+        "market research",
+        "technical analysis",
+        "needs to check for existing research topics before conducting new research"
       ],
       "workflows": [
-        "deep-research",
-        "market-research",
-        "technical-analysis",
-        "framework-comparison",
-        "project-research",
-        "research-to-spec",
-        "topic-lookup",
-        "topic-reference",
-        "cleanup-prompts"
+        "DeepResearch",
+        "MarketResearch",
+        "TechnicalAnalysis",
+        "FrameworkComparison",
+        "ProjectResearch",
+        "ResearchToSpec",
+        "TopicLookup",
+        "TopicReference",
+        "CleanupPrompts"
       ],
       "tier": "deferred"
     },
     "skill-set": {
       "name": "skill-set",
       "path": "skill-set/SKILL.md",
-      "fullDescription": "Lifecycle management for agent skills: create, validate, optimize, lint, and canonicalize. Use when creating a new skill, validating skill effectiveness, reviewing skill quality, refining skills from feedback, canonicalizing existing skills, fixing skill compliance issues, or migrating skills to the Agent Skills standard.",
+      "fullDescription": "Lifecycle management for agent skills: create, validate, optimize, lint, and canonicalize. Includes authoring best practices (description design, token efficiency, patterns, anti-patterns). Use when creating a new skill, validating skill effectiveness, reviewing skill quality, refining skills from feedback, canonicalizing existing skills, fixing skill compliance issues, or migrating skills to the Agent Skills standard. Do not use for one-off prompts or project rules; use for skill lifecycle only.",
       "triggers": [
-        "create",
-        "skill",
-        "new",
-        "validate",
-        "optimize",
-        "lint",
-        "canonicalize",
-        "review",
-        "quality",
-        "refine",
-        "feedback",
-        "compliance",
-        "migrate",
-        "standard"
+        "creating a new skill",
+        "validating skill effectiveness",
+        "reviewing skill quality",
+        "refining skills from feedback",
+        "canonicalizing existing skills",
+        "fixing skill compliance issues",
+        "migrating skills to the Agent Skills standard. Do not use for one-off prompts",
+        "project rules; use for skill lifecycle only"
       ],
       "workflows": [
         "synthesize",
         "validate",
         "optimize",
         "lint",
-        "canonicalize"
+        "canonicalize",
+        "standard-reference",
+        "authoring-guide"
+      ],
+      "tier": "deferred"
+    },
+    "software-architecture": {
+      "name": "software-architecture",
+      "path": "software-architecture/SKILL.md",
+      "fullDescription": "Guides quality-focused software architecture and technical design. Use when designing architecture, reviewing structure, creating architecture decisions, checking implementation readiness, researching topology and patterns, or aligning PRD/UX/architecture/epics. Applies lean architecture wisdom and separation of concerns. For Clean Architecture / DDD / naming conventions, use the minimalist-coding skill.",
+      "triggers": [
+        "designing architecture",
+        "reviewing structure",
+        "creating architecture decisions",
+        "checking implementation readiness",
+        "researching topology and patterns",
+        "use the minimalist-coding skill"
+      ],
+      "workflows": [
+        "ResearchTopology",
+        "create-architecture",
+        "check-implementation-readiness"
       ],
       "tier": "deferred"
     },
@@ -188,57 +407,85 @@
       "path": "specification/SKILL.md",
       "fullDescription": "Specification-driven development system for generating and managing project specifications, PRDs, technical plans, and constitutions. USE WHEN generate spec, create PRD, write technical plan, create constitution, specification-driven development, spec-first workflow.",
       "triggers": [
-        "generate",
-        "spec",
-        "create",
-        "prd",
-        "write",
-        "technical",
-        "plan",
-        "constitution",
-        "specification-driven",
-        "development",
-        "spec-first",
-        "workflow"
+        "generate spec",
+        "create PRD",
+        "write technical plan",
+        "create constitution",
+        "specification-driven development",
+        "spec-first workflow"
+      ],
+      "workflows": [
+        "GenerateSpec",
+        "GeneratePRD",
+        "GeneratePlan",
+        "GenerateConstitution"
+      ],
+      "tier": "deferred"
+    },
+    "tech-documentation": {
+      "name": "tech-documentation",
+      "path": "tech-documentation/SKILL.md",
+      "fullDescription": "Global orchestrator for technical and professional documentation workflows with Markdown as the canonical source of truth. Use when the user wants to create, reshape, enrich, or audit technical docs across vaults, and to route into subskills such as doc coauthoring, technical writing, diagrams, enterprise architecture views, and research-backed content, including Office artifact export (Word/PDF/PPTX) via the `office-*` skills.",
+      "triggers": [
+        "the user wants to create",
+        "reshape",
+        "enrich",
+        "audit technical docs across vaults",
+        "and to route into subskills such as doc coauthoring",
+        "technical writing",
+        "diagrams",
+        "enterprise architecture views",
+        "and research-backed content",
+        "including Office artifact export (Word/PDF/PPTX) via the `office-*` skills"
       ],
       "workflows": [],
       "tier": "deferred"
     },
-    "versioncontrol": {
+    "ux-designer": {
+      "name": "ux-designer",
+      "path": "ux-designer/SKILL.md",
+      "fullDescription": "Creates professional, industry-appropriate UX and UI designs by combining UI UX Pro Max style and design-system intelligence with BMAD UX-designer workflows. Use when you need to design or refine user experiences, screens, flows, or design systems (including brand themes, color palettes, typography, interaction patterns, and accessibility) for web, mobile, or dashboards.",
+      "triggers": [
+        "you need to design",
+        "refine user experiences",
+        "screens",
+        "flows",
+        "design systems (including brand themes",
+        "color palettes",
+        "typography",
+        "interaction patterns",
+        "and accessibility) for web",
+        "mobile",
+        "dashboards"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "version-control": {
       "name": "version-control",
       "path": "version-control/SKILL.md",
       "fullDescription": "Self-version management for PAI framework. USE WHEN tracking changes to .claude folder, reverting framework modifications, viewing version history, creating checkpoints, managing git repository for PAI infrastructure, OR after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts).",
       "triggers": [
-        "tracking",
-        "changes"
-      ],
-      "workflows": [],
-      "tier": "deferred"
-    },
-    "diagram": {
-      "name": "diagram",
-      "path": "diagram/SKILL.md",
-      "fullDescription": "Translates textual content into diagrammatic form and back using a format-agnostic semantic model. Supports Author (create), Revise (update), Verify (validate), and Interpret (extract insights). Default output: draw.io. USE WHEN create diagram, update diagram, validate diagram, diagram from text, text from diagram, draw.io, Excalidraw, PlantUML, ArchiMate, flowchart, sequence diagram, entity-relationship, visual model.",
-      "triggers": [
-        "create diagram",
-        "update diagram",
-        "validate diagram",
-        "diagram from text",
-        "text from diagram",
-        "draw.io",
-        "excalidraw",
-        "plantuml",
-        "archimate",
-        "flowchart",
-        "sequence diagram",
-        "entity-relationship",
-        "visual model"
+        "tracking changes to .claude folder",
+        "reverting framework modifications",
+        "viewing version history",
+        "creating checkpoints",
+        "managing git repository for PAI infrastructure",
+        "after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts)"
       ],
       "workflows": [
-        "Author",
-        "Revise",
-        "Verify",
-        "Interpret"
+        "Initialize",
+        "ViewHistory",
+        "Revert",
+        "Checkpoint",
+        "Compare",
+        "CreateBranch",
+        "SwitchBranch",
+        "ListBranches",
+        "DescribeBranch",
+        "DeleteBranch",
+        "HandlePendingAction",
+        "CheckChanges"
       ],
       "tier": "deferred"
     },
@@ -247,17 +494,17 @@
       "path": "web-visual/SKILL.md",
       "fullDescription": "Transform text content, research reports, and structured data into polished, interactive single-file HTML5 visualizations. USE WHEN generate HTML page, create visualization, interactive report, web visual, visual report, data dashboard, content to HTML, generative UI, interactive page, visual summary, HTML export, web presentation, data visualization.",
       "triggers": [
-        "generate html page",
+        "generate HTML page",
         "create visualization",
         "interactive report",
         "web visual",
         "visual report",
         "data dashboard",
-        "content to html",
-        "generative ui",
+        "content to HTML",
+        "generative UI",
         "interactive page",
         "visual summary",
-        "html export",
+        "HTML export",
         "web presentation",
         "data visualization"
       ],
@@ -267,112 +514,6 @@
         "audit",
         "refine"
       ],
-      "tier": "deferred"
-    },
-    "document-deep-merge": {
-      "name": "document-deep-merge",
-      "path": "document-deep-merge/SKILL.md",
-      "fullDescription": "Deep-merges or fully integrates learnings from one or more sub-documents (sub-researches, extensions) into a main document. Answers: how do sub-document findings impact the main, and what would the main have looked like if those findings were known upfront? Use when merging sub-research into main report, integrating extended sections, consolidating research documents, or combining diagram content with prose (with diagram skill).",
-      "triggers": [
-        "merge sub-research",
-        "integrate findings",
-        "deep-merge documents",
-        "consolidate research documents",
-        "merge reports",
-        "integrate extensions"
-      ],
-      "workflows": [
-        "merge"
-      ],
-      "tier": "deferred"
-    },
-    "pdf-to-markdown": {
-      "name": "pdf-to-markdown",
-      "path": "pdf-to-markdown/SKILL.md",
-      "fullDescription": "Converts PDFs to full Markdown (text, links, images, tables) and optional interactive HTML using the markdrop library. Supports PDF files and URLs, table detection, image extraction, and optional AI-powered image/table descriptions via six LLM providers. Use when the user wants to convert a PDF to Markdown, import a PDF into the vault, extract content from a PDF with images and tables, or add AI descriptions to PDF-derived Markdown.",
-      "triggers": [
-        "convert PDF to Markdown",
-        "import PDF",
-        "PDF to Markdown",
-        "PDF to MD",
-        "extract content from PDF",
-        "AI descriptions for images in PDF",
-        "markdrop"
-      ],
-      "workflows": [
-        "convert",
-        "describe",
-        "analyze",
-        "batch"
-      ],
-      "tier": "deferred"
-    },
-    "office-pptx": {
-      "name": "office-pptx",
-      "path": "office-pptx/SKILL.md",
-      "fullDescription": "PowerPoint (.pptx) creation, editing, and analysis for Office automation, including template-based slide duplication/reordering, text inventory + safe replacement, and HTML→PPTX generation with visual validation. Use when the user says \"create a deck\", \"update this PowerPoint\", \"replace text in PPTX\", \"reorder slides\", or \"generate slide thumbnails\".",
-      "triggers": [
-        "pptx",
-        "powerpoint",
-        "presentation",
-        "deck",
-        "create a deck",
-        "update this PowerPoint",
-        "replace text in PPTX",
-        "reorder slides",
-        "generate slide thumbnails",
-        "html to pptx"
-      ],
-      "workflows": [],
-      "tier": "deferred"
-    },
-    "office-docx": {
-      "name": "office-docx",
-      "path": "office-docx/SKILL.md",
-      "fullDescription": "Word (.docx) automation for Markdown↔DOCX workflows and OOXML-based redlining/tracked-changes patterns. Use when the user says \"export to Word\", \"import this .docx\", \"apply tracked changes\", \"redline this document\", or needs unpack/edit/pack docx workflows.",
-      "triggers": [
-        "docx",
-        "word",
-        "export to Word",
-        "import .docx",
-        "tracked changes",
-        "redline",
-        "unpack docx",
-        "pack docx"
-      ],
-      "workflows": [],
-      "tier": "deferred"
-    },
-    "office-xlsx": {
-      "name": "office-xlsx",
-      "path": "office-xlsx/SKILL.md",
-      "fullDescription": "Excel / spreadsheet automation for creating and editing .xlsx models with formula integrity checks and LibreOffice-backed recalculation. Use when the user asks to update an Excel file, build a spreadsheet model, recalculate formulas, or fix Excel error values.",
-      "triggers": [
-        "xlsx",
-        "excel",
-        "spreadsheet",
-        "recalculate formulas",
-        "fix #REF",
-        "fix #DIV/0",
-        "formula errors"
-      ],
-      "workflows": [],
-      "tier": "deferred"
-    },
-    "office-pdf": {
-      "name": "office-pdf",
-      "path": "office-pdf/SKILL.md",
-      "fullDescription": "PDF automation for importing PDFs into Markdown, extracting content, and common PDF operations (merge/split/forms). Use when the user says \"convert PDF to Markdown\", \"merge PDFs\", \"split PDF\", \"extract tables\", or \"fill a PDF form\".",
-      "triggers": [
-        "pdf",
-        "convert PDF to Markdown",
-        "import this PDF",
-        "merge PDFs",
-        "split PDF",
-        "extract tables from PDF",
-        "fill a PDF form"
-      ],
-      "workflows": [],
       "tier": "deferred"
     }
   }
