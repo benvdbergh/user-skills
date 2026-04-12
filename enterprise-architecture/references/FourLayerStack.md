@@ -50,6 +50,6 @@ This framework addresses these by:
 
 ## Related References
 
-- See `Core/DocumentationFramework.md` for arc42 structure (Layer 3)
-- See `Reference/ViewGenerationAlgorithms.md` for visualization (Layer 4)
-- See `Reference/MetamodelDesign.md` for metamodel structure (Layer 1)
+- See `references/arc42.md` for arc42 structure (Layer 3)
+- See `references/ViewGenerationAlgorithms.md` for visualization (Layer 4)
+- See `references/MetamodelDesign.md` for metamodel structure (Layer 1)

@@ -43,18 +43,18 @@ Key Process: Order-to-Shipment
 
 ### Software Layer (S1-S4) - Focus on AGV Fleet Controller
 
-See `Core/ArchitectureProcess.md` → Phase 2 for complete metamodel example.
+See `references/ArchitectureProcess.md` → Phase 2 for complete metamodel example.
 
 ### Physical Layer
 
-See `Reference/ModelingApproaches.md` → Physical/Technology Domain for deployment example.
+See `references/ModelingApproaches.md` → Physical/Technology Domain for deployment example.
 
 ### Key Architecture Decisions
 
-See `Core/ArchitectureProcess.md` → Phase 6 for ADR examples (ADR-001, ADR-002, ADR-003).
+See **`software-architecture`** → `assets/architecture-decision-template.md` for solution-level decision documentation (ADR-style).
 
 ## Related References
 
-- See `Core/ArchitectureProcess.md` for process phases
-- See `Reference/MetamodelDesign.md` for intralogistics domain extensions
+- See `references/ArchitectureProcess.md` for process phases
+- See `references/MetamodelDesign.md` for intralogistics domain extensions
 - See `Examples/UseCaseExamples.md` → Example 1 for workflow execution

@@ -95,6 +95,6 @@ def generate_process_diagram(metamodel, process):
 
 ## Related References
 
-- See `Core/DocumentationFramework.md` for arc42 section structure
-- See `Reference/ModelingApproaches.md` for C4 and BPMN-lite details
+- See `references/arc42.md` for arc42 section structure
+- See `references/ModelingApproaches.md` for C4 and BPMN-lite details
 - See `Workflows/ApplyVisualBestPractices.md` for visual layout rules

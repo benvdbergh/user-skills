@@ -1,7 +1,7 @@
 {
   "title": "Skill Relationship Map",
   "version": 2,
-  "updated": "2026-04-12T15:27:12.657130Z",
+  "updated": "2026-04-12T16:04:53.534813Z",
   "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage).",
   "sources": {
     "user_level_skill_index": "C:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
@@ -99,19 +99,13 @@
       "web-visual"
     ],
     "project_level_ai_vault": [
-      "code-discovery-for-docs",
       "documentation",
-      "documentation-governance",
-      "docx-documentation",
-      "enterprise-architecture",
       "enterprise-model-store",
       "kion-design",
+      "kion-pptx",
       "market-segmentation-research",
       "obsidian-confluence-sync",
-      "pdf-to-markdown",
-      "product-knowledge-catalog",
       "search-company-knowledge",
-      "tech-documentation",
       "vault-research-integration"
     ]
   },
@@ -646,7 +640,7 @@
         "quote": "Vault-local adapters such as `vault-research-integration` are responsible for actually calling those skills and managing paths/notes; deep-research only signals where such calls are useful."
       },
       "confidence_score": 0.9,
-      "notes": "deep-research is vault-agnostic and surfaces structured hooks and signals, while vault-research-integration owns the concrete calls into enterprise-modeling, diagram, and KB storage inside Ai-Vault."
+      "notes": "deep-research is vault-agnostic and surfaces structured hooks and signals, while vault-research-integration owns the concrete calls into enterprise-architecture / enterprise-model-store, diagram, and KB storage inside Ai-Vault."
     },
     {
       "id": "rel-0039",
@@ -801,6 +795,34 @@
       },
       "confidence_score": 0.95,
       "notes": "enterprise-model-store (Ai-Vault storage backend) references methodology from enterprise-architecture (global ArchiMate/arc42 skill) for classification, extraction, and relationship workflows. The store owns Neo4j persistence and Obsidian note generation; the architecture skill owns the methodology."
+    },
+    {
+      "id": "rel-0054",
+      "from_skill": "software-architecture",
+      "to_skill": "enterprise-architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "C:\\Users\\vandenbb\\.claude\\skills\\software-architecture\\SKILL.md",
+        "quote": "When the user asks about portfolio, strategy-to-code, SAFe, ArchiMate, arc42, BPMN, enterprise modeling, or ontology-guided modeling, use the enterprise-architecture skill instead."
+      },
+      "confidence_score": 0.95,
+      "notes": "software-architecture explicitly routes portfolio/ArchiMate/ontology work to enterprise-architecture; boundaries are documented in both SKILL.md files and CrossSkillAndOntologySources.md."
+    },
+    {
+      "id": "rel-0055",
+      "from_skill": "enterprise-architecture",
+      "to_skill": "software-architecture",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "C:\\Users\\vandenbb\\.claude\\skills\\enterprise-architecture\\references\\arc42.md",
+        "quote": "For workflows that produce solution-level decisions, C4-style decomposition, and implementation readiness (PRD/UX/epics alignment), load software-architecture after you have the arc42 section map."
+      },
+      "confidence_score": 0.9,
+      "notes": "enterprise-architecture defers solution/product implementation readiness and ADR-style decision docs to software-architecture; avoids duplicating lean product architecture workflows."
     },
     {
       "id": "rel-0049",

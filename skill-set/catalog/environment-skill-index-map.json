@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-03-11T00:00:00Z",
+  "updated": "2026-04-12T16:05:00Z",
   "description": "Single source of truth for all environments that use the agentic system and their local skill-index paths. Used by skill-set workflows (inventory refresh, Story 01-02, 01-06) to discover and update skill indexes.",
   "environments": [
     {

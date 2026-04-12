@@ -1,6 +1,6 @@
 # Metamodel Design
 
-See `Templates/MetamodelTemplate.md` for the base template structure.
+See `assets/MetamodelTemplate.md` for the base template structure.
 
 ## Core Metamodel Structure
 
@@ -84,7 +84,7 @@ Define clear semantics for relationships to enable AI reasoning:
 
 ## Validation Rules
 
-See `Reference/ValidationRules.md` for complete validation rules.
+See `references/ValidationRules.md` for complete validation rules.
 
 AI agents should validate metamodel instances:
 1. **Type Consistency:** Elements must have valid types from metamodel
@@ -97,6 +97,6 @@ AI agents should validate metamodel instances:
 
 ## Related References
 
-- See `Templates/MetamodelTemplate.md` for base structure
-- See `Reference/ValidationRules.md` for validation implementation
-- See `Core/ArchitectureProcess.md` → Phase 2 for creation process
+- See `assets/MetamodelTemplate.md` for base structure
+- See `references/ValidationRules.md` for validation implementation
+- See `references/ArchitectureProcess.md` → Phase 2 for creation process

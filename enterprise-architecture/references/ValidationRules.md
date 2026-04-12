@@ -78,6 +78,6 @@ def validate_traceability(metamodel):
 
 ## Related References
 
-- See `Reference/MetamodelDesign.md` for relationship semantics
-- See `Reference/QualityAssurance.md` for documentation quality checks
+- See `references/MetamodelDesign.md` for relationship semantics
+- See `references/QualityAssurance.md` for documentation quality checks
 - See `Workflows/QualityReview.md` for workflow integration

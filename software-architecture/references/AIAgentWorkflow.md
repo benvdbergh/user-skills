@@ -1,122 +1,28 @@
-# AI Agent Workflow
+# Optional: how this skill fits the wider agent stack
 
-## Input Processing
+This file is **not** a standalone modeling methodology. It explains **where to go next** when the user needs more than lean solution architecture.
 
-The AI agent should accept various input formats:
+## Default path (this skill)
 
-1. **Natural Language Requirements**
-   - "Build an AGV fleet controller that manages 50 vehicles in a warehouse"
-   - Parse stakeholders, constraints, quality goals
+1. **Topology / patterns** → `references/ResearchTopology.md`
+2. **Decision document** → `references/create-architecture.md` + `assets/architecture-decision-template.md`
+3. **Ship readiness** → `references/check-implementation-readiness.md`
+4. **Code structure & DDD** → load **`minimalist-coding`** → `references/clean-architecture-and-ddd.md`
 
-2. **Existing Documentation**
-   - Import from arc42 markdown
-   - Extract existing architectural decisions
-   - Identify gaps
+## When the problem is enterprise / ArchiMate / portfolio
 
-3. **Structured Data**
-   - JSON/YAML system descriptions
-   - API specifications (OpenAPI/Swagger)
-   - Infrastructure-as-Code (Terraform, K8s manifests)
+Load **`enterprise-architecture`** for:
 
-4. **Diagrams**
-   - Import ArchiMate XML
-   - Parse C4 diagrams (if in standard format)
-   - Extract elements and relationships
+- ArchiMate entity extraction, relationship rules, ontology-guided modeling
+- arc42 as **enterprise documentation** structure across the metamodel
+- Metamodel design, validation rules, and EA quality review
 
-## Metamodel Generation Workflow
+Load **`enterprise-model-store`** (Ai-Vault / CAI project skill) when you must use **`ontology-v1.json`**, Neo4j MCP, or validated write packages — see **`enterprise-architecture`** → `references/CrossSkillAndOntologySources.md`.
 
-```
-┌─────────────────────────────────────────────────────┐
-│ 1. ANALYZE INPUTS                                    │
-│    - Parse requirements                              │
-│    - Identify domain (intralogistics, automotive...) │
-│    - Extract key entities and relationships          │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 2. SELECT & EXTEND METAMODEL                        │
-│    - Choose base metamodel (generic or domain)      │
-│    - Add domain-specific element types              │
-│    - Define custom properties                       │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 3. CREATE BUSINESS MODEL (B1-B2)                    │
-│    - Identify capabilities                          │
-│    - Map products/systems                           │
-│    - Define key processes                           │
-│    - Extract stakeholders and goals                 │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 4. CREATE SOFTWARE MODEL (S1-S4)                    │
-│    - Define system context (S1)                     │
-│    - Decompose into containers (S2)                 │
-│    - Break down into components (S3)                │
-│    - Specify interfaces (S4)                        │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 5. ADD PHYSICAL/DEPLOYMENT                          │
-│    - Map to infrastructure                          │
-│    - Define network topology                        │
-│    - Specify hardware requirements                  │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 6. ESTABLISH TRACEABILITY                           │
-│    - Link business→software (realizes)              │
-│    - Link software→physical (deployed-on)           │
-│    - Link processes→systems (uses)                  │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 7. VALIDATE METAMODEL                               │
-│    - Check type consistency                         │
-│    - Verify relationship validity                   │
-│    - Detect circular dependencies                   │
-│    - Ensure completeness                            │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│ 8. GENERATE VIEWS & DOCUMENTATION                   │
-│    - Apply C4 projection rules                      │
-│    - Generate BPMN-lite processes                   │
-│    - Create deployment diagrams                     │
-│    - Populate arc42 sections                        │
-└─────────────────────────────────────────────────────┘
-```
+## When the problem is product definition or specs
 
-## Decision Making & ADR Generation
+Load **`specification`** when the user needs a **PRD, technical plan, or constitution** before architecture work; this skill’s readiness checklist assumes those artifacts exist or will be created.
 
-The AI agent should generate Architecture Decision Records when:
-- Multiple valid alternatives exist
-- Significant impact on quality attributes
-- Trade-offs between competing concerns
-- Deviation from standards or common patterns
+## Deprecated internal paths
 
-See `Templates/ADRTemplate.md` for the ADR template structure.
-
-## Incremental Refinement
-
-The agent should support iterative refinement:
-
-1. **Initial Pass:** High-level structure (B1, S1-S2)
-2. **Detailed Design:** Component level (S3-S4)
-3. **Cross-Cutting:** Quality, security, deployment
-4. **Validation:** Consistency checks, gap analysis
-5. **Stakeholder Review:** Incorporate feedback
-6. **Finalization:** Complete documentation
-
-At each stage:
-- Generate intermediate views
-- Identify gaps and uncertainties
-- Request clarification where needed
-- Update metamodel incrementally
-
-## Related References
-
-- See `Core/ArchitectureProcess.md` for the 6-phase process
-- See `Reference/ViewGenerationAlgorithms.md` for view generation
-- See `Templates/ADRTemplate.md` for ADR structure
-- See `Reference/ValidationRules.md` for validation
+Older drafts pointed at `Core/`, `Reference/`, and `Templates/` files that **do not exist** under this skill. Ignore any copy that still mentions them; use the routing table above instead.

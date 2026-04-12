@@ -64,14 +64,16 @@ Ensures that Claude doesn't just "guess" a design, but instead researches establ
 
 **Common Styles and When to Use:**
 
-| Style | Characteristics | ArchiMate Focus |
-|-------|----------------|-----------------|
-| **Event-Driven** | Decoupling, Real-time processing | Focus on Flow and Event elements |
-| **Hexagonal (Ports & Adapters)** | Testability, Domain isolation | Focus on Application Interface and Service elements |
-| **Layered** | Clear separation of concerns | Strict Realization paths from Tech → App → Business |
-| **Microservices** | Independent deployment, scalability | Many Application Components + Application Interfaces |
-| **Modular Monolith** | Simpler than microservices, still modular | Fewer Components, clear internal boundaries |
-| **Serverless** | Low operational overhead | High focus on Technology Services rather than Devices |
+| Style | Characteristics | Typical modeling emphasis (optional) |
+|-------|----------------|----------------------------------------|
+| **Event-Driven** | Decoupling, real-time processing | Events, async boundaries, idempotency |
+| **Hexagonal (Ports & Adapters)** | Testability, domain isolation | Ports/adapters, domain core vs infrastructure |
+| **Layered** | Clear separation of concerns | Strict dependency direction (e.g. inward toward domain) |
+| **Microservices** | Independent deployment, scalability | Service boundaries, APIs, data ownership |
+| **Modular Monolith** | Simpler ops than microservices, still modular | Modules, package boundaries, compile-time seams |
+| **Serverless** | Low operational overhead | Functions, queues, managed services, cold start / limits |
+
+> **Enterprise / ArchiMate:** If the user needs **ArchiMate elements, portfolio views, or ontology-backed extraction**, stop inferring from this table and load **`enterprise-architecture`** after topology is chosen.
 
 **Selection Criteria:**
 - Match style to domain requirements
@@ -107,12 +109,11 @@ Ensures that Claude doesn't just "guess" a design, but instead researches establ
 
 **Critical Rule**: **DO NOT** create elements until user confirms the selected topology.
 
-## Integration with MCP Tools
+## After user confirms topology
 
-After user confirms topology selection:
-- Use MCP tools to create elements following the selected pattern
-- Apply the selected style's ArchiMate focus areas
-- Ensure element types match the architectural style
+- Continue with **`references/create-architecture.md`** using the chosen style and constraints (context diagram, decisions, NFRs).
+- Use MCP or repo tools **only** in ways the user has enabled (e.g. cloud CLI, infra search). Do **not** assume an ArchiMate or Neo4j MCP unless the user is explicitly doing enterprise modeling with those tools.
+- For **ArchiMate / enterprise model** updates, load **`enterprise-architecture`** and (when on Ai-Vault CAI) **`enterprise-model-store`** for ontology and graph writes.
 
 ## Example Execution
 
@@ -128,7 +129,7 @@ Step 3: Comparison shows Event-Driven best for real-time requirements
 Step 4: Select Event-Driven style
 Step 5: Present findings to user
 → User confirms
-→ Proceed with creating Event-Driven architecture model
+→ Proceed with `create-architecture` workflow (or enterprise modeling skills if the scope is portfolio/EA)
 ```
 
 ## Quality Checklist

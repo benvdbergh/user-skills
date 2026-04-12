@@ -1,13 +1,12 @@
-# Prior Art Summary (Synthesize)
+# Prior art summary
 
-This skill was created using the skill-set synthesize workflow. Prior art informed design as follows.
+This skill was synthesized from public patterns and adapted for Agent Skills progressive disclosure.
 
 | Source | Pattern / practice | Applicable? | Implication |
 |--------|--------------------|-------------|-------------|
-| [NeoLabHQ context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (software-architecture SKILL) | Code style: early returns, library-first, Clean/DDD, domain naming, anti-patterns (NIH, no business logic in UI) | Yes | Adopted into code-style-and-design.md and SKILL summary. |
-| [BMAD-METHOD architect agent](https://github.com/bmad-code-org/BMAD-METHOD) (architect.agent.yaml, 3-solutioning) | Architect persona (Winston), create-architecture and check-implementation-readiness workflows, lean architecture principles | Yes | Persona and principles in SKILL; workflows adapted in references. |
-| BMAD create-architecture workflow | Step-by-step collaborative discovery, append-only doc, user approval between steps | Yes | Simplified into references/create-architecture.md. |
-| Clean Architecture / DDD 2025 guides, CAA | Dependency inversion, layers, ports/adapters, when to apply (complex domains, long-lived systems) | Partial | Already covered by NeoLab content; Hexagonal noted in code-style ref. |
-| SkillMD / architecture-patterns skills | Trigger phrasing, USE WHEN in description | Yes | Description and When to Use section include explicit triggers. |
+| [NeoLabHQ context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (software-architecture SKILL) | Lean architecture, separation of concerns, explicit triggers | Yes | Principles and “research before guessing” live in `SKILL.md` and `references/ResearchTopology.md`. **Code-level** Clean Architecture / DDD detail is delegated to **`minimalist-coding`**. |
+| [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) (architect agent, solutioning) | Architect persona, create-architecture and readiness-style workflows | Yes | Persona in `SKILL.md`; workflows in `references/create-architecture.md` and `references/check-implementation-readiness.md`. |
+| BMAD create-architecture | Stepwise collaborative discovery, user checkpoints | Yes | Simplified in `references/create-architecture.md`. |
+| Agent Skills standard | YAML `name`/`description`, WHAT + WHEN, references/ and assets/ layout | Yes | `SKILL.md` structure and routing table. |
 
-No MCP dependencies: skill is guidance and workflow only. No `list_mcp_resources` gap.
+No MCP dependencies: this skill is guidance and workflow only unless the user attaches MCP servers for research.

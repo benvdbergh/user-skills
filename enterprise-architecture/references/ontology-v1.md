@@ -143,7 +143,7 @@ Every entity follows this base structure (ArchiMate-first):
 - **reports_to**: BusinessActor → BusinessActor (organizational hierarchy)
 - **collaborates_with**: BusinessActor → BusinessActor (organizational collaboration)
 
-**Note**: All relationship types follow ArchiMate 3.1 specification constraints. See `ontology-v1.json` for complete allowed source/target combinations.
+**Note**: All relationship types follow ArchiMate 3.1 specification constraints. For the **machine-readable** schema (allowed source/target pairs), load `ontology-v1.json` from the **`enterprise-model-store`** project skill when present; see `references/CrossSkillAndOntologySources.md`.
 
 ## Confidence Scores
 

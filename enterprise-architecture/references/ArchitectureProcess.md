@@ -102,8 +102,8 @@ Relationships:
 ```
 
 **Related References:**
-- See `Reference/MetamodelDesign.md` for metamodel structure
-- See `Templates/ADRTemplate.md` for decision recording
+- See `references/MetamodelDesign.md` for metamodel structure
+- For **solution-level** decision docs, use **`software-architecture`** → `assets/architecture-decision-template.md`
 
 ---
 
@@ -163,7 +163,7 @@ Error Handling:
 ```
 
 **Related References:**
-- See `Reference/ModelingApproaches.md` for BPMN-lite details
+- See `references/ModelingApproaches.md` for BPMN-lite details
 
 ---
 
@@ -315,5 +315,5 @@ Consequences:
 **Related Workflow:** `Workflows/QualityReview.md` - Quality validation and gap analysis
 
 **Related References:**
-- See `Templates/ADRTemplate.md` for ADR structure
-- See `Reference/QualityAssurance.md` for validation rules
+- For ADR-style **product/solution** decisions, see **`software-architecture`** → `assets/architecture-decision-template.md`
+- See `references/QualityAssurance.md` for validation rules

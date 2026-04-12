@@ -35,6 +35,8 @@
 
 ### Software Architecture Domain (4-5 levels - C4 Model)
 
+> **Routing:** arc42 describes *what* belongs in documentation at each zoom level. For **workflows** that produce solution-level decisions, C4-style decomposition, and implementation readiness (PRD/UX/epics alignment), load **`software-architecture`** after you have the arc42 section map.
+
 **Level S1: System Context**
 - **Scope:** The system and its environment
 - **Elements:** The system as a black box, external systems, users
@@ -67,6 +69,6 @@
 
 ## Related References
 
-- See `Core/ArchitectureProcess.md` for how to populate arc42 sections
-- See `Templates/ADRTemplate.md` for Section 9 (Architecture Decisions)
-- See `Reference/ModelingApproaches.md` for C4 and BPMN-lite details
+- See `references/ArchitectureProcess.md` for how to populate arc42 sections
+- For **solution-level** decision records (single solution / product), load the **`software-architecture`** skill and use `assets/architecture-decision-template.md` for Section 9–style content
+- See `references/ModelingApproaches.md` for C4 and BPMN-lite details

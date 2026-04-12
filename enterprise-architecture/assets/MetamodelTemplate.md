@@ -1,6 +1,6 @@
 # Metamodel Template
 
-This template provides the core structure for creating architecture metamodels. See `Reference/MetamodelDesign.md` for complete details and domain-specific extensions.
+This template provides the core structure for creating architecture metamodels. See `references/MetamodelDesign.md` for complete details and domain-specific extensions.
 
 ## Core Metamodel Structure
 
@@ -87,12 +87,12 @@ This template provides the core structure for creating architecture metamodels. 
 ## Usage
 
 1. Start with the core metamodel structure above
-2. Add domain-specific extensions (see `Reference/MetamodelDesign.md`)
+2. Add domain-specific extensions (see `references/MetamodelDesign.md`)
 3. Define custom properties for your domain
-4. Validate using rules in `Reference/ValidationRules.md`
+4. Validate using rules in `references/ValidationRules.md`
 
 ## Related References
 
-- See `Reference/MetamodelDesign.md` for complete metamodel design and domain extensions
-- See `Reference/ValidationRules.md` for validation rules
-- See `Core/ArchitectureProcess.md` → Phase 2 for metamodel creation process
+- See `references/MetamodelDesign.md` for complete metamodel design and domain extensions
+- See `references/ValidationRules.md` for validation rules
+- See `references/ArchitectureProcess.md` → Phase 2 for metamodel creation process

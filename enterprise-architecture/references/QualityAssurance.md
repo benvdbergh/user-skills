@@ -120,6 +120,6 @@ Different stakeholders need different levels of detail:
 
 ## Related References
 
-- See `Reference/ValidationRules.md` for metamodel validation
+- See `references/ValidationRules.md` for metamodel validation
 - See `Workflows/QualityReview.md` for quality review workflow
-- See `Core/ArchitectureProcess.md` → Phase 6 for refinement process
+- See `references/ArchitectureProcess.md` → Phase 6 for refinement process

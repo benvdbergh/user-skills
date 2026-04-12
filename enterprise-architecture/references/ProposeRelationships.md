@@ -10,7 +10,7 @@
 
 ## Prerequisites
 
-1. **Load ontology**: Read `references/ontology-v1.json` for relationship types and rules
+1. **Resolve ontology and project files**: Read `references/CrossSkillAndOntologySources.md` — load `ontology-v1.json` from **`enterprise-model-store`** when present.
 2. **Load existing model from Neo4j**: Use MCP `read-cypher`:
    ```cypher
    MATCH (n) RETURN n.id, n.title, n.archimate_type
@@ -18,7 +18,7 @@
    ```cypher
    MATCH (a)-[r]->(b) RETURN a.id, type(r), b.id
    ```
-3. For reference resolution: Read `references/ReferenceResolutionGuide.md`
+3. For reference resolution: Use `ReferenceResolutionGuide.md` from **`enterprise-model-store`** when available.
 
 ## The Workflow
 
@@ -141,4 +141,4 @@ If a relationship requires an entity that doesn't exist, identify the missing en
 
 ## Next Step
 
-After proposing relationships, proceed to `references/ProposeModelUpdate.md` to compile the update package.
+After proposing relationships, compile an update package using **`enterprise-model-store`** → `references/ProposeModelUpdate.md` when that project skill exists. If it does not, output a structured proposal (entities, relationships, confidence, assumptions) for human review without claiming graph application.

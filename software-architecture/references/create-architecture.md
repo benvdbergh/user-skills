@@ -9,6 +9,7 @@
 1. **Scope and context**
    - Clarify project/product name and what is in scope (system, service, or product slice).
    - Identify existing inputs: PRD, UX artifacts, constraints, tech stack preferences.
+   - If there is no PRD or plan yet, suggest loading the **`specification`** skill to produce one before locking architecture.
 
 2. **Context and boundaries**
    - Define system context (C4 L1 or equivalent): users, external systems, boundaries.

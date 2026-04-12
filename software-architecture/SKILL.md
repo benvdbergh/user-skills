@@ -31,6 +31,8 @@ Guides software architecture and technical design using lean architecture princi
 
 > **For Clean Architecture, DDD, naming conventions, and library-first coding rules**, load the `minimalist-coding` skill's `references/clean-architecture-and-ddd.md`.
 
+> **For PRDs, technical plans, or constitutions**, load the `specification` skill when those artifacts are missing or need to be created before readiness checks.
+
 ## Principles (Architect Persona)
 
 - **Lean architecture**: Draw on distributed systems, cloud patterns, scalability trade-offs, and what actually ships. User journeys drive technical decisions; prefer boring technology for stability.
@@ -82,8 +84,9 @@ Result: Clear go/no-go and list of gaps to close
 - **references/create-architecture.md** — Guided workflow to create architecture decisions.
 - **references/check-implementation-readiness.md** — Checklist to ensure PRD, UX, architecture, and epics/stories are aligned before implementation.
 - **references/prior-art.md** — Prior art and pattern catalogue reference.
+- **references/AIAgentWorkflow.md** — How this skill composes with `enterprise-architecture`, `enterprise-model-store`, `specification`, and `minimalist-coding`.
 - **assets/architecture-decision-template.md** — Template for architecture decision documents.
 
 ## Optional: Portfolio and Enterprise Architecture Levels
 
-When the user asks about **portfolio**, **strategy-to-code**, **SAFe**, **ArchiMate**, **arc42**, **BPMN**, **enterprise modeling**, or **ontology-guided modeling**, use the `enterprise-architecture` skill instead. The `software-architecture` skill stays focused on **solution/product-level** software architecture and technical design.
+When the user asks about **portfolio**, **strategy-to-code**, **SAFe**, **ArchiMate**, **arc42**, **BPMN**, **enterprise modeling**, or **ontology-guided modeling**, use the **`enterprise-architecture`** skill instead. When the user is on **Ai-Vault CAI** and needs **Neo4j writes, `ontology-v1.json`, or validated update packages**, also involve **`enterprise-model-store`**. This skill stays focused on **solution/product-level** software architecture and technical design.

@@ -15,7 +15,9 @@ Global enterprise architecture skill that owns all ArchiMate + arc42 methodology
 
 **Invoke when:** user asks to model enterprise architecture, extract ArchiMate entities from text, propose relationships, classify enterprise content, run gap analysis, apply arc42 documentation structure, validate model quality, or apply visual best practices to architecture diagrams.
 
-> **Note on project-local ontology:** The live enterprise ontology (`ontology-v1.json`) lives in the project-local skill at `.claude/skills/enterprise-model-store/references/ontology-v1.json`. Load it when extracting entities or proposing relationships. The human-readable documentation is in `references/ontology-v1.md` (this skill).
+> **Note on project-local ontology:** The live enterprise ontology (`ontology-v1.json`) lives in the project-local skill **`enterprise-model-store`** (e.g. `.claude/skills/enterprise-model-store/references/ontology-v1.json`). Load it when extracting entities or proposing relationships. The human-readable documentation is in `references/ontology-v1.md` (this skill). See `references/CrossSkillAndOntologySources.md` for the full split.
+
+**Boundary with `software-architecture`:** This skill owns **enterprise / ArchiMate / arc42** methodology, metamodel projections, and model quality. The **`software-architecture`** skill owns **solution- and product-level** technical design, topology research for implementation, implementation readiness (PRD/UX/epics alignment), and lean ADR-style decision docs. When the user is designing **one system or service** to ship—not portfolio or enterprise-wide ontology work—prefer **`software-architecture`**.
 
 ---
 
@@ -81,9 +83,10 @@ See `references/FourLayerStack.md` for complete details.
 | File | Purpose |
 |------|---------|
 | `references/ontology-v1.md` | Human-readable ArchiMate ontology documentation |
+| `references/CrossSkillAndOntologySources.md` | Where `ontology-v1.json` and companion files live (`enterprise-model-store`) |
 | `references/ArchimateMappingGuide.md` | Consulting terminology to ArchiMate type mapping |
 | `references/LlmReferenceGuide.md` | LLM reference resolution guide |
-| `references/IntegrationPatterns-DiagramDocsEA.md` | Integration patterns: diagram, docs, and EA skill interop |
+| `references/IntegrationPatterns-DiagramDocsEA.md` | Integration patterns: diagram, docs, EA methodology, and model store |
 
 ### Core Framework
 | File | Purpose |
@@ -110,6 +113,7 @@ See `references/FourLayerStack.md` for complete details.
 | File | Purpose |
 |------|---------|
 | `references/examples/IntralogisticsExample.md` | Warehouse automation ArchiMate model example |
+| `references/examples/UseCaseExamples.md` | Use-case style modeling examples |
 
 ## Assets
 

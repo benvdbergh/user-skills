@@ -115,4 +115,4 @@ Practical examples demonstrating workflow execution for different scenarios.
 - See `Workflows/ResearchTopology.md` for pattern selection
 - See `Workflows/ApplyVisualBestPractices.md` for visual layout rules
 - See `Workflows/QualityReview.md` for quality validation
-- See `Core/ArchitectureProcess.md` for process phases
+- See `references/ArchitectureProcess.md` for process phases

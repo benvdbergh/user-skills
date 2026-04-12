@@ -107,6 +107,6 @@ Avoid BPMN complexity like:
 
 ## Related References
 
-- See `Core/DocumentationFramework.md` for zoom level strategy
+- See `references/arc42.md` for documentation zoom level strategy
 - See `Examples/` for domain-specific examples
-- See `Reference/ViewGenerationAlgorithms.md` for view generation
+- See `references/ViewGenerationAlgorithms.md` for view generation

@@ -10,13 +10,12 @@
 
 ## Prerequisites
 
-1. **Load ontology**: Read `references/ontology-v1.json` for entity types and schema
-2. **Load ID format**: Read `references/IdentifierBestPractices.md` for ID prefix mapping
-3. **Load current model from Neo4j** (when applicable): Use MCP `read-cypher` to list existing entities and avoid duplicates:
+1. **Resolve ontology and project files**: Read `references/CrossSkillAndOntologySources.md` — load `ontology-v1.json` and companion guides from **`enterprise-model-store`** when that project skill exists; otherwise use `references/ontology-v1.md` only and note the limitation.
+2. **Load current model from Neo4j** (when applicable): Use MCP `read-cypher` to list existing entities and avoid duplicates:
    ```cypher
    MATCH (n) RETURN n.id, n.title, n.archimate_type
    ```
-4. For reference resolution: Read `references/ReferenceResolutionGuide.md`
+3. For reference resolution: Use `ReferenceResolutionGuide.md` from **`enterprise-model-store`** when available (see cross-skill reference above).
 
 ## The Workflow
 
