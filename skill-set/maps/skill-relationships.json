@@ -1,11 +1,11 @@
 {
   "title": "Skill Relationship Map",
   "version": 2,
-  "updated": "2026-03-17T00:00:00Z",
+  "updated": "2026-04-12T15:18:07.611186Z",
   "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage).",
   "sources": {
-    "user_level_skill_index": "c:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
-    "project_level_inventory": "c:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json",
+    "user_level_skill_index": "C:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
+    "project_level_inventory": "C:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json",
     "agent_graph_spec": "c:\\Users\\vandenbb\\.claude\\self\\spec\\northstart-agent_graph_architecture.md"
   },
   "edge_vocabulary_reference": {
@@ -71,36 +71,48 @@
   ],
   "skills": {
     "user_level": [
+      "code-discovery-for-docs",
       "deep-research",
-      "architecture",
+      "diagram",
+      "document-deep-merge",
+      "documentation-governance",
+      "docx-documentation",
+      "enterprise-architecture",
+      "low-poly-gen-mcp",
       "minimalist-coding",
+      "office-docx",
+      "office-pdf",
+      "office-pptx",
+      "office-xlsx",
+      "pdf-to-markdown",
+      "physio-fitness-coach",
+      "product-knowledge-catalog",
       "project-planning",
       "prompting",
       "research-analysis",
       "skill-set",
+      "software-architecture",
       "specification",
-      "version-control",
-      "diagram",
-      "web-visual",
-      "document-deep-merge",
       "tech-documentation",
-      "docx-documentation",
-      "code-discovery-for-docs",
-      "product-knowledge-catalog",
-      "documentation-governance",
-      "pdf-to-markdown",
-      "office-pptx",
-      "office-docx",
-      "office-xlsx",
-      "office-pdf"
+      "ux-designer",
+      "version-control",
+      "web-visual"
     ],
     "project_level_ai_vault": [
+      "code-discovery-for-docs",
       "documentation",
+      "documentation-governance",
+      "docx-documentation",
+      "enterprise-architecture",
       "enterprise-model-store",
       "kion-design",
       "market-segmentation-research",
       "obsidian-confluence-sync",
-      "search-company-knowledge"
+      "pdf-to-markdown",
+      "product-knowledge-catalog",
+      "search-company-knowledge",
+      "tech-documentation",
+      "vault-research-integration"
     ]
   },
   "relationships": [
@@ -303,7 +315,7 @@
     {
       "id": "rel-0014",
       "from_skill": "kion-design",
-      "to_skill": "architecture",
+      "to_skill": "enterprise-architecture",
       "relationship_type": "specialized_version_of",
       "candidate_agent_graph_edge_type": "depends_on",
       "mapping_is_approximate": true,
@@ -312,7 +324,7 @@
         "quote": "Integration with Other Skills: Architecture: Brand ArchiMate and system diagrams."
       },
       "confidence_score": 0.75,
-      "notes": "Architecture outputs (diagrams/docs) may consume KION design tokens for branded deliverables."
+      "notes": "Enterprise architecture outputs (diagrams/docs) may consume KION design tokens for branded deliverables."
     },
     {
       "id": "rel-0015",
@@ -359,7 +371,7 @@
     {
       "id": "rel-0018",
       "from_skill": "web-visual",
-      "to_skill": "architecture",
+      "to_skill": "enterprise-architecture",
       "relationship_type": "may_call_or_wrap",
       "candidate_agent_graph_edge_type": "depends_on",
       "mapping_is_approximate": true,
@@ -368,7 +380,7 @@
         "quote": "Integration Points: Architecture: Generate interactive views of architecture diagrams."
       },
       "confidence_score": 0.65,
-      "notes": "web-visual may be used to present architecture artifacts interactively."
+      "notes": "web-visual may be used to present enterprise architecture artifacts interactively."
     },
     {
       "id": "rel-0019",

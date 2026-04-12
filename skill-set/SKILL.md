@@ -127,6 +127,19 @@ After adding or removing a top-level skill folder, or changing discovery-relevan
 
 Output is always `<skills-root>/skill-index.json`.
 
+### Updating `maps/skill-relationships.json`
+
+`skill-relationships.json` is the **Skill Relationship Map**: typed edges between skills (and sometimes MCP/tool nodes), evidence quotes, confidence, optional Agent Graph edge hints, and **high-risk refactor sequences**. It supports refactor planning and Story-01-05–style alignment; see `maps/skill-relationships.json` header and `catalog/README.md`.
+
+- **Not auto-generated in full:** Curated `relationships[]` and `high_risk_refactor_sequences[]` require human judgment (and occasional updates when skills are renamed).
+- **Partially automated:** `scripts/update_relationship_map.py` syncs `skills.user_level` from `<skills-root>/skill-index.json`, `skills.project_level_ai_vault` from `skill-set/catalog/ai-vault-skill-inventory.json` when present (override with `--project-inventory`, or `--no-project-inventory` to leave the project list unchanged), refreshes `sources` paths and `updated`, and prints **warnings** when an edge endpoint is missing from those lists (MCP-style names like `user-mcp-atlassian` are ignored).
+
+```bash
+python scripts/update_relationship_map.py
+python scripts/update_relationship_map.py --check-only
+python scripts/update_relationship_map.py -s C:/path/to/.claude/skills -p C:/path/to/ai-vault-skill-inventory.json
+```
+
 ### When to use the catalog
 
 - **Before creating or refreshing an inventory:** Read `catalog/environment-skill-index-map.json` to discover all environments and their `skill_index_path`. Use those paths to read the corresponding `skill-index.json` and produce or update `catalog/ai-vault-skill-inventory.json` (or other per-environment inventories).
@@ -143,6 +156,7 @@ Output is always `<skills-root>/skill-index.json`.
 | "Update scope conventions", "change scope rules", "update skill hubs" | Revise user vs project rules or functional clusters. | Edit `scope-and-conventions.md`; keep consistent with `standard-reference.md`. |
 | "Update relationship map", "document skill dependencies", "update skill relationships" | Add or change relationships or high-risk sequences. | Read inventories and skill-indexes as needed; edit `maps/skill-relationships.json`. |
 | "Regenerate skill index", "refresh skill-index.json" | Rebuild `skill-index.json` from all `*/SKILL.md` frontmatter. | Run `scripts/update_skill_index.py` (optional `--skills-root` for project-level trees). |
+| "Sync relationship map skill lists", "refresh skill-relationships lists" | Align `maps/skill-relationships.json` skill ID lists with indexes; validate edges. | Run `scripts/update_relationship_map.py` (`--check-only` to validate without writing). |
 
 ## Examples
 
