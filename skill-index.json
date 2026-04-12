@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-12T16:04:53.330964Z",
+  "generated": "2026-04-12T16:43:00.286021Z",
   "totalSkills": 26,
   "alwaysLoadedCount": 0,
   "deferredCount": 26,
@@ -386,19 +386,29 @@
     "software-architecture": {
       "name": "software-architecture",
       "path": "software-architecture/SKILL.md",
-      "fullDescription": "Guides quality-focused software architecture and technical design. Use when designing architecture, reviewing structure, creating architecture decisions, checking implementation readiness, researching topology and patterns, or aligning PRD/UX/architecture/epics. Applies lean architecture wisdom and separation of concerns. For Clean Architecture / DDD / naming conventions, use the minimalist-coding skill.",
+      "fullDescription": "Guides quality-focused software architecture and technical design. Use when designing architecture, reviewing structure, creating architecture decisions, checking implementation readiness, evaluating platform or product fitness (scorecard, NFR gates), designing or reviewing APIs and data models, versioning and compatibility, researching topology and patterns, or aligning PRD/UX/architecture/epics. Applies lean architecture wisdom and separation of concerns. For Clean Architecture / DDD / naming conventions, use the minimalist-coding skill.",
       "triggers": [
         "designing architecture",
         "reviewing structure",
         "creating architecture decisions",
         "checking implementation readiness",
+        "evaluating platform",
+        "product fitness (scorecard",
+        "NFR gates)",
+        "designing",
+        "reviewing APIs and data models",
+        "versioning and compatibility",
         "researching topology and patterns",
         "use the minimalist-coding skill"
       ],
       "workflows": [
         "ResearchTopology",
         "create-architecture",
-        "check-implementation-readiness"
+        "check-implementation-readiness",
+        "platform-fitness-evaluation",
+        "functional-domain-data-modeling",
+        "functional-api-design-consistency",
+        "functional-versioning-compatibility"
       ],
       "tier": "deferred"
     },

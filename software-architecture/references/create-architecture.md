@@ -26,10 +26,12 @@
 4. **Building blocks and interfaces**
    - Identify main components/services and their interfaces (APIs, events, contracts).
    - Ensure dependency direction is inward (infrastructure → application → domain).
+   - For **API shape, data ownership, schema evolution, and versioning/compatibility** rules, follow **`SKILL.md`** *Functional architecture topic map* and load **`references/functional-domain-data-modeling.md`**, **`references/functional-api-design-consistency.md`**, and/or **`references/functional-versioning-compatibility.md`** as needed; capture decisions in the ADR (or attach OpenAPI/AsyncAPI pointers).
 
 5. **Non-functional and risks**
    - Note NFRs that shape design (performance, security, availability, cost).
    - Call out main risks and mitigations.
+   - When the scope is **platform-like** or **production-critical**, optionally cross-check against **`references/platform-fitness-evaluation.md`** (delivery, operability, data/events, security-by-construction) and record pass/fail **gates** or waivers in the decision doc.
 
 6. **Review and handoff**
    - Summarize decisions and open points.

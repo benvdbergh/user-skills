@@ -109,9 +109,14 @@ Ensures that Claude doesn't just "guess" a design, but instead researches establ
 
 **Critical Rule**: **DO NOT** create elements until user confirms the selected topology.
 
+### Optional: Stress-test candidate topologies
+
+If the user is choosing between **platform-scale** options (build patterns, vendor stacks, or major style choices), run a **lightweight fitness pass** using **`references/platform-fitness-evaluation.md`** on the **shortlisted** topologies only—focus on dimensions most sensitive to that choice (e.g. integration, evolution speed, operability).
+
 ## After user confirms topology
 
 - Continue with **`references/create-architecture.md`** using the chosen style and constraints (context diagram, decisions, NFRs).
+- If the solution is **API- or data-heavy** (microservices, public HTTP, event schemas), use **`SKILL.md`** *Functional architecture topic map* and load **`references/functional-*.md`** topic files when detailing interfaces and evolution rules.
 - Use MCP or repo tools **only** in ways the user has enabled (e.g. cloud CLI, infra search). Do **not** assume an ArchiMate or Neo4j MCP unless the user is explicitly doing enterprise modeling with those tools.
 - For **ArchiMate / enterprise model** updates, load **`enterprise-architecture`** and (when on Ai-Vault CAI) **`enterprise-model-store`** for ontology and graph writes.
 
@@ -140,4 +145,5 @@ Step 5: Present findings to user
 - [ ] Style selection justified
 - [ ] User presented with findings before element creation
 - [ ] User confirmation received before proceeding
+- [ ] (If platform-scale decision) Fitness pass documented or explicitly deferred
 

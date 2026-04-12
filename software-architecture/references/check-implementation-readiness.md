@@ -30,6 +30,9 @@
    - Architecture supports the described flows and NFRs.
    - No contradictions between PRD, UX, architecture, and stories.
 
+6. **Optional: Deeper NFR and “day-2” posture** (platforms, vendor picks, high-stakes launches)
+   - If the user needs a **fitness scorecard**, **non-negotiable technical gates**, or **operability/security/delivery** depth beyond this checklist, load **`references/platform-fitness-evaluation.md`** and use **`../assets/platform-scorecard-template.md`** for structured output.
+
 ## Output
 
 - **Ready:** All sections present and aligned; list any minor open points and recommend starting implementation.
