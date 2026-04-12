@@ -36,8 +36,6 @@ Manifest-based:
 bun run $PAI_DIR/skills/project-planning/scripts/ShardFromSources.ts --root <path>
 ```
 
-`ShardPRD.ts` remains a thin entry that delegates to the same implementation for backward compatibility.
-
 ## Integration
 
 - **specification** skill produces PRDs/plans; reference them via paths in the manifest and `traces_to`.

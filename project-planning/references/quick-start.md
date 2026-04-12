@@ -15,8 +15,6 @@ bun run $PAI_DIR/skills/project-planning/scripts/ScanSources.ts --root .
 
 # Shard PRD.md into epics
 bun run $PAI_DIR/skills/project-planning/scripts/ShardFromSources.ts --root .
-# Alias:
-bun run $PAI_DIR/skills/project-planning/scripts/ShardPRD.ts --root .
 
 bun run $PAI_DIR/skills/project-planning/scripts/EpicManager.ts --root . --action create --epic "Auth" --description "..."
 bun run $PAI_DIR/skills/project-planning/scripts/StoryManager.ts --root . --action create --story "Login" --epic "Auth" --description "..."
