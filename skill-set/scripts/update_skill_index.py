@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Regenerate skill-index.json from each top-level */SKILL.md YAML frontmatter.
+Update skill-index.json from each top-level */SKILL.md YAML frontmatter.
 
 Aligns with skill-set / Agent Skills L1 discovery: name + description (WHAT + WHEN)
 are mirrored for index consumers (environment map, inventory refresh). Paths are

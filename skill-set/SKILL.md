@@ -120,10 +120,10 @@ Schema and update rules for each artifact are in `catalog/README.md`.
 
 After adding or removing a top-level skill folder, or changing discovery-relevant YAML (`name`, `description`, optional load `metadata.tier`), regenerate that environment’s `skill-index.json` so it stays aligned with Agent Skills L1 (see `references/standard-reference.md`).
 
-**Script:** `scripts/regenerate_skill_index.py`
+**Script:** `scripts/update_skill_index.py`
 
 - **Default (user or project):** run from anywhere; the script infers the skills root as the parent of `skill-set/` (i.e. the `.claude/skills` directory that contains `skill-set`).
-- **Explicit path:** `python scripts/regenerate_skill_index.py --skills-root "C:/path/to/.claude/skills"` (or `-s`). Use for a project vault’s `.claude/skills` when you do not rely on the default layout, or when the script file was copied elsewhere.
+- **Explicit path:** `python scripts/update_skill_index.py --skills-root "C:/path/to/.claude/skills"` (or `-s`). Use for a project vault’s `.claude/skills` when you do not rely on the default layout, or when the script file was copied elsewhere.
 
 Output is always `<skills-root>/skill-index.json`.
 
@@ -142,7 +142,7 @@ Output is always `<skills-root>/skill-index.json`.
 | "Add environment", "register new workspace", "add skill index" | Add one environment to the map. | Read `environment-skill-index-map.json`; add entry with `id`, `path`, `skill_index_path`; bump `updated`. |
 | "Update scope conventions", "change scope rules", "update skill hubs" | Revise user vs project rules or functional clusters. | Edit `scope-and-conventions.md`; keep consistent with `standard-reference.md`. |
 | "Update relationship map", "document skill dependencies", "update skill relationships" | Add or change relationships or high-risk sequences. | Read inventories and skill-indexes as needed; edit `maps/skill-relationships.json`. |
-| "Regenerate skill index", "refresh skill-index.json" | Rebuild `skill-index.json` from all `*/SKILL.md` frontmatter. | Run `scripts/regenerate_skill_index.py` (optional `--skills-root` for project-level trees). |
+| "Regenerate skill index", "refresh skill-index.json" | Rebuild `skill-index.json` from all `*/SKILL.md` frontmatter. | Run `scripts/update_skill_index.py` (optional `--skills-root` for project-level trees). |
 
 ## Examples
 
