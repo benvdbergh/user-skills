@@ -99,6 +99,9 @@ Skills are rarely perfect upon initial creation. This workflow implements a **De
    - Ensure all changes maintain structural compliance
    - Fix any new issues introduced by the changes
 
+7b. **Refresh indexes (when applicable)**
+   - If `description`, `name`, or skill folder membership changed under a managed `<skills-root>`, run `skill-set/scripts/update_skill_index.py` (optional `--with-relationship-map`).
+
 8. **Recommend Testing**
    Suggest the user test with:
    - **Triggering tests**: 3–5 queries that SHOULD trigger, 3–5 that should NOT
@@ -148,6 +151,17 @@ description: >-
   "legal analysis". Do NOT use for general document editing
   or non-legal PDFs.
 ```
+
+### Pattern: Monolithic reference → topic-scoped files + SKILL hub
+
+When one `references/*.md` file grows hard to maintain (multiple domains, duplicated examples):
+
+1. Split into **one file per topic** (each with when-to-load, examples, frameworks table, no-gos, links).
+2. Move **routing table**, **topic map**, and **agent execution steps** into **`SKILL.md`**; remove redundant `references/*-index.md` if it only mirrors the hub.
+3. Add **Related** cross-links at the top of sibling topic files.
+4. Run `update_skill_index.py` (`-R` if used) after changing `name`, `description`, or folder layout; bump `metadata.version`.
+
+See `references/authoring-guide.md` — *Topic-scoped reference files (maintainability)*.
 
 ## Output
 

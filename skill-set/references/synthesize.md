@@ -132,6 +132,7 @@ Create a new skill with standard-compliant structure, MCP tool integration, and 
    - In each workflow, explicitly document MCP tool usage if applicable
    - Move detailed documentation out of SKILL.md into `references/`
    - Keep references one level deep: link from SKILL.md directly to reference files; avoid long reference chains so the agent does not do partial reads
+   - **Topic-heavy skills:** If the domain splits into several maintainable areas (e.g. separate concerns with their own examples, framework tables, no-gos, and links), use **one reference file per topic** and keep **workflow routing + topic map + agent execution steps** in `SKILL.md` (do not add a separate `references/*-index.md` hub). Cross-link sibling references at the top of each file. See `references/authoring-guide.md` — *Topic-scoped reference files (maintainability)*.
 
 ### Phase 3: Tool Policy & Safety
 
@@ -158,6 +159,9 @@ Create a new skill with standard-compliant structure, MCP tool integration, and 
     - Verify all required sections exist
     - Check MCP dependencies are documented
     - Fix any compliance issues
+
+14b. **Refresh skill index (when applicable)**
+    - If the new skill lives under a `<skills-root>` tree that publishes `skill-index.json`, run `skill-set/scripts/update_skill_index.py` from that environment (optional `-R` / `--with-relationship-map` to sync `skill-relationships.json` lists). See `SKILL.md` § Catalog and Maps.
 
 15. **Authoring Verification** (see `references/authoring-guide.md`)
     - Description is third person and includes WHAT + WHEN and trigger terms

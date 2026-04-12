@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: PAI
-  version: 2.2.0
+  version: 2.3.0
 ---
 
 # skill-set
@@ -99,6 +99,14 @@ By embedding `list_mcp_resources` into the skill creation workflow, we ensure:
 **Authoring best practices:** For description design (third person, WHAT + WHEN), token efficiency, common patterns, and anti-patterns, see `references/authoring-guide.md`. Use when writing or refining skill content.
 
 **Lint vs. Validate:** Lint checks structural compliance (naming, frontmatter, files). Validate evaluates content effectiveness (instruction quality, token efficiency, ecosystem fit). Run lint first, then validate.
+
+**Post-change hygiene (quality + efficiency):**
+
+- **Structure:** For skills with several subject areas, use **topic-scoped** `references/*.md` files (examples, frameworks, no-gos, links per topic) and keep **workflow routing + topic map + agent steps** in `SKILL.md`—avoid a duplicate hub file under `references/`. Details: `references/authoring-guide.md` (*Topic-scoped reference files*).
+- **Grounding:** Prefer **citable external specs/guides** for “best practices” content; extend `prior-art` (or equivalent) when adding major sources.
+- **Discovery metadata:** After changing frontmatter `name`/`description`, adding/removing a skill folder, or reshaping workflows—run `scripts/update_skill_index.py` on the correct `<skills-root>`; use `--with-relationship-map` (`-R`) to refresh `skill-set/maps/skill-relationships.json` skill lists.
+- **Versioning:** Bump the skill’s `metadata.version` when behavior or structure changes materially.
+- **Git:** Commit from the repository that **contains** `<skills-root>` (often a dedicated `skills` repo; do not assume the parent `.claude/` folder is the git root).
 
 ## Catalog and Maps
 

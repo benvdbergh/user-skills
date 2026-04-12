@@ -155,6 +155,9 @@ description: Creates sophisticated docs.   # No WHEN clause
 [ ] Consistent terminology; no time-sensitive wording; no Windows paths
 [ ] All referenced files exist
 [ ] MCP dependencies documented (if applicable)
+[ ] Topic-heavy skills: topic map + agent execution in SKILL.md; no redundant index-only reference file (see `references/authoring-guide.md` — Topic-scoped reference files)
+[ ] After adding/removing a skill folder or changing discovery frontmatter: regenerate `<skills-root>/skill-index.json` (`skill-set/scripts/update_skill_index.py`; use `--with-relationship-map` / `-R` when applicable)
+[ ] Git: commit from the repository that **owns** `<skills-root>` (often the `skills` repo itself—not assumed to be the parent `.claude/` folder)
 ```
 
 For full authoring verification, see `references/authoring-guide.md`.

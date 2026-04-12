@@ -111,6 +111,19 @@ Branch by type of request (e.g. "Creating new? → Creation workflow. Editing ex
 
 For quality-critical tasks: do step → validate (e.g. run script) → if fail, fix and re-validate → only proceed when validation passes.
 
+### Topic-scoped reference files (maintainability)
+
+Use when a skill accumulates **distinct subject areas** (e.g. NFR fitness vs functional API design vs data modeling)—each with its own examples, framework tables, no-gos, and external links.
+
+| Practice | Detail |
+|----------|--------|
+| **One topic per file** | Keep each `references/{topic}.md` focused; repeat the **same section shape** (when to load, core practices, **examples**, **frameworks/standards table**, **no-gos**, **further reading**) so authors know where to edit. |
+| **SKILL.md = orchestration hub** | Put **workflow routing**, a **topic map** (which file for which trigger), and **agent execution steps** in `SKILL.md`. Avoid a separate `references/*-index.md` that only duplicates the hub—agents already load `SKILL.md` at activation. |
+| **Cross-link siblings** | At the top of each topic file, a short **Related** line linking peer references and `SKILL.md` (e.g. `../SKILL.md` from `references/`). |
+| **References = durable knowledge** | Long procedural “agent workflow” prose belongs in **SKILL.md**; references hold norms, citations, and checklists—not duplicate orchestration. |
+| **Ground in external sources** | For “best practices” skills, cite **stable specs and guides** (RFCs, vendor design docs, foundation sites); do not rely only on internal org notes unless scoped as such. Add rows to `references/prior-art.md` (or equivalent) when you introduce major external corpora. |
+| **Delegate to other skills** | If another skill owns code-level detail (e.g. Clean Architecture / DDD in code), state **delegation** once in `SKILL.md` or the topic file—avoid overlapping deep guidance. |
+
 ---
 
 ## Utility Scripts
@@ -133,6 +146,8 @@ Pre-made scripts are often better than generated code: more reliable, fewer toke
 | **Time-sensitive wording** | Avoid "before August 2025 use old API." Use "Current method" vs "Old patterns (deprecated)" in a collapsible or separate section |
 | **Inconsistent terminology** | Pick one term per concept (e.g. "API endpoint" vs "URL"/"route") and use it throughout |
 | **Vague skill names** | Use specific names: `processing-pdfs`, `analyzing-spreadsheets` — not `helper`, `utils`, `tools` |
+| **Hub reference file** mirroring `SKILL.md` | Use **SKILL.md** for routing + topic map + agent steps; link **directly** to topic references from there |
+| **Monolithic reference** mixing many domains | Split by topic; keep shared “cross-links” as short bullets in `SKILL.md` or at top of each topic file |
 
 ---
 
@@ -162,6 +177,7 @@ Pre-made scripts are often better than generated code: more reliable, fewer toke
 - [ ] Progressive disclosure used (details in references/assets)
 - [ ] Workflows have clear steps
 - [ ] No time-sensitive information
+- [ ] Large domains split into **topic references**; **SKILL.md** holds topic map + agent steps (see **Topic-scoped reference files** above)
 
 ### If including scripts
 
