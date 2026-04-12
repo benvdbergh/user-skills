@@ -127,6 +127,8 @@ After adding or removing a top-level skill folder, or changing discovery-relevan
 
 Output is always `<skills-root>/skill-index.json`.
 
+Optional **`--with-relationship-map`** (`-R`): after a successful index write, runs `scripts/update_relationship_map.py` with the same `--skills-root`. If `<skills-root>/skill-set/maps/skill-relationships.json` exists, that file is targeted; otherwise the relationship script uses its default path next to the installed scripts (see note printed on stderr).
+
 ### Updating `maps/skill-relationships.json`
 
 `skill-relationships.json` is the **Skill Relationship Map**: typed edges between skills (and sometimes MCP/tool nodes), evidence quotes, confidence, optional Agent Graph edge hints, and **high-risk refactor sequences**. It supports refactor planning and Story-01-05–style alignment; see `maps/skill-relationships.json` header and `catalog/README.md`.

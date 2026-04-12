@@ -9,6 +9,9 @@ posix-style relative to the skills root.
 Default skills root: the directory that contains this skill-set folder (i.e. the
 `.claude/skills` tree), whether that tree is user-global or project-local.
 Override with --skills-root for any other skills directory.
+
+Use --with-relationship-map to run update_relationship_map.py afterward with the
+same skills root (keeps skill-relationships.json skill lists in sync).
 """
 
 from __future__ import annotations
@@ -16,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -154,6 +158,27 @@ def regenerate(skills_root: Path) -> tuple[Path, int, int, int]:
     return out_path, len(skills_out), always, deferred
 
 
+def run_relationship_map(skills_root: Path) -> int:
+    """Run sibling update_relationship_map.py; return its exit code."""
+    sibling = Path(__file__).resolve().parent / "update_relationship_map.py"
+    if not sibling.is_file():
+        print(f"error: missing script: {sibling}", file=sys.stderr)
+        return 1
+    cmd = [sys.executable, str(sibling), "-s", str(skills_root)]
+    map_in_tree = (
+        skills_root / "skill-set" / "maps" / "skill-relationships.json"
+    )
+    if map_in_tree.is_file():
+        cmd.extend(["-r", str(map_in_tree.resolve())])
+    else:
+        print(
+            "note: no skill-set/maps/skill-relationships.json under skills root; "
+            "relationship script will use its default map path (next to this script).",
+            file=sys.stderr,
+        )
+    return subprocess.call(cmd, cwd=str(sibling.parent))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Write skill-index.json under a .claude/skills (or equivalent) tree."
@@ -165,6 +190,12 @@ def main() -> int:
         default=None,
         help="Folder containing top-level skill directories (default: parent of skill-set/).",
     )
+    parser.add_argument(
+        "--with-relationship-map",
+        "-R",
+        action="store_true",
+        help="After updating skill-index.json, run update_relationship_map.py for the same skills root.",
+    )
     args = parser.parse_args()
     root = (args.skills_root or default_skills_root()).expanduser().resolve()
     if not root.is_dir():
@@ -175,6 +206,10 @@ def main() -> int:
     print(
         f"Wrote {out_path} with {n} skills (always={always}, deferred={deferred})"
     )
+    if args.with_relationship_map:
+        rc = run_relationship_map(root)
+        if rc != 0:
+            return rc
     return 0
 
 
