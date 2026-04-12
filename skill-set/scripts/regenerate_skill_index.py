@@ -5,16 +5,27 @@ Regenerate skill-index.json from each top-level */SKILL.md YAML frontmatter.
 Aligns with skill-set / Agent Skills L1 discovery: name + description (WHAT + WHEN)
 are mirrored for index consumers (environment map, inventory refresh). Paths are
 posix-style relative to the skills root.
+
+Default skills root: the directory that contains this skill-set folder (i.e. the
+`.claude/skills` tree), whether that tree is user-global or project-local.
+Override with --skills-root for any other skills directory.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
+
+
+def default_skills_root() -> Path:
+    """skill-set/scripts/this.py -> .../skills (parent of skill-set)."""
+    return Path(__file__).resolve().parent.parent.parent
 
 
 def load_frontmatter(skill_md: Path) -> dict:
@@ -74,8 +85,7 @@ def guess_workflows(skill_md: Path, body: str) -> list[str]:
     return w[:40]
 
 
-def main() -> None:
-    skills_root = Path(__file__).resolve().parent.parent
+def regenerate(skills_root: Path) -> tuple[Path, int, int, int]:
     skills_out: dict[str, dict] = {}
     always = 0
     deferred = 0
@@ -141,8 +151,32 @@ def main() -> None:
     out_path.write_text(
         json.dumps(idx, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    print(f"Wrote {out_path} with {len(skills_out)} skills (always={always}, deferred={deferred})")
+    return out_path, len(skills_out), always, deferred
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Write skill-index.json under a .claude/skills (or equivalent) tree."
+    )
+    parser.add_argument(
+        "--skills-root",
+        "-s",
+        type=Path,
+        default=None,
+        help="Folder containing top-level skill directories (default: parent of skill-set/).",
+    )
+    args = parser.parse_args()
+    root = (args.skills_root or default_skills_root()).expanduser().resolve()
+    if not root.is_dir():
+        print(f"error: not a directory: {root}", file=sys.stderr)
+        return 1
+
+    out_path, n, always, deferred = regenerate(root)
+    print(
+        f"Wrote {out_path} with {n} skills (always={always}, deferred={deferred})"
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
