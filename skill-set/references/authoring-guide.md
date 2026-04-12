@@ -128,11 +128,13 @@ Use when a skill accumulates **distinct subject areas** (e.g. NFR fitness vs fun
 
 ## Utility Scripts
 
-Pre-made scripts are often better than generated code: more reliable, fewer tokens, consistent behavior.
+Pre-made scripts are often better than generated code: more reliable, fewer tokens, consistent behavior—especially when the skill touches **many structured files** (frontmatter, graphs, globs). Let scripts **scan, validate, and summarize**; let the LLM **interpret and edit** (see **`references/skill-scripts.md`** for full guardrails and the `project-planning` pattern).
 
-- Document **how** to run each script (command, args, env).
+**Minimum in authoring-guide:**
+
+- Document **how** to run each script (command, args, env); every agent-callable entrypoint should support **`--help` / `-h`** (details in `skill-scripts.md`).
 - State whether the agent should **execute** the script or **read** it as reference.
-- Document required packages and clear error handling.
+- Document required packages and clear error handling; prefer **one runtime** (Python or Bun/TS) per skill and **`scripts/lib/`** for shared code.
 - Use **forward slashes** in paths (e.g. `scripts/helper.py`), not Windows backslashes, for portability.
 
 ---
@@ -182,10 +184,12 @@ Pre-made scripts are often better than generated code: more reliable, fewer toke
 ### If including scripts
 
 - [ ] Scripts solve the problem (no placeholders)
-- [ ] Required packages documented
-- [ ] Error handling explicit and helpful
+- [ ] Required packages documented; **one** primary language/runtime for `scripts/`
+- [ ] Shared helpers in `scripts/lib/`; entrypoints stay thin
+- [ ] Each agent-facing script has **`--help` / `-h`** with usage on stdout
+- [ ] Error handling explicit and helpful; stdout shaped for agent parsing where relevant
 - [ ] No Windows-style paths
 
 ---
 
-**See also:** `references/standard-reference.md` (structure, frontmatter), `references/synthesize.md` (full creation workflow), `references/lint.md` (structural compliance).
+**See also:** `references/standard-reference.md` (structure, frontmatter), `references/skill-scripts.md` (scripts architecture and CLI contract), `references/synthesize.md` (full creation workflow), `references/lint.md` (structural compliance).

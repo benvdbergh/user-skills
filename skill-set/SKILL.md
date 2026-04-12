@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: PAI
-  version: 2.3.0
+  version: 2.6.0
 ---
 
 # skill-set
@@ -89,7 +89,7 @@ By embedding `list_mcp_resources` into the skill creation workflow, we ensure:
 | Workflow | Trigger | File |
 |----------|---------|------|
 | **synthesize** | "create a new skill", "new skill", "build skill" | `references/synthesize.md` |
-| **validate** | "validate skill", "review skill quality", "is this skill effective?", "deep review" | `references/validate.md` |
+| **validate** | "validate skill", "review skill quality", "is this skill effective?", "deep review", "effectiveness assessment", "quality analysis" | `references/validate.md` (workflow); [effectiveness-assessment.md](references/effectiveness-assessment.md) (report synthesis / quality narrative) |
 | **optimize** | "optimize skill", "improve skill", "refine skill" | `references/optimize.md` |
 | **lint** | "lint skill", "check skill structure", "check compliance" | `references/lint.md` |
 | **canonicalize** | "canonicalize", "migrate skill", "fix skill" | `references/canonicalize.md` |
@@ -98,11 +98,13 @@ By embedding `list_mcp_resources` into the skill creation workflow, we ensure:
 
 **Authoring best practices:** For description design (third person, WHAT + WHEN), token efficiency, common patterns, and anti-patterns, see `references/authoring-guide.md`. Use when writing or refining skill content.
 
-**Lint vs. Validate:** Lint checks structural compliance (naming, frontmatter, files). Validate evaluates content effectiveness (instruction quality, token efficiency, ecosystem fit). Run lint first, then validate.
+**Scripts in skills:** For LLM-vs-script division of labor, one runtime per skill, `scripts/lib/`, `--help` on entrypoints, and stdout shaped for agents, see `references/skill-scripts.md`.
+
+**Lint vs. Validate:** Lint checks structural compliance (naming, frontmatter, files). Validate evaluates content effectiveness (instruction quality, token efficiency, ecosystem fit) and, on a full run, appends an **effectiveness assessment** (domain quality bar, ecosystem map, goals→design, proposed shape—see `references/effectiveness-assessment.md`). The **workflow steps** are in `references/validate.md`; the **assessment template** is in `references/effectiveness-assessment.md`. Run lint first, then validate.
 
 **Post-change hygiene (quality + efficiency):**
 
-- **Structure:** For skills with several subject areas, use **topic-scoped** `references/*.md` files (examples, frameworks, no-gos, links per topic) and keep **workflow routing + topic map + agent steps** in `SKILL.md`—avoid a duplicate hub file under `references/`. Details: `references/authoring-guide.md` (*Topic-scoped reference files*).
+- **Structure:** For skills with several subject areas, use **topic-scoped** `references/*.md` files (examples, market-standards, frameworks, no-gos, links per topic) and keep **workflow routing + topic map + agent steps** in `SKILL.md`—avoid a duplicate hub file under `references/`. Details: `references/authoring-guide.md` (*Topic-scoped reference files*).
 - **Grounding:** Prefer **citable external specs/guides** for “best practices” content; extend `prior-art` (or equivalent) when adding major sources.
 - **Discovery metadata:** After changing frontmatter `name`/`description`, adding/removing a skill folder, or reshaping workflows—run `scripts/update_skill_index.py` on the correct `<skills-root>`; use `--with-relationship-map` (`-R`) to refresh `skill-set/maps/skill-relationships.json` skill lists.
 - **Versioning:** Bump the skill’s `metadata.version` when behavior or structure changes materially.
@@ -206,14 +208,14 @@ User: "Lint the enterprise-modeling skill"
 **Example 4: Validate a skill (content effectiveness)**
 ```
 User: "Validate the research-analysis skill"
-→ Invokes validate workflow
+→ Invokes validate workflow (validate.md) + effectiveness-assessment.md for report synthesis
 → Reads skill + all references + prompting standards
 → Benchmarks against industry: searches "research automation agent best practices"
 → Finds established RAG patterns the skill partially implements
 → Analyzes instruction quality, token efficiency, tool usage, ecosystem fit
 → Identifies: description lacks third-person voice, 2 redundant paragraphs,
    missed RAG chunking pattern from prior art, overlapping triggers with prompting skill
-→ Generates effectiveness score (74/100) with prioritized recommendations
+→ Generates effectiveness score (74/100) with prioritized recommendations + effectiveness assessment sections
 ```
 
 **Example 5: Refresh project inventory (catalog workflow)**

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-12T18:14:14.434182Z",
+  "generated": "2026-04-12T18:18:21.564702Z",
   "totalSkills": 26,
   "alwaysLoadedCount": 0,
   "deferredCount": 26,
@@ -378,7 +378,7 @@
         "standard-reference",
         "authoring-guide",
         "skill-scripts",
-        "validate-rework-blueprint",
+        "effectiveness-assessment",
         "*"
       ],
       "tier": "deferred"

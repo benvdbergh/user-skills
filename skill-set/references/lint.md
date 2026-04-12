@@ -77,6 +77,8 @@ The linter checks four categories, inspired by the agnix rule-set:
 | X3 | Script safety | Scripts in `scripts/` don't perform unauthorized file/network ops | WARNING |
 | X4 | No shell injection | No unescaped user input passed to shell commands | ERROR |
 
+**Script architecture (manual / spot-check):** When the skill ships CLIs the agent runs, verify norms in [skill-scripts.md](skill-scripts.md) (`--help`, minimal deps, `scripts/lib/`).
+
 ### 6. Portability Checks
 
 | # | Check | Pass Criteria | Severity |

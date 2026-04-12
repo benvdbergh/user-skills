@@ -17,6 +17,7 @@ Create a new skill with standard-compliant structure, MCP tool integration, and 
    - Understand kebab-case naming conventions
    - Review required directory structure (`scripts/`, `references/`, `assets/`)
    - For authoring best practices (description, patterns, anti-patterns), read `references/authoring-guide.md`
+   - If the skill needs executable automation, read `references/skill-scripts.md` (LLM vs script split, `scripts/lib/`, `--help`, dependencies)
 
 2. **Gather Requirements** (if not inferrable from context)
    Gather or infer: purpose and scope, target location (e.g. project vs user-level), trigger scenarios, key domain knowledge, output format preferences, and existing patterns to follow. Use AskQuestion when available; otherwise ask conversationally.
@@ -168,7 +169,7 @@ Create a new skill with standard-compliant structure, MCP tool integration, and 
     - SKILL.md under ~500 lines or ~5,000 words; details in `references/`
     - File references from SKILL.md are one level deep (no deep reference chains)
     - Consistent terminology; no time-sensitive wording; no Windows-style paths
-    - If scripts: documented, with clear run instructions and error handling
+    - If scripts: documented, with clear run instructions, error handling, and `skill-scripts.md` compliance (`--help`, one runtime, minimal deps, `scripts/lib/` for shared code)
 
 16. **Test MCP Integration** (if applicable)
     - Verify MCP tools are accessible

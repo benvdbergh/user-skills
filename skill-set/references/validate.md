@@ -4,6 +4,8 @@ Deep content-level validation of a skill's effectiveness as an LLM instruction s
 
 **Complementary to lint:** Lint checks structure and formatting. Validate checks whether the skill *works well* as an instruction set for an LLM agent.
 
+**Effectiveness assessment (report section):** Full validate runs also produce a **strategic effectiveness assessment**—the same class of analysis as a top-tier quality review (domain quality bar, ecosystem map, goals→design, proposed shape, drop/demote, success criteria, implementation order). Section definitions and proportionality rules live in [effectiveness-assessment.md](effectiveness-assessment.md), separate from this workflow file.
+
 ## When to Use
 
 - User requests: "validate skill", "review skill quality", "is this skill effective?", "deep review skill"
@@ -17,8 +19,9 @@ Deep content-level validation of a skill's effectiveness as an LLM instruction s
 Before running this workflow:
 1. Run the lint workflow on the target skill first (or confirm it has been run recently).
 2. Read the target skill's `SKILL.md` and all referenced files
-3. Read `$PAI_DIR/skills/prompting/references/standards.md` for prompt engineering criteria
-4. List all skills in `$PAI_DIR/skills/` and `$CURSOR_DIR/skills-cursor/` to understand the ecosystem
+3. Read [effectiveness-assessment.md](effectiveness-assessment.md) for mandatory synthesis sections in the validation report (quality / effectiveness narrative, not the validate steps themselves)
+4. Read `$PAI_DIR/skills/prompting/references/standards.md` for prompt engineering criteria
+5. List all skills in `$PAI_DIR/skills/` and `$CURSOR_DIR/skills-cursor/` to understand the ecosystem
 
 ## Validation Dimensions
 
@@ -159,6 +162,7 @@ The validate workflow evaluates five dimensions:
    | TF4 | Error handling for tools | Tool failures have documented recovery paths | INFO |
    | TF5 | MCP tools verified | Documented MCP tools exist and are accessible | ERROR |
    | TF6 | No hallucinated tools | All referenced tools are real and available | CRITICAL |
+   | TF7 | Skill `scripts/` CLI contract | Agent-facing entrypoints support `--help`/`-h`; stdout usable for parsing; shared code in `scripts/lib/`; one primary runtime per skill — see [skill-scripts.md](skill-scripts.md) | WARNING |
 
 9. **Context Sufficiency Check**
 
@@ -263,6 +267,36 @@ The validate workflow evaluates five dimensions:
 
     If the conclusion is "not a skill", recommend the appropriate alternative.
 
+### Phase 7: Effectiveness assessment synthesis
+
+Produce the **strategic effectiveness assessment** defined in [effectiveness-assessment.md](effectiveness-assessment.md). This phase turns dimension findings into a single coherent quality and redesign narrative.
+
+16. **Domain quality bar**
+
+    From Phase 1 prior art and domain knowledge, state what “excellent” means for this skill’s problem space (practices, patterns, quality gates). Flag gaps between that bar and the skill’s mandatory behaviors / references.
+
+17. **Ecosystem & workspace context**
+
+    Summarize adjacent skills, overlap risks, and handoff contracts. If the skill includes scripts, note brittle path or env assumptions with concrete file pointers when validating in a repo.
+
+18. **Goals → design choices**
+
+    Infer or quote user/stakeholder goals from the skill text and map each to a structural design response (routing, references, config, contracts).
+
+19. **Proposed rework shape**
+
+    Using the template in effectiveness-assessment.md section 4: positioning sentence, Level 2/3 split, operational discovery steps, contracts, config, assets, skill-set follow-up. Omit inapplicable subsections.
+
+20. **Drop, demote, retain**
+
+    Explicit list: what to remove, what to move to references or flags, what must stay as the spine of the skill.
+
+21. **Success criteria & implementation order**
+
+    Testable post-rework outcomes (3–7 bullets) and a numbered implementation sequence.
+
+**Proportionality:** For a quick sanity check, the agent may collapse Phase 7 into a short paragraph per section; for “deep review” or scores below “Good”, expand to the full assessment. Never skip Phase 7 entirely on a full validate.
+
 ---
 
 ## Scoring
@@ -351,6 +385,43 @@ Generate a structured validation report:
 - **Total skill size:** {total words across all files}
 - **Progressive disclosure:** {Proper / Needs improvement}
 - **Estimated context cost:** {Low / Medium / High} relative to value delivered
+
+### Effectiveness assessment (strategic quality synthesis)
+
+*Sections follow [effectiveness-assessment.md](effectiveness-assessment.md); scale length to skill size and review depth.*
+
+#### Domain quality bar
+{Established practices for this domain + how an excellent skill encodes them + gaps in current skill}
+
+#### Ecosystem & context
+{Adjacent skills table + integration/handoff risks + script/path brittleness if any}
+
+#### Goals → design choices
+| Goal | Design response |
+|------|-----------------|
+| … | … |
+
+#### Proposed rework
+**Positioning:** {one sentence}
+
+- **SKILL.md (L2):** {mandatory behaviors, routing, integration}
+- **references/ (L3):** {topic-scoped files; what moves out of SKILL.md}
+- **Operational detail:** {discovery / ordering before proposing work}
+- **Contracts:** {frontmatter, schema, lintable fields}
+- **Config & defaults:** {manifest, CLI, env, named profiles}
+- **Assets:** {templates aligned to contract}
+- **skill-set follow-up:** {version, index, relationship map, inventory}
+
+#### Drop / demote / retain
+- **Drop:** …
+- **Demote:** …
+- **Retain:** …
+
+#### Success criteria (post-rework)
+1. …
+
+#### Suggested implementation order
+1. …
 ```
 
 ## Relationship to Other Workflows
@@ -378,4 +449,5 @@ For a rapid assessment without the full workflow:
 [ ] Does this skill do ONE job, not three?
 [ ] Would 2-3 users trigger this with the same intent phrase?
 [ ] Does this need to be a skill (vs. a rule or inline prompt)?
+[ ] Does the report include an effectiveness assessment (domain bar, ecosystem, goals→design, proposed shape, drop/demote, success criteria, order)?
 ```

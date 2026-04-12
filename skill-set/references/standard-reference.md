@@ -7,7 +7,7 @@ A condensed reference for the Agent Skills open standard rules. For full details
 ```
 your-skill-name/          # kebab-case, required
 ├── SKILL.md              # Required, exact case
-├── scripts/              # Optional — executable code
+├── scripts/              # Optional — executable code (see skill-set references/skill-scripts.md)
 ├── references/           # Optional — documentation, data
 └── assets/               # Optional — templates, static resources
 ```

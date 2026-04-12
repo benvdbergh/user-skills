@@ -31,3 +31,22 @@ User: "Create a Spotify skill"
 → Gap Analysis: Required MCP not installed
 → Halts creation, informs user: "Spotify MCP not found. Install MCP first."
 ```
+
+**Example: Full validate with effectiveness assessment**
+```
+User: "Deep review project-planning; I want a refactor advisory like we did last time"
+→ Lint the skill first
+→ validate.md (workflow) + effectiveness-assessment.md (synthesis template)
+→ Report: dimension scores + Effectiveness assessment sections (domain quality bar, ecosystem table,
+  goals→design, proposed SKILL.md/references/contracts/config, drop/demote/retain,
+  success criteria, implementation order)
+```
+
+**Example: Add scripts to a skill (LLM vs automation split)**
+```
+User: "This skill will manage hundreds of YAML-frontmatter files — add tooling"
+→ Read skill-scripts.md
+→ Plan: scan/lint/list as scripts; lib/ for parse + paths; Bun or Python only
+→ Each entrypoint: --help, --root/--config, markdown tables to stdout
+→ SKILL.md: CLI summary table + when to run each script
+```
