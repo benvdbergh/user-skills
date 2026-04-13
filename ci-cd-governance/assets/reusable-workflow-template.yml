@@ -1,0 +1,79 @@
+name: reusable-ci-verify
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        required: false
+        type: string
+        default: "20"
+      run-security-scan:
+        description: Enable dependency and code scanning lane
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      npm-token:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    name: ci / test (${{ runner.os }}, ${{ inputs.node-version }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Test
+        run: npm test -- --ci
+
+  security-scan:
+    if: ${{ inputs.run-security-scan }}
+    name: ci / security-scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - name: Run lightweight dependency audit
+        run: npm audit --audit-level=high
+
+  upload-test-report:
+    name: ci / upload-artifacts
+    runs-on: ubuntu-latest
+    needs: [lint-and-test]
+    if: ${{ always() }}
+    permissions:
+      contents: read
+    steps:
+      - name: Upload test report
+      # Replace with your generated report path.
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        with:
+          name: test-report
+          path: reports/test-report.xml
+          retention-days: 7
