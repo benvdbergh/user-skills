@@ -1,9 +1,23 @@
 {
-  "generated": "2026-04-12T18:18:21.564702Z",
-  "totalSkills": 26,
+  "generated": "2026-04-13T12:45:51.418084Z",
+  "totalSkills": 32,
   "alwaysLoadedCount": 0,
-  "deferredCount": 26,
+  "deferredCount": 32,
   "skills": {
+    "ci-cd-governance": {
+      "name": "ci-cd-governance",
+      "path": "ci-cd-governance/SKILL.md",
+      "fullDescription": "Defines and enforces CI/CD governance for GitHub Actions, including reusable workflows, least-privilege permissions, action pinning, required check policy, matrix and cache strategy, artifact retention, and cost controls. Use when designing, reviewing, or hardening CI/CD pipelines, branch protections, and workflow standards.",
+      "triggers": [
+        "designing",
+        "reviewing",
+        "hardening CI/CD pipelines",
+        "branch protections",
+        "and workflow standards"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
     "code-discovery-for-docs": {
       "name": "code-discovery-for-docs",
       "path": "code-discovery-for-docs/SKILL.md",
@@ -238,6 +252,21 @@
       "workflows": [],
       "tier": "deferred"
     },
+    "open-source-community": {
+      "name": "open-source-community",
+      "path": "open-source-community/SKILL.md",
+      "fullDescription": "Builds practical open source community operating guidance that improves contributor experience, governance transparency, maintainer role clarity, communication norms, recognition systems, and sustainability safeguards. Use when creating or revising community docs, maintainer policies, onboarding flows, governance files, or health checks for open source projects.",
+      "triggers": [
+        "creating",
+        "revising community docs",
+        "maintainer policies",
+        "onboarding flows",
+        "governance files",
+        "health checks for open source projects"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
     "pdf-to-markdown": {
       "name": "pdf-to-markdown",
       "path": "pdf-to-markdown/SKILL.md",
@@ -327,6 +356,64 @@
       "workflows": [
         "standards"
       ],
+      "tier": "deferred"
+    },
+    "release-versioning": {
+      "name": "release-versioning",
+      "path": "release-versioning/SKILL.md",
+      "fullDescription": "Defines SemVer and commit-convention release governance, then applies repeatable changelog, release-notes, checklist, and automation patterns. Use when setting or enforcing versioning policy, preparing releases, mapping commits to version bumps, or implementing release automation with GitHub Releases, release-please, or semantic-release.",
+      "triggers": [
+        "setting",
+        "enforcing versioning policy",
+        "preparing releases",
+        "mapping commits to version bumps",
+        "implementing release automation with GitHub Releases",
+        "release-please",
+        "semantic-release"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "repo-docs": {
+      "name": "repo-docs",
+      "path": "repo-docs/SKILL.md",
+      "fullDescription": "Improves repository discoverability and documentation quality across README, repository metadata, docs information architecture, community health files, and freshness signals. Use when auditing or upgrading an OSS repository's outward presentation and contributor-facing docs.",
+      "triggers": [
+        "auditing",
+        "upgrading an OSS repository's outward presentation and contributor-facing docs"
+      ],
+      "workflows": [
+        "repo-metadata-discoverability",
+        "readme-standards",
+        "docs-information-architecture",
+        "community-health-docs-baseline"
+      ],
+      "tier": "deferred"
+    },
+    "repo-security-compliance": {
+      "name": "repo-security-compliance",
+      "path": "repo-security-compliance/SKILL.md",
+      "fullDescription": "Assesses and improves repository security compliance for GitHub repositories by validating SECURITY.md quality, vulnerability disclosure operations, Dependabot and code scanning coverage, secret scanning and push protection, branch protection controls, and OpenSSF Scorecard governance. Use when creating or auditing repository security baselines and secure repository operations.",
+      "triggers": [
+        "creating",
+        "auditing repository security baselines and secure repository operations"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "repo-triage-pr-ops": {
+      "name": "repo-triage-pr-ops",
+      "path": "repo-triage-pr-ops/SKILL.md",
+      "fullDescription": "Defines OSS issue and pull request operations for GitHub repositories: issue forms, PR templates, label taxonomy, triage states with SLAs, stale policy, CODEOWNERS routing, and maintainer response patterns. Use when the user asks to set up or improve repository triage, contributor intake, review routing, backlog hygiene, or maintainer communication workflows.",
+      "triggers": [
+        "the user asks to set up",
+        "improve repository triage",
+        "contributor intake",
+        "review routing",
+        "backlog hygiene",
+        "maintainer communication workflows"
+      ],
+      "workflows": [],
       "tier": "deferred"
     },
     "research-analysis": {
