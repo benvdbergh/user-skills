@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels: ["type:bug", "status:triage-needed", "priority:p2"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. Please provide enough detail for reproduction.
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Pre-flight checks
+      description: Confirm before submitting.
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Product version, commit SHA, or container tag.
+      placeholder: v1.2.3 or abc1234
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Production
+        - Staging
+        - Local development
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or stack trace
+      render: shell
+      description: Paste relevant output. Remove secrets.
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, links, or mitigations tried.
+    validations:
+      required: false

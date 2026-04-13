@@ -1,0 +1,62 @@
+name: Feature request
+description: Propose an improvement with problem context
+title: "[Feature]: "
+labels: ["type:feature", "status:triage-needed", "priority:p2"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. Requests with problem context are triaged faster.
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: I searched existing issues and discussions first.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What pain exists today and who is impacted?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds or competing approaches.
+    validations:
+      required: false
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution intent
+      options:
+        - label: I am willing to help with implementation or testing.
+          required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Mockups, related issues, or references.
+    validations:
+      required: false
