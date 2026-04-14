@@ -1,6 +1,6 @@
 # GeneratePlan Workflow
 
-Generate a technical plan from existing specification or PRD.
+Generate a technical implementation plan from approved specification or PRD artifacts.
 
 ## When to Use
 
@@ -10,29 +10,33 @@ Generate a technical plan from existing specification or PRD.
 
 ## Workflow Steps
 
-1. **Load Source Document**
+1. **Load and Assess Source**
    - Read existing `spec.md` or `PRD.md`
-   - Extract technical requirements
-   - Identify architectural needs
+   - Extract technical requirements, constraints, and risks
+   - Identify unresolved architecture decisions and dependency risks
 
-2. **Generate Technical Plan**
-   - Use `assets/PlanTemplate.md` as base
-   - Structure plan with:
-     - Architecture Overview
-     - Technology Stack
-     - Implementation Phases
-     - Dependencies
-     - Risk Assessment
+2. **Apply Standards and Scale**
+   - Use `references/domain-standards.md` and `references/scale-playbooks.md`.
+   - Calibrate plan detail to startup/growth/enterprise scale.
+   - Convert risks into mitigation and contingency actions.
 
-3. **Validate Plan**
-   - Ensure all requirements are addressed
-   - Check for technical feasibility
-   - Verify dependencies are identified
+3. **Generate Technical Plan**
+   - Use `assets/PlanTemplate.md` as scaffold.
+   - Include:
+     - architecture context and explicit decision status (accepted/pending),
+     - phased implementation with dependency ordering,
+     - test strategy aligned to acceptance criteria,
+     - rollout and rollback strategy.
 
-4. **Save & Version**
+4. **Validate Plan Readiness**
+   - Run `ValidateSpec.ts` for structural completeness.
+   - Apply Gate 2 (Build Ready) from `references/quality-gates.md`.
+   - Escalate complex or unresolved architecture decisions to `software-architecture`.
+
+5. **Save & Version**
    - Save to `~/Knowledge/Projects/{project-name}/Plan.md`
-   - Link to source spec/PRD
-   - Version controlled
+   - Link to source spec/PRD and unresolved decision register
+   - Preserve traceability for `project-planning`
 
 ## CLI Usage
 
@@ -46,10 +50,10 @@ bun run $PAI_DIR/skills/specification/scripts/Specify.ts \
 
 ## Output
 
-Creates `Plan.md` with detailed technical implementation plan.
+Creates `Plan.md` with phased, risk-aware implementation guidance and readiness evidence.
 
 ## Integration
 
-- Reads from specification skill outputs
-- Feeds into ProjectPlanning for epic/story creation
-- Informs StateManagement for architectural state
+- Reads from specification outputs (`spec.md`, `PRD.md`)
+- Feeds `project-planning` for epic/story decomposition
+- Escalates architecture complexity to `software-architecture`

@@ -1,6 +1,6 @@
 # GenerateSpec Workflow
 
-Generate a project specification using Spec Kit-style executable specifications.
+Generate a project specification that is measurable, scale-calibrated, and handoff-ready.
 
 ## When to Use
 
@@ -10,32 +10,33 @@ Generate a project specification using Spec Kit-style executable specifications.
 
 ## Workflow Steps
 
-1. **Gather Requirements**
-   - Extract project name and description from user request
-   - Identify project type (web app, API, CLI tool, etc.)
-   - Collect key requirements and constraints
+1. **Establish Context and Scale**
+   - Extract project name, problem statement, user, and desired outcome.
+   - Choose scale profile from `references/scale-playbooks.md` (startup/growth/enterprise).
+   - Capture explicit constraints, assumptions, and key risks.
 
-2. **Select Template**
-   - Use `assets/SpecTemplate.md` as base structure
-   - Customize based on project type
+2. **Apply Domain Standards**
+   - Load `references/domain-standards.md`.
+   - Convert vague asks into measurable requirement statements.
+   - Ensure NFR categories include thresholds (performance, reliability, security, operability).
 
-3. **Generate Specification**
-   - Use Prompting skill to generate spec content
-   - Ensure all required sections are present:
-     - Project Overview
-     - Goals & Objectives
-     - Requirements
-     - Technical Constraints
-     - Success Criteria
+3. **Generate Artifact**
+   - Use `assets/SpecTemplate.md` as scaffold.
+   - Populate with:
+     - measurable goals and objectives,
+     - scoped functional and non-functional requirements,
+     - explicit out-of-scope boundaries,
+     - assumptions and unresolved decisions with owners.
 
-4. **Validate Specification**
-   - Run `ValidateSpec.ts` to check completeness
-   - Ensure all sections have content
+4. **Run Quality Gates**
+   - Run `ValidateSpec.ts` for structural completeness.
+   - Apply Gate 1 (Spec Ready) from `references/quality-gates.md`.
+   - If architecture decisions are unresolved and blocking, escalate to `software-architecture`.
 
 5. **Save & Version**
    - Save to `~/Knowledge/Projects/{project-name}/specs/spec.md`
-   - Initialize version control if needed
-   - Create initial commit
+   - Preserve stable section structure for downstream planning and architecture skills
+   - Version via repository workflow when requested
 
 ## CLI Usage
 
@@ -48,10 +49,10 @@ bun run $PAI_DIR/skills/specification/scripts/Specify.ts \
 
 ## Output
 
-Creates `spec.md` with complete project specification following Spec Kit patterns.
+Creates `spec.md` with complete project specification and measurable quality baseline.
 
 ## Integration
 
-- Uses Prompting skill for content generation
-- Uses VersionControl skill for versioning
-- Feeds into ProjectPlanning skill for sharding
+- Feeds `project-planning` with requirement and dependency context
+- Escalates complex architecture decisions to `software-architecture`
+- Uses `references/skill-escalation.md` for ownership boundaries

@@ -19,6 +19,10 @@ updated: {{date}}
 
 {{productVision}}
 
+## Problem Statement and Opportunity
+
+{{problemStatement}}
+
 ## Target Users
 
 {{targetUsers}}
@@ -35,6 +39,10 @@ updated: {{date}}
 
 {{nonFunctionalRequirements}}
 
+## Acceptance Criteria
+
+{{acceptanceCriteria}}
+
 ## Success Metrics
 
 {{successMetrics}}
@@ -46,6 +54,14 @@ updated: {{date}}
 ## Dependencies
 
 {{dependencies}}
+
+## Risks, Assumptions, and Open Questions
+
+{{risksAssumptionsOpenQuestions}}
+
+## Quality Gates
+
+{{qualityGates}}
 
 ## Timeline
 

@@ -18,6 +18,14 @@ updated: {{date}}
 
 {{goals}}
 
+## Problem Statement and Baseline
+
+{{problemStatement}}
+
+## Scale Profile
+
+{{scaleProfile}}
+
 ## Requirements
 
 ### Functional Requirements
@@ -36,6 +44,10 @@ updated: {{date}}
 
 {{successCriteria}}
 
+## Assumptions and Open Questions
+
+{{assumptionsAndOpenQuestions}}
+
 ## Out of Scope
 
 {{outOfScope}}
@@ -47,6 +59,10 @@ updated: {{date}}
 ## Risks & Mitigations
 
 {{risks}}
+
+## Quality Gates
+
+{{qualityGates}}
 
 ## Notes
 

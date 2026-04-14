@@ -1,6 +1,6 @@
 # Specification Skill — Overview
 
-Specification-driven development system for generating and managing project specifications, PRDs, technical plans, and constitutions.
+Specification-driven development skill for generating and managing project specifications, PRDs, technical plans, and constitutions with measurable standards and scale-aware rigor.
 
 ## Quick Start
 
@@ -32,7 +32,7 @@ The `ValidateSpec.ts` tool checks specification completeness by:
 
 ## Integration
 
-- Uses Prompting skill for document generation
-- Stores specs in `~/Knowledge/Projects/{project-name}/specs/`
-- Version controlled via VersionControl skill
-- Feeds into ProjectPlanning skill for sharding
+- Applies domain standards from `references/domain-standards.md`
+- Applies scale profiles from `references/scale-playbooks.md`
+- Applies readiness checks from `references/quality-gates.md`
+- Feeds `project-planning` and escalates architecture complexity to `software-architecture`

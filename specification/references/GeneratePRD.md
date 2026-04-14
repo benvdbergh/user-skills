@@ -1,6 +1,6 @@
 # GeneratePRD Workflow
 
-Generate a Product Requirements Document using BMAD-style structure.
+Generate a Product Requirements Document with clear outcomes, testable requirements, and delivery guardrails.
 
 ## When to Use
 
@@ -10,33 +10,32 @@ Generate a Product Requirements Document using BMAD-style structure.
 
 ## Workflow Steps
 
-1. **Gather Product Context**
-   - Extract product vision and goals
-   - Identify target users and use cases
-   - Collect business requirements
+1. **Capture Product Intent and Scale**
+   - Identify product vision, business objective, and target users.
+   - Select scale profile from `references/scale-playbooks.md`.
+   - Define measurable success outcomes before feature detail.
 
-2. **Select Template**
-   - Use `assets/PRDTemplate.md` as base structure
-   - Follow BMAD Method PRD patterns
+2. **Apply Domain Standards**
+   - Use `references/domain-standards.md` to enforce measurable requirements.
+   - Ensure each user story has acceptance criteria.
+   - Ensure NFRs have explicit thresholds and ownership.
 
 3. **Generate PRD**
-   - Use Prompting skill with PRD guidance
-   - Ensure all required sections:
-     - Executive Summary
-     - Product Vision
-     - User Stories
-     - Functional Requirements
-     - Non-Functional Requirements
-     - Success Metrics
+   - Use `assets/PRDTemplate.md` as scaffold.
+   - Fill:
+     - problem statement and opportunity,
+     - user stories and functional requirements,
+     - non-functional requirements with measurable thresholds,
+     - success metrics and rollout assumptions.
 
-4. **Validate PRD**
-   - Check for completeness
-   - Ensure user stories are well-defined
-   - Verify requirements are testable
+4. **Validate and Gate**
+   - Run `ValidateSpec.ts` for completeness checks.
+   - Apply Gate 1 (Spec Ready) and relevant Gate 2 checks from `references/quality-gates.md`.
+   - Escalate unresolved architecture or UX design concerns per `references/skill-escalation.md`.
 
 5. **Save & Version**
    - Save to `~/Knowledge/Projects/{project-name}/PRD.md`
-   - Version controlled via VersionControl skill
+   - Preserve stable sections for `project-planning` handoff
 
 ## CLI Usage
 
@@ -49,10 +48,10 @@ bun run $PAI_DIR/skills/specification/scripts/Specify.ts \
 
 ## Output
 
-Creates `PRD.md` with complete product requirements following BMAD patterns.
+Creates `PRD.md` with measurable product requirements and delivery-ready guardrails.
 
 ## Integration
 
-- Uses Prompting skill for document generation
-- Feeds into ProjectPlanning skill for sharding into Epics/Stories
-- Informs StateManagement for architectural constraints
+- Feeds `project-planning` for decomposition into epics/stories
+- Links architecture-sensitive decisions to `software-architecture`
+- Links UX-sensitive decisions to `ux-designer`

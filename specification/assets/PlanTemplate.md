@@ -19,6 +19,10 @@ updated: {{date}}
 
 {{technologyStack}}
 
+## Decision Log (Accepted/Pending)
+
+{{decisionLog}}
+
 ## Implementation Phases
 
 {{implementationPhases}}
@@ -30,6 +34,10 @@ updated: {{date}}
 ## Risk Assessment
 
 {{riskAssessment}}
+
+## Assumptions and Dependencies
+
+{{assumptionsAndDependencies}}
 
 ## Performance Considerations
 
@@ -46,6 +54,14 @@ updated: {{date}}
 ## Deployment Plan
 
 {{deploymentPlan}}
+
+## Rollback and Contingency Plan
+
+{{rollbackPlan}}
+
+## Quality Gates and Exit Criteria
+
+{{qualityGatesAndExitCriteria}}
 
 ## Notes
 

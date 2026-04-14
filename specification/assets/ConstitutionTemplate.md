@@ -36,6 +36,10 @@ updated: {{date}}
 
 {{performanceConstraints}}
 
+## Reliability and Operability Standards
+
+{{reliabilityAndOperabilityStandards}}
+
 ## Testing Requirements
 
 {{testingRequirements}}
@@ -44,12 +48,20 @@ updated: {{date}}
 
 {{documentationStandards}}
 
+## Change Control and Exception Process
+
+{{changeControlAndExceptionProcess}}
+
+## Review Cadence and Ownership
+
+{{reviewCadenceAndOwnership}}
+
 ## Enforcement
 
 This constitution is enforced by:
 - `pre-project-action.ts` hook - Validates actions against constraints
 - `security-validator.ts` hook - Checks tech stack compliance
-- StateManagement skill - Tracks architectural decisions
+- Specification + architecture workflows - Track decision and guardrail changes
 
 ## Notes
 

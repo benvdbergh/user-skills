@@ -523,14 +523,13 @@
     "specification": {
       "name": "specification",
       "path": "specification/SKILL.md",
-      "fullDescription": "Specification-driven development system for generating and managing project specifications, PRDs, technical plans, and constitutions. USE WHEN generate spec, create PRD, write technical plan, create constitution, specification-driven development, spec-first workflow.",
+      "fullDescription": "Specification-driven development orchestrator for project specifications, PRDs, technical implementation plans, and constitutions with scale-aware standards, quality gates, and handoff contracts to architecture and planning skills. Use when the user asks to generate a spec, create a PRD, write a technical plan, define project guardrails, or run a spec-first workflow.",
       "triggers": [
-        "generate spec",
-        "create PRD",
-        "write technical plan",
-        "create constitution",
-        "specification-driven development",
-        "spec-first workflow"
+        "the user asks to generate a spec",
+        "create a PRD",
+        "write a technical plan",
+        "define project guardrails",
+        "run a spec-first workflow"
       ],
       "workflows": [
         "GenerateSpec",
