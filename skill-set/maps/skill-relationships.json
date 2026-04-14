@@ -2,7 +2,7 @@
   "title": "Skill Relationship Map",
   "version": 2,
   "updated": "2026-04-13T12:45:53.575904Z",
-  "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage).",
+  "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage). Curators should treat each skill's references/skill-escalation.md as primary boundary evidence when present.",
   "sources": {
     "user_level_skill_index": "C:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
     "project_level_inventory": "C:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json",

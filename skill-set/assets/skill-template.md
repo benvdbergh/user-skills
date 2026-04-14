@@ -36,6 +36,15 @@ Example:
 | Workflow | Trigger | File |
 |----------|---------|------|
 | **{workflow-name}** | "{trigger phrase}" | `references/{workflow-file}.md` |
+| **SkillEscalation** | "scope boundary, delegation, escalation to other skills" | `references/skill-escalation.md` |
+
+## Skill Boundaries
+
+Boundary and delegation rules live in `references/skill-escalation.md`.
+This file should include:
+- what this skill owns
+- what this skill does not own
+- which skills to escalate to for adjacent concerns
 
 ## Examples
 

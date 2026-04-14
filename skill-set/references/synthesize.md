@@ -126,6 +126,7 @@ Create a new skill with standard-compliant structure, MCP tool integration, and 
    - Add **MCP Dependencies** section if MCP tools are used
    - Add **Tool Integration Protocol** section if applicable
    - Add **Workflow Routing** table
+   - Add routing entry for `references/skill-escalation.md`
    - Add **Examples** section with 2–3 usage patterns from the identified use cases
 
 11. **Create Reference Files** (if needed)
@@ -134,6 +135,7 @@ Create a new skill with standard-compliant structure, MCP tool integration, and 
    - Move detailed documentation out of SKILL.md into `references/`
    - Keep references one level deep: link from SKILL.md directly to reference files; avoid long reference chains so the agent does not do partial reads
    - **Topic-heavy skills:** If the domain splits into several maintainable areas (e.g. separate concerns with their own examples, framework tables, no-gos, and links), use **one reference file per topic** and keep **workflow routing + topic map + agent execution steps** in `SKILL.md` (do not add a separate `references/*-index.md` hub). Cross-link sibling references at the top of each file. See `references/authoring-guide.md` — *Topic-scoped reference files (maintainability)*.
+   - **Mandatory boundary artifact:** Create `references/skill-escalation.md` for every new skill. This file defines scope boundaries and handoffs: what the skill owns, what it delegates, and which neighboring skills to escalate to for adjacent concerns.
 
 ### Phase 3: Tool Policy & Safety
 
@@ -213,6 +215,7 @@ Creates complete skill structure with:
 - Prior art research summary informing the design
 - SKILL.md with standard-compliant frontmatter (kebab-case, WHAT + WHEN description)
 - `references/` directory with workflow files (if needed)
+- `references/skill-escalation.md` describing ownership boundaries and escalation handoffs
 - `scripts/` directory with executable code (if needed)
 - `assets/` directory with templates (if needed)
 - Explicit MCP tool mapping and safety policies (if applicable)

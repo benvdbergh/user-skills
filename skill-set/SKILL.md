@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: PAI
-  version: 2.6.0
+  version: 2.7.0
 ---
 
 # skill-set
@@ -105,6 +105,7 @@ By embedding `list_mcp_resources` into the skill creation workflow, we ensure:
 **Post-change hygiene (quality + efficiency):**
 
 - **Structure:** For skills with several subject areas, use **topic-scoped** `references/*.md` files (examples, market-standards, frameworks, no-gos, links per topic) and keep **workflow routing + topic map + agent steps** in `SKILL.md`—avoid a duplicate hub file under `references/`. Details: `references/authoring-guide.md` (*Topic-scoped reference files*).
+- **Boundary standard:** Every new skill MUST include `references/skill-escalation.md` describing ownership boundaries (`owns` / `does not own`) and explicit escalation paths to adjacent skills.
 - **Grounding:** Prefer **citable external specs/guides** for “best practices” content; extend `prior-art` (or equivalent) when adding major sources.
 - **Discovery metadata:** After changing frontmatter `name`/`description`, adding/removing a skill folder, or reshaping workflows—run `scripts/update_skill_index.py` on the correct `<skills-root>`; use `--with-relationship-map` (`-R`) to refresh `skill-set/maps/skill-relationships.json` skill lists.
 - **Versioning:** Bump the skill’s `metadata.version` when behavior or structure changes materially.

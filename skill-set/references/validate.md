@@ -232,6 +232,7 @@ The validate workflow evaluates five dimensions:
     | SA3 | Scope creep | Does the skill contain instructions unrelated to its stated job? |
     | SA4 | Module count | Does the skill use 2-3 focused modules (optimal) vs. 4+ (diminishing returns)? |
     | SA5 | Reusability | Could parts of this skill be extracted into a shared reference? |
+    | SA6 | Escalation artifact present | `references/skill-escalation.md` exists and defines owns/does-not-own/escalation map |
 
     **Research insight (SkillsBench 2026):** Tasks with 2-3 skills show +18.6pp improvement; 4+ skills drop to +5.9pp. Smaller, focused skills composed together outperform monolithic comprehensive skills.
 
@@ -248,6 +249,22 @@ The validate workflow evaluates five dimensions:
     - **Missed industry pattern**: An established practice exists that the skill ignores without reason
     - **Justified divergence**: The skill intentionally differs from common patterns (document why)
     - **Novel contribution**: The skill introduces an approach not found in prior art (positive signal)
+
+14b. **Mandatory Skill Escalation Check**
+
+    Every validated skill must include `references/skill-escalation.md`.
+
+    Validate:
+    - file exists
+    - file is referenced from `SKILL.md`
+    - file defines:
+      - ownership (`owns`)
+      - non-ownership (`does not own`)
+      - escalation targets for adjacent concerns
+
+    If missing or incomplete, raise:
+    - **ERROR:** "Missing or incomplete `references/skill-escalation.md`."
+    - Add blocking remediation: "Create/update `references/skill-escalation.md` before validation can pass."
 
 15. **Skill vs. Prompt Decision**
 
@@ -363,6 +380,9 @@ Generate a structured validation report:
 ### Critical Issues
 {List of CRITICAL severity findings — fix these first}
 
+### Blocking Remediations
+- {List mandatory fixes required for pass; include missing `references/skill-escalation.md` when applicable}
+
 ### Improvement Recommendations
 
 #### High Impact (fix these for biggest performance gain)
@@ -449,5 +469,6 @@ For a rapid assessment without the full workflow:
 [ ] Does this skill do ONE job, not three?
 [ ] Would 2-3 users trigger this with the same intent phrase?
 [ ] Does this need to be a skill (vs. a rule or inline prompt)?
+[ ] Does `references/skill-escalation.md` exist and define owns / does-not-own / escalation paths?
 [ ] Does the report include an effectiveness assessment (domain bar, ecosystem, goals→design, proposed shape, drop/demote, success criteria, order)?
 ```

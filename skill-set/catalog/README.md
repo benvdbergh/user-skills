@@ -53,6 +53,14 @@ Paths are stored as absolute paths so that tooling can resolve them without extr
 - To add an environment: add a new object to `environments` with `id`, `path`, and `skill_index_path` (and optionally `scope`, `display_name`).
 - To remove an environment: delete its entry from `environments` and bump `updated`.
 
+## Standardized Escalation Artifact
+
+For relationship analysis consistency, each new skill should include `references/skill-escalation.md`:
+
+- Documents **owns / does not own** boundaries.
+- Documents **which skills to escalate to** for adjacent concerns.
+- Provides high-signal evidence for curating `maps/skill-relationships.json` edges and overlap notes.
+
 ## Discovery note
 
 Environments are: (1) the global/user-level `.claude` (single skill-index), and (2) each project or workspace root that has a local `.claude/skills/skill-index.json`. There is no requirement for a `~/.claude/projects` directory; workspace roots (e.g. Ai-Vault) are discovered by convention.
