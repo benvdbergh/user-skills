@@ -1,8 +1,8 @@
 {
-  "generated": "2026-04-13T12:45:51.418084Z",
-  "totalSkills": 32,
+  "generated": "2026-04-14T00:00:00.000000Z",
+  "totalSkills": 33,
   "alwaysLoadedCount": 0,
-  "deferredCount": 32,
+  "deferredCount": 33,
   "skills": {
     "ci-cd-governance": {
       "name": "ci-cd-governance",
@@ -318,6 +318,27 @@
       ],
       "workflows": [
         "workflows"
+      ],
+      "tier": "deferred"
+    },
+    "product-roadmap": {
+      "name": "product-roadmap",
+      "path": "product-roadmap/SKILL.md",
+      "fullDescription": "Creates and evolves outcome-oriented product roadmaps across horizons, aligning product vision, architecture strategy, feature sequencing, release intent, and architectural runway. Use when creating a high-level roadmap, aligning roadmap and system design, deciding what to build next, placing features into releases, maintaining architectural runway, or replanning after strategy shifts.",
+      "triggers": [
+        "creating a high-level roadmap",
+        "aligning roadmap and system design",
+        "deciding what to build next",
+        "placing features into releases",
+        "maintaining architectural runway",
+        "replanning after strategy shifts"
+      ],
+      "workflows": [
+        "VisionToRoadmap",
+        "RoadmapArchitectureAlignment",
+        "FeatureReleaseSequencing",
+        "ArchitecturalRunwayPlanning",
+        "RoadmapRepositioning"
       ],
       "tier": "deferred"
     },
