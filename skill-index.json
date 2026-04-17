@@ -1,8 +1,8 @@
 {
-  "generated": "2026-04-14T00:00:00.000000Z",
-  "totalSkills": 33,
+  "generated": "2026-04-17T06:54:46.271723Z",
+  "totalSkills": 35,
   "alwaysLoadedCount": 0,
-  "deferredCount": 33,
+  "deferredCount": 35,
   "skills": {
     "ci-cd-governance": {
       "name": "ci-cd-governance",
@@ -487,7 +487,8 @@
         "authoring-guide",
         "skill-scripts",
         "effectiveness-assessment",
-        "*"
+        "*",
+        "skill-escalation"
       ],
       "tier": "deferred"
     },
@@ -578,6 +579,36 @@
       "workflows": [],
       "tier": "deferred"
     },
+    "value-propositions": {
+      "name": "value-propositions",
+      "path": "value-propositions/SKILL.md",
+      "fullDescription": "Guides creation, critique, and testing of value propositions using established business frameworks (Value Proposition Canvas, Jobs to Be Done, Bain Elements of Value, B2B economic value logic, Moore-style positioning, HBR business-markets discipline, Lean value hypotheses). Use when drafting or analyzing a value proposition, value proposition canvas, customer value story, product-market fit narrative, elevator pitch, differentiated offer, or when the user asks how to measure, validate, or structure customer value. Requires organizational inputs and explicit assumptions before applying any framework; does not replace legal, pricing, or market research execution.",
+      "triggers": [
+        "drafting",
+        "analyzing a value proposition",
+        "value proposition canvas",
+        "customer value story",
+        "product-market fit narrative",
+        "elevator pitch",
+        "differentiated offer",
+        "when the user asks how to measure",
+        "validate",
+        "pricing",
+        "market research execution"
+      ],
+      "workflows": [
+        "value-proposition-canvas-osterwalder",
+        "jobs-to-be-done",
+        "bain-elements-of-value",
+        "economic-value-and-pricing-logic",
+        "moore-positioning-statement",
+        "hbr-business-markets-value-propositions",
+        "lean-startup-value-hypothesis",
+        "gap-analysis-and-critique-checklist",
+        "prior-art-market-landscape"
+      ],
+      "tier": "deferred"
+    },
     "version-control": {
       "name": "version-control",
       "path": "version-control/SKILL.md",
@@ -630,6 +661,33 @@
         "compose",
         "audit",
         "refine"
+      ],
+      "tier": "deferred"
+    },
+    "workflow-engine-mcp-design": {
+      "name": "workflow-engine-mcp-design",
+      "path": "workflow-engine-mcp-design/SKILL.md",
+      "fullDescription": "Guides design, validation, execution, and recovery for Agent Workflow Protocol POC workflows through the @agent-workflow/engine MCP adapter. Use when the user mentions workflow-engine MCP, workflows-engine-mcp, workflow_start, workflow_status, workflow_resume, POC workflow JSON, interrupt/resume, lighthouse-style routing, or JSON Schema workflow-definition-poc. Covers in-scope node types, bundled as-built schema, MCP lifecycle limits, and structured adapter errors.",
+      "triggers": [
+        "the user mentions workflow-engine MCP",
+        "workflows-engine-mcp",
+        "workflow_start",
+        "workflow_status",
+        "workflow_resume",
+        "POC workflow JSON",
+        "interrupt/resume",
+        "lighthouse-style routing",
+        "JSON Schema workflow-definition-poc. Covers in-scope node types",
+        "bundled as-built schema",
+        "MCP lifecycle limits",
+        "and structured adapter errors"
+      ],
+      "workflows": [
+        "poc-feature-surface",
+        "mcp-tools-and-lifecycle",
+        "schema-and-validation",
+        "troubleshooting",
+        "skill-escalation"
       ],
       "tier": "deferred"
     }
