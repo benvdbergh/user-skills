@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-17T06:54:46.271723Z",
+  "generated": "2026-04-21T21:53:51.174206Z",
   "totalSkills": 35,
   "alwaysLoadedCount": 0,
   "deferredCount": 35,
@@ -241,13 +241,21 @@
     "office-xlsx": {
       "name": "office-xlsx",
       "path": "office-xlsx/SKILL.md",
-      "fullDescription": "Excel / spreadsheet automation skill for creating, editing, and validating `.xlsx` models with formula integrity checks and LibreOffice-backed recalculation. Use when the user asks to \"update an Excel file\", \"build a spreadsheet model\", \"recalculate formulas\", \"fix #REF/#DIV errors\", or wants spreadsheet conventions (inputs vs formulas) enforced.",
+      "fullDescription": "Excel workbook automation for `.xlsx` and `.xlsm`: models, edits, validation, LibreOffice-backed recalculation and error scanning, plus optional Excel MCP for host-backed reads and small writes. Use when the user names an Excel file, asks to build or fix a spreadsheet, recalculate formulas, clear `#REF`/`#DIV/0!`, validate ranges, apply tables or charts, or turn messy `.csv`/`.tsv` into a structured workbook. Do not use when the primary deliverable is Word, HTML, a standalone script only, a database pipeline without an xlsx artifact, or Google Sheets API-only workflows.",
       "triggers": [
-        "the user asks to \"update an Excel file",
-        "build a spreadsheet model",
+        "the user names an Excel file",
+        "asks to build",
+        "fix a spreadsheet",
         "recalculate formulas",
-        "fix #REF/#DIV errors",
-        "wants spreadsheet conventions (inputs vs formulas) enforced"
+        "clear `#REF`/`#DIV/0!`",
+        "validate ranges",
+        "apply tables",
+        "charts",
+        "turn messy `.csv`/`.tsv` into a structured workbook. Do not use when the primary deliverable is Word",
+        "HTML",
+        "a standalone script only",
+        "a database pipeline without an xlsx artifact",
+        "Google Sheets API-only workflows"
       ],
       "workflows": [],
       "tier": "deferred"

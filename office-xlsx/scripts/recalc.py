@@ -163,9 +163,14 @@ def recalc(filename, timeout=30):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python recalc.py <excel_file> [timeout_seconds]")
-        sys.exit(1)
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+        print(
+            "Usage: python recalc.py <excel_file> [timeout_seconds]\n\n"
+            "Recalculates all formulas via LibreOffice, then prints JSON with\n"
+            "status, total_errors, error_summary, total_formulas.\n"
+            "Optional timeout (seconds) wraps soffice on Linux/macOS only."
+        )
+        sys.exit(0 if len(sys.argv) >= 2 and sys.argv[1] in ("-h", "--help") else 1)
 
     filename = sys.argv[1]
     timeout = int(sys.argv[2]) if len(sys.argv) > 2 else 30
