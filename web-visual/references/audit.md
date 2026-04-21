@@ -83,7 +83,7 @@ Check for:
 
 ## Audit Report Format
 
-Generate the report as `{workspace}/web-visuals/{name}.audit.md`:
+Generate the report as `{name}.audit.md` in the **same directory as the HTML file** being audited (or a path the user specified for audit output):
 
 ```markdown
 ---
@@ -136,7 +136,7 @@ Apply auto-fixes? (User confirms before changes are made)
 3. **Evaluate** each dimension using the criteria tables above
 4. **Score** each dimension (0-10) based on findings
 5. **Generate** the audit report markdown
-6. **Save** to `{workspace}/web-visuals/{name}.audit.md`
+6. **Save** next to the HTML (or to the user-specified audit path), e.g. `{html-dir}/{name}.audit.md`
 7. **Present** summary to user with option to auto-fix issues
 8. If user approves auto-fixes, invoke the **refine** workflow with the fix list
 

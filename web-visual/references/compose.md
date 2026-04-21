@@ -153,10 +153,11 @@ Fix any issues found before proceeding to output.
 
 ### Stage 5: Output
 
-1. **Create output directory** if it doesn't exist: `{workspace}/web-visuals/`
-2. **Save HTML file**: `{workspace}/web-visuals/{slug}.html`
-3. **Preview in browser**: Use `cursor-ide-browser` tools to open and verify the result
-4. **Report to user**: Summarize what was generated, key design decisions, and the file path
+1. **Resolve output directory** using the Output Convention in `SKILL.md` (explicit path → source-adjacent → task context → ask once if still ambiguous). Do **not** assume a fixed folder such as `web-visuals/`.
+2. **Create parent directories** if they do not exist for the chosen path.
+3. **Save HTML file**: `{resolved-dir}/{slug}.html`
+4. **Preview in browser**: Use `cursor-ide-browser` tools to open and verify the result
+5. **Report to user**: Summarize what was generated, key design decisions, and the **full** file path
 
 ## Post-Compose
 

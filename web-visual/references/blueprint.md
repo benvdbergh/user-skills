@@ -86,7 +86,7 @@ Propose the overall page structure:
 
 ### Step 5: Output Blueprint Document
 
-Save the blueprint as `{workspace}/web-visuals/{name}.blueprint.md` with this structure:
+Save the blueprint as `{name}.blueprint.md` in the **same resolved output directory** as compose would use (see Output Convention in `SKILL.md` — no fixed `web-visuals/` folder). If only a blueprint is produced, resolve that directory the same way. Use this structure:
 
 ```markdown
 ---

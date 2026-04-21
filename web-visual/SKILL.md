@@ -9,7 +9,7 @@ description: >-
 license: MIT
 metadata:
   author: PAI
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # web-visual
@@ -101,16 +101,15 @@ blueprint → compose → audit → refine → audit
 
 ## Output Convention
 
-Generated files are saved to a project-local output directory:
+**Do not** use a single fixed output folder (for example a hard-coded `web-visuals/` at the workspace root). Resolve where to write files from context:
 
-```
-{workspace}/web-visuals/
-├── {name}.html           # Self-contained visualization
-├── {name}.blueprint.md   # Design blueprint (if blueprint workflow was used)
-└── {name}.audit.md       # Audit report (if audit workflow was used)
-```
+1. **Explicit path** — If the user names a folder or full path, use it. Create parent directories as needed.
+2. **Source-adjacent** — When the visualization is built from an existing file, default to the **same directory** as that file: `{source-dir}/{slug}.html` (and `{slug}.blueprint.md` / `{slug}.audit.md` alongside, unless the user wants them elsewhere).
+3. **Task context** — When there is no single source file, place outputs next to the primary note, spec, or folder the user is working in; if that is unclear, ask once for the target directory.
 
-- `{name}` defaults to a slugified version of the content title
+Naming:
+
+- `{name}` / `{slug}` defaults to a slugified version of the content title
 - The HTML file can be opened directly in any browser or hosted on GitHub Pages
 - Preview in Cursor's built-in browser using `cursor-ide-browser` tools
 
@@ -133,7 +132,7 @@ User: "Visualize this market analysis report"
 → Stage 2: Maps sections to narrative-section, table to comparison-grid, metrics to metric-cards
 → Stage 3: Generates single HTML file with nav, smooth scrolling, animated charts
 → Stage 4: Self-critique passes (a11y OK, responsive OK, no console errors)
-→ Output: web-visuals/market-analysis.html
+→ Output: e.g. same folder as the source report → `.../market-analysis.html`
 ```
 
 **Example 2: Blueprint before generation**
@@ -142,7 +141,7 @@ User: "What's the best way to visualize this product roadmap?"
 → Invokes blueprint workflow
 → Analyzes content: timeline data + feature groups + priority indicators
 → Proposes: horizontal timeline with grouped swimlanes, filterable by priority
-→ Output: web-visuals/product-roadmap.blueprint.md
+→ Output: e.g. `.../product-roadmap.blueprint.md` next to the agreed output location
 → User approves → compose workflow generates the HTML
 ```
 
@@ -154,7 +153,7 @@ User: "Add a dark mode toggle and make the charts bigger"
 → Adds CSS custom property theme switcher + JS toggle
 → Adjusts chart container dimensions
 → Runs audit: confirms dark mode contrast ratios pass WCAG AA
-→ Output: updated web-visuals/market-analysis.html
+→ Output: updated `market-analysis.html` at its existing path
 ```
 
 **Example 4: Audit a generated page**
@@ -163,7 +162,7 @@ User: "Check if the dashboard is accessible and mobile-friendly"
 → Invokes audit workflow
 → Checks: semantic HTML ✅, ARIA labels ⚠️ (2 missing), color contrast ✅
 → Checks: 320px layout ⚠️ (table overflow), 768px ✅, 1024px ✅
-→ Output: web-visuals/dashboard.audit.md with findings and fix suggestions
+→ Output: `dashboard.audit.md` beside the HTML (or path the user specified)
 → Optionally auto-fixes issues if user confirms
 ```
 
@@ -175,7 +174,7 @@ User: "Turn this CSV data into an interactive dashboard"
 → Stage 2: Maps to metric-cards (KPIs) + data-chart (line chart) + comparison-grid (table)
 → Stage 3: Embeds Chart.js via CDN, generates responsive dashboard layout
 → Stage 4: Validates chart rendering, tooltip accessibility, filter UX
-→ Output: web-visuals/data-dashboard.html
+→ Output: e.g. user-specified or source-adjacent `data-dashboard.html`
 ```
 
 ## Integration Points

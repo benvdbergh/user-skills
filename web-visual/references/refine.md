@@ -68,7 +68,7 @@ Adding or modifying JavaScript behavior:
 
 Applying fixes from an audit report:
 
-1. **Read** the audit report (`{name}.audit.md`)
+1. **Read** the audit report (`{name}.audit.md`, usually beside the HTML)
 2. **Parse** the auto-fix list
 3. **Apply fixes in priority order**: Critical → Warnings → Suggestions
 4. **After each fix**, verify it doesn't break other functionality
