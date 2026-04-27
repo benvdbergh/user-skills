@@ -1,10 +1,12 @@
-# Excel MCP (`user-excel`)
+# Excel MCP quick index (`user-excel`)
 
-Cursor commonly exposes the Excel integration as MCP server identifier **`user-excel`** (display name `excel`). **Confirm the server id** in the host’s MCP panel if calls fail.
+**Canonical usage, filepath rules, lifecycle tools, transport/env summary:** load **`references/excel-mcp-server.md`** first — it defines **MCP-first** execution for this skill before Python fallbacks.
 
-## Tool inventory (typical)
+## Cursor server id
 
-Use MCP descriptors in the IDE for authoritative schemas. Common tools include:
+Typically **`user-excel`** (display name may be `excel`). Confirm in the host MCP panel if calls fail.
+
+## Tool inventory (compact)
 
 | Area | Tools |
 |------|--------|
@@ -16,14 +18,8 @@ Use MCP descriptors in the IDE for authoritative schemas. Common tools include:
 | Ranges | `copy_range`, `delete_range`, `format_range`, `merge_cells`, `unmerge_cells` |
 | Objects | `create_table`, `create_chart`, `create_pivot_table` |
 | Validation | `validate_excel_range` |
+| Session / persistence | `excel_list_open_workbooks`, `excel_open_workbook`, `excel_close_workbook`, `save_workbook` |
 
-## Routing guidance
+## Routing reminder
 
-- **Prefer MCP** for **one-shot** host-backed actions: read a block, apply one formula, create one sheet, validate a range, light formatting.
-- **Prefer scripts (Python)** when chaining **many** structural edits, generating large grids programmatically, or repeating the same transform across files (deterministic, reviewable code).
-- **Prefer pandas** when the first step is **analytical** (stats, filters, joins) on data that must be fully materialized in memory before any Excel write.
-
-## Safety
-
-- MCP touches **live files** on the machine running Excel; confirm paths and **ask before overwrite** of important workbooks.
-- `write_data_to_excel` may accept formula strings **without** the same checks as `apply_formula`; choose the right tool for the risk level.
+Prefer **`references/excel-mcp-server.md`** default order: **MCP → Python → `recalc.py`** per situation.

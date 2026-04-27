@@ -4,7 +4,7 @@
 
 - `.xlsx` / `.xlsm` workbook structure, formulas, formatting, and conventions (inputs vs calculated cells).
 - LibreOffice-backed full-workbook **recalculation** and **error-cell scanning** via `scripts/recalc.py`.
-- Guidance for **openpyxl** / **pandas** workflows and **Excel MCP** (`user-excel` in typical Cursor installs) when the deliverable remains a spreadsheet artifact.
+- Guidance for **openpyxl** / **pandas** workflows and **Excel MCP** (`user-excel` in typical Cursor installs) when the deliverable remains a spreadsheet artifact; MCP-first usage is specified in **`references/excel-mcp-server.md`**.
 
 ## Does not own
 
@@ -24,4 +24,4 @@
 
 ## MCP availability
 
-If the Excel MCP server is not configured, fall back to **Python (openpyxl/pandas)** plus `scripts/recalc.py` for validation; state the gap to the user instead of assuming tools exist.
+If the Excel MCP server is not configured, fall back to **Python (openpyxl/pandas)** plus `scripts/recalc.py` for validation; state the gap to the user instead of assuming tools exist. When MCP **is** configured, follow **`references/excel-mcp-server.md`** before choosing scripted alternatives.
