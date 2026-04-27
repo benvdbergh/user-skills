@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-21T21:53:51.174206Z",
+  "generated": "2026-04-27T22:16:28.469314Z",
   "totalSkills": 35,
   "alwaysLoadedCount": 0,
   "deferredCount": 35,
@@ -55,23 +55,33 @@
     "diagram": {
       "name": "diagram",
       "path": "diagram/SKILL.md",
-      "fullDescription": "Translates textual content into diagrammatic form and back using a format-agnostic semantic model. Supports Author (create), Revise (update), Verify (validate), and Interpret (extract insights). Default output: draw.io. USE WHEN create diagram, update diagram, validate diagram, diagram from text, text from diagram, draw.io, Excalidraw, PlantUML, ArchiMate, flowchart, sequence diagram, entity-relationship, visual model.",
+      "fullDescription": "Creates, revises, validates, and interprets technical and product diagrams using a format-agnostic semantic model and an opinionated editorial design system. Outputs draw.io files (.drawio XML), standalone HTML/SVG, or Mermaid. Thirteen diagram types: architecture, flowchart, sequence, state machine, ER, timeline, swimlane, quadrant, nested, tree, layer stack, venn, pyramid. USE WHEN: create diagram, update diagram, validate diagram, draw flowchart, architecture diagram, sequence diagram, ER diagram, state machine, swimlane, timeline, quadrant, layer stack, venn, pyramid, nested, tree, diagram from text, text from diagram, explain diagram, summarize diagram.",
       "triggers": [
         "create diagram",
         "update diagram",
         "validate diagram",
+        "draw flowchart",
+        "architecture diagram",
+        "sequence diagram",
+        "ER diagram",
+        "state machine",
+        "swimlane",
+        "timeline",
+        "quadrant",
+        "layer stack",
+        "venn",
+        "pyramid",
+        "nested",
+        "tree",
         "diagram from text",
         "text from diagram",
-        "draw.io",
-        "Excalidraw",
-        "PlantUML",
-        "ArchiMate",
-        "flowchart",
-        "sequence diagram",
-        "entity-relationship",
-        "visual model"
+        "explain diagram",
+        "summarize diagram"
       ],
-      "workflows": [],
+      "workflows": [
+        "diagram-mechanics",
+        "type-*"
+      ],
       "tier": "deferred"
     },
     "document-deep-merge": {
@@ -241,7 +251,7 @@
     "office-xlsx": {
       "name": "office-xlsx",
       "path": "office-xlsx/SKILL.md",
-      "fullDescription": "Excel workbook automation for `.xlsx` and `.xlsm`: models, edits, validation, LibreOffice-backed recalculation and error scanning, plus optional Excel MCP for host-backed reads and small writes. Use when the user names an Excel file, asks to build or fix a spreadsheet, recalculate formulas, clear `#REF`/`#DIV/0!`, validate ranges, apply tables or charts, or turn messy `.csv`/`.tsv` into a structured workbook. Do not use when the primary deliverable is Word, HTML, a standalone script only, a database pipeline without an xlsx artifact, or Google Sheets API-only workflows.",
+      "fullDescription": "Excel workbook automation for `.xlsx` and `.xlsm`: defaults to Excel MCP (`user-excel`) when configured for reads, writes, discovery, and validation; falls back to openpyxl / pandas and LibreOffice-backed recalculation (`scripts/recalc.py`) when MCP is absent or bulk scripted work is clearer. Use when the user names an Excel file, asks to build or fix a spreadsheet, recalculate formulas, clear `#REF`/`#DIV/0!`, validate ranges, apply tables or charts, or turn messy `.csv`/`.tsv` into a structured workbook. Do not use when the primary deliverable is Word, HTML, a standalone script only, a database pipeline without an xlsx artifact, or Google Sheets API-only workflows.",
       "triggers": [
         "the user names an Excel file",
         "asks to build",
@@ -257,7 +267,9 @@
         "a database pipeline without an xlsx artifact",
         "Google Sheets API-only workflows"
       ],
-      "workflows": [],
+      "workflows": [
+        "excel-mcp-server"
+      ],
       "tier": "deferred"
     },
     "open-source-community": {
