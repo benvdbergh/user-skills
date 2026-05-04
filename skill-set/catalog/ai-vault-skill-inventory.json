@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-04-16T14:00:00Z",
+  "updated": "2026-05-04T12:00:00Z",
   "description": "Canonical project-level skill inventory for Ai-Vault. Source: Ai-Vault .claude/skills/skill-index.json. Used by Stories 01-04, 01-05, 01-06 and skill-set workflows for mapping, relationships, and artifact generation.",
   "environment_id": "ai-vault",
   "source_index_path": "C:\\Users\\vandenbb\\repos\\Ai-Agents\\obsidian\\Ai-Vault\\.claude\\skills\\skill-index.json",
@@ -64,6 +64,25 @@
       "workflows": [
         "ProposeModelUpdate",
         "ValidationWorkflow"
+      ],
+      "tier": "deferred",
+      "standard_version": "agent-skills-v1",
+      "indication": "ai-vault-cai-specific"
+    },
+    {
+      "name": "feature-model-navigation",
+      "path": "skills/feature-model-navigation",
+      "purpose_summary": "Ai-Vault project skill for navigating and analyzing product feature-model Markdown: feasibility vs documented capabilities, gap and placement in the taxonomy, and release-driven doc updates from change notes and source diffs; default context FCS stackFleet 02-Feature-Model.",
+      "primary_triggers": [
+        "feasibility questions against the feature model",
+        "gap and placement in the taxonomy",
+        "release and diff alignment for feature sheets",
+        "FCS stackFleet 02-Feature-Model folder work"
+      ],
+      "workflows": [
+        "Feasibility",
+        "GapPlacement",
+        "ReleaseSync"
       ],
       "tier": "deferred",
       "standard_version": "agent-skills-v1",

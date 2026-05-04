@@ -24,6 +24,7 @@
 | Specs, PRDs, technical plans from VP work | `specification` |
 | Customer-facing technical docs from stable messaging | `tech-documentation` |
 | Enterprise / ArchiMate modeling of capabilities | `enterprise-architecture` (global) + vault model store workflows |
+| Product feature taxonomy: feasibility vs docs, gap placement in feature sheets, release-to-doc sync (Ai-Vault stackFleet feature model) | `feature-model-navigation` (Ai-Vault project skill) |
 
 ## Whole-product warning (Moore)
 

@@ -19,6 +19,8 @@ Global enterprise architecture skill that owns all ArchiMate + arc42 methodology
 
 **Boundary with `software-architecture`:** This skill owns **enterprise / ArchiMate / arc42** methodology, metamodel projections, and model quality. The **`software-architecture`** skill owns **solution- and product-level** technical design, topology research for implementation, implementation readiness (PRD/UX/epics alignment), and lean ADR-style decision docs. When the user is designing **one system or service** to ship—not portfolio or enterprise-wide ontology work—prefer **`software-architecture`**.
 
+**Boundary with product feature-model trees:** Vault-local **product feature taxonomies** (consultant-facing feature sheets, feasibility vs Markdown docs, release-to-doc sync) are owned by the Ai-Vault **`feature-model-navigation`** project skill when present. Use **`enterprise-architecture`** for ArchiMate extraction, relationships, and EA gaps; use **`feature-model-navigation`** for taxonomy navigation and doc policy without inventing graph entities. See `references/IntegrationPatterns-DiagramDocsEA.md` §6.
+
 ---
 
 ## MCP Dependencies

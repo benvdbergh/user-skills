@@ -82,3 +82,20 @@ See also `references/CrossSkillAndOntologySources.md`.
 - **`diagram`** — Formats and rendering; treats IDs as opaque bindings from upstream.
 - **Documentation / tech-documentation** — Narrative structure and publishing; orchestrates the above via clear contracts.
 - **deep-research / research-analysis** — Research execution; hands off text and structured hints to **`enterprise-architecture`** (and then **`enterprise-model-store`** when persisting).
+
+---
+
+### 6. Product feature-model docs vs enterprise architecture (boundary)
+
+**Goal:** Keep **product feature sheets** (Markdown taxonomies, consultant-facing parameters, integration wikilinks) separate from **ArchiMate / graph** modeling unless the user explicitly bridges them.
+
+| Concern | Primary owner |
+|---------|----------------|
+| Navigate or analyze a **vault-local** product feature model (feasibility vs documented features, gap placement in taxonomy, release-driven doc updates from notes + diffs) | **`feature-model-navigation`** (Ai-Vault project skill when installed there) |
+| Classify enterprise text, extract ArchiMate entities, propose relationships, EA gap/quality | **`enterprise-architecture`** |
+| Ontology JSON, graph read/write, validated apply, Obsidian from graph | **`enterprise-model-store`** (project) |
+
+**Contract**
+
+- **`feature-model-navigation` → `enterprise-architecture`**: hand off only when the user wants **portfolio or ArchiMate-aligned** updates; pass a short narrative bridge (business capability hints, actors, dependencies)—not fabricated ontology IDs.
+- **`enterprise-architecture` → `feature-model-navigation`**: when the deliverable is **product documentation structure** inside a feature-model tree rather than graph persistence, delegate doc mechanics and policy checks to the project skill.
