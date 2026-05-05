@@ -1,16 +1,14 @@
 #!/usr/bin/env bun
 
 /**
- * Revert changes in PAI repository
- * Supports reverting to specific commit or restoring specific files
+ * Revert or restore paths in the selected repository.
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
 import { updateStateForVCOperation, getCurrentCommitHash } from "./StateIntegration";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 interface RevertOptions {
   commit?: string;
@@ -19,7 +17,8 @@ interface RevertOptions {
 }
 
 async function revertChange(options: RevertOptions): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
@@ -33,25 +32,25 @@ async function revertChange(options: RevertOptions): Promise<void> {
     // Revert to specific commit
     revertedTo = options.commit;
     if (options.hard) {
-      await $`cd ${PAI_DIR} && git reset --hard ${options.commit}`.quiet();
+      await $`cd ${repoRoot} && git reset --hard ${options.commit}`.quiet();
       console.log(`✓ Reset to commit ${options.commit.substring(0, 7)}`);
     } else {
-      await $`cd ${PAI_DIR} && git revert --no-commit ${options.commit}`.quiet();
-      await $`cd ${PAI_DIR} && git commit -m "Revert to ${options.commit.substring(0, 7)}"`.quiet();
+      await $`cd ${repoRoot} && git revert --no-commit ${options.commit}`.quiet();
+      await $`cd ${repoRoot} && git commit -m "Revert to ${options.commit.substring(0, 7)}"`.quiet();
       commitHash = await getCurrentCommitHash() || undefined;
       console.log(`✓ Reverted to commit ${options.commit.substring(0, 7)}`);
     }
   } else if (options.file) {
     // Restore specific file from HEAD
-    await $`cd ${PAI_DIR} && git checkout HEAD -- ${options.file}`.quiet();
+    await $`cd ${repoRoot} && git checkout HEAD -- ${options.file}`.quiet();
     console.log(`✓ Restored ${options.file} from HEAD`);
   } else {
     // Revert uncommitted changes
     if (options.hard) {
-      await $`cd ${PAI_DIR} && git reset --hard HEAD`.quiet();
+      await $`cd ${repoRoot} && git reset --hard HEAD`.quiet();
       console.log("✓ Discarded all uncommitted changes");
     } else {
-      await $`cd ${PAI_DIR} && git checkout -- .`.quiet();
+      await $`cd ${repoRoot} && git checkout -- .`.quiet();
       console.log("✓ Restored all files to last commit");
     }
   }

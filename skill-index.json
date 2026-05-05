@@ -1,6 +1,6 @@
 {
   "generated": "2026-04-27T22:16:28.469314Z",
-  "totalSkills": 35,
+  "totalSkills": 36,
   "alwaysLoadedCount": 0,
   "deferredCount": 35,
   "skills": {
@@ -118,7 +118,7 @@
     "docx-documentation": {
       "name": "docx-documentation",
       "path": "docx-documentation/SKILL.md",
-      "fullDescription": "Global skill for Word/.docx and PDF export: Markdown↔DOCX conversion, DOCX→PDF export, light structural edits, and export pipelines. Use when the user needs to import from or export to Word, export to PDF from DOCX, inspect or tweak DOCX structure, or run post-processing on generated documents, while keeping Markdown as canonical. For PDF-to-Markdown ingestion use the pdf-to-markdown skill instead.",
+      "fullDescription": "Global skill for Word/.docx and PDF export: Markdown\u2194DOCX conversion, DOCX\u2192PDF export, light structural edits, and export pipelines. Use when the user needs to import from or export to Word, export to PDF from DOCX, inspect or tweak DOCX structure, or run post-processing on generated documents, while keeping Markdown as canonical. For PDF-to-Markdown ingestion use the pdf-to-markdown skill instead.",
       "triggers": [
         "the user needs to import from",
         "export to Word",
@@ -182,7 +182,7 @@
     "minimalist-coding": {
       "name": "minimalist-coding",
       "path": "minimalist-coding/SKILL.md",
-      "fullDescription": "Search-first coding workflow enforcing YAGNI principles, Clean Architecture layering, and DDD structural standards. USE WHEN implementing features, writing code, modifying codebase, structuring layers, applying clean architecture, DDD, naming conventions, library-first approach, OR user requests code changes. Enforces Locate→Modify→Create hierarchy, two-phase coding loop, and automatic refactoring.",
+      "fullDescription": "Search-first coding workflow enforcing YAGNI principles, Clean Architecture layering, and DDD structural standards. USE WHEN implementing features, writing code, modifying codebase, structuring layers, applying clean architecture, DDD, naming conventions, library-first approach, OR user requests code changes. Enforces Locate\u2192Modify\u2192Create hierarchy, two-phase coding loop, and automatic refactoring.",
       "triggers": [
         "implementing features",
         "writing code",
@@ -192,7 +192,7 @@
         "DDD",
         "naming conventions",
         "library-first approach",
-        "user requests code changes. Enforces Locate→Modify→Create hierarchy",
+        "user requests code changes. Enforces Locate\u2192Modify\u2192Create hierarchy",
         "two-phase coding loop",
         "and automatic refactoring"
       ],
@@ -206,7 +206,7 @@
     "office-docx": {
       "name": "office-docx",
       "path": "office-docx/SKILL.md",
-      "fullDescription": "Word (.docx) automation skill for Markdown↔DOCX workflows and OOXML-based redlining/tracked-changes editing patterns. Use when the user says \"export to Word\", \"import this .docx\", \"apply tracked changes\", \"redline this document\", \"unpack/edit/pack docx\", or needs safe DOCX editing without losing formatting.",
+      "fullDescription": "Word (.docx) automation skill for Markdown\u2194DOCX workflows and OOXML-based redlining/tracked-changes editing patterns. Use when the user says \"export to Word\", \"import this .docx\", \"apply tracked changes\", \"redline this document\", \"unpack/edit/pack docx\", or needs safe DOCX editing without losing formatting.",
       "triggers": [
         "the user says \"export to Word",
         "import this .docx",
@@ -236,7 +236,7 @@
     "office-pptx": {
       "name": "office-pptx",
       "path": "office-pptx/SKILL.md",
-      "fullDescription": "PowerPoint (.pptx) creation, editing, and analysis for Office automation, including template-based slide duplication/reordering, text inventory + safe replacement, and HTML→PPTX generation with visual validation. Use when the user says \"create a deck\", \"update this PowerPoint\", \"replace text in PPTX\", \"reorder slides\", \"generate slide thumbnails\", or needs PPTX OOXML unpack/edit/pack workflows.",
+      "fullDescription": "PowerPoint (.pptx) creation, editing, and analysis for Office automation, including template-based slide duplication/reordering, text inventory + safe replacement, and HTML\u2192PPTX generation with visual validation. Use when the user says \"create a deck\", \"update this PowerPoint\", \"replace text in PPTX\", \"reorder slides\", \"generate slide thumbnails\", or needs PPTX OOXML unpack/edit/pack workflows.",
       "triggers": [
         "the user says \"create a deck",
         "update this PowerPoint",
@@ -632,29 +632,20 @@
     "version-control": {
       "name": "version-control",
       "path": "version-control/SKILL.md",
-      "fullDescription": "Self-version management for PAI framework. USE WHEN tracking changes to .claude folder, reverting framework modifications, viewing version history, creating checkpoints, managing git repository for PAI infrastructure, OR after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts).",
+      "fullDescription": "Generic git workflow support for any repository: history, checkpoints, diffs, branches with optional branch metadata, commit helpers, and optional pending-action handling. Use when the user asks for git checkpoints, comparing commits, branch management, reverting, viewing history, initializing a repo, or reviewing uncommitted changes. Set REPO_ROOT or GIT_WORK_TREE to the repository root, or run scripts from that directory. Do not use for fork upstream policy; use fork-management.",
       "triggers": [
-        "tracking changes to .claude folder",
-        "reverting framework modifications",
-        "viewing version history",
-        "creating checkpoints",
-        "managing git repository for PAI infrastructure",
-        "after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts)"
+        "git",
+        "version control",
+        "checkpoint",
+        "commit",
+        "branch",
+        "revert",
+        "git log",
+        "diff",
+        "uncommitted",
+        "REPO_ROOT"
       ],
-      "workflows": [
-        "Initialize",
-        "ViewHistory",
-        "Revert",
-        "Checkpoint",
-        "Compare",
-        "CreateBranch",
-        "SwitchBranch",
-        "ListBranches",
-        "DescribeBranch",
-        "DeleteBranch",
-        "HandlePendingAction",
-        "CheckChanges"
-      ],
+      "workflows": [],
       "tier": "deferred"
     },
     "web-visual": {
@@ -708,6 +699,27 @@
         "schema-and-validation",
         "troubleshooting",
         "skill-escalation"
+      ],
+      "tier": "deferred"
+    },
+    "fork-management": {
+      "name": "fork-management",
+      "path": "fork-management/SKILL.md",
+      "fullDescription": "Governs long-lived GitHub forks using a FORK.md ledger, upstream sync decisions, and contribution workflows back to parent repositories. Use when maintaining a fork, syncing with upstream/parent, deciding whether to keep fork patches vs adopt parent changes, documenting fork-only modifications, or opening pull requests from a fork to upstream.",
+      "triggers": [
+        "fork",
+        "upstream sync",
+        "parent sync",
+        "FORK.md",
+        "maintain fork",
+        "pull request to parent",
+        "upstream contribution"
+      ],
+      "workflows": [
+        "BootstrapForkLedger",
+        "SyncFromParent",
+        "ContributeUpstreamPR",
+        "ForkPolicyReview"
       ],
       "tier": "deferred"
     }

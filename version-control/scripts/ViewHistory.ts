@@ -1,15 +1,13 @@
 #!/usr/bin/env bun
 
 /**
- * View git history for PAI repository
- * Displays commits, file changes, and statistics
+ * Git log and history for the selected repository.
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 interface HistoryOptions {
   limit?: number;
@@ -19,7 +17,8 @@ interface HistoryOptions {
 }
 
 async function viewHistory(options: HistoryOptions = {}): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
@@ -29,7 +28,7 @@ async function viewHistory(options: HistoryOptions = {}): Promise<void> {
   const limit = options.limit || 10;
   const format = options.format || "short";
 
-  let gitCommand = `cd ${PAI_DIR} && git log --oneline -${limit}`;
+  let gitCommand = `cd ${repoRoot} && git log --oneline -${limit}`;
 
   if (options.file) {
     gitCommand += ` -- ${options.file}`;

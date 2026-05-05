@@ -1,118 +1,107 @@
 ---
 name: version-control
-description: Self-version management for PAI framework. USE WHEN tracking changes to .claude folder, reverting framework modifications, viewing version history, creating checkpoints, managing git repository for PAI infrastructure, OR after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts).
+description: >-
+  Generic git workflow support for any repository: history, checkpoints, diffs, branches with
+  optional branch metadata, and commit/branch/skip prompts when pending-change tooling is used.
+  Use when the user asks for git checkpoints, comparing commits, branch management, reverting
+  changes, viewing history, initializing a repo, or handling uncommitted changes after edits.
+  Set REPO_ROOT or GIT_WORK_TREE to the repository root, or run scripts from that directory
+  (defaults to current working directory). Do not use for fork/upstream policy; use fork-management.
 ---
 
-# VersionControl
+# Version control
 
-Self-version management system for the Personal AI Infrastructure (PAI). Automatically tracks all changes to the `.claude` folder using git, enabling rollback, history viewing, and checkpoint management. In Cursor, hooks do not run; use CheckAndPrompt.ts and HandlePendingAction when PAI files change.
+Generic git state management for a single working tree: history, checkpoints, compare/revert, branch helpers, and optional pending-action flows.
 
-## Workflow Routing
+## Scope boundaries
+
+`version-control` applies to **one git repository** (the tree selected by `REPO_ROOT`, `GIT_WORK_TREE`, or the current working directory).
+
+For fork governance (`FORK.md`, upstream sync policy, PRs to parent), use **fork-management** and reuse this skill only for mechanical git steps (checkpoint, compare, branches).
+
+## Workflow routing
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **Initialize** | "initialize version control", "set up git for PAI" | `references/Initialize.md` |
-| **ViewHistory** | "show version history", "git log PAI", "what changed" | `references/ViewHistory.md` |
-| **Revert** | "revert changes", "rollback PAI", "undo framework change" | `references/Revert.md` |
-| **Checkpoint** | "create checkpoint", "save current state", "tag version" | `references/Checkpoint.md` |
-| **Compare** | "compare versions", "diff changes", "what's different" | `references/Compare.md` |
+| **Initialize** | "initialize git", "set up version control for this repo" | `references/Initialize.md` |
+| **ViewHistory** | "show version history", "git log", "what changed in commits" | `references/ViewHistory.md` |
+| **Revert** | "revert changes", "rollback", "undo commit", "restore file from git" | `references/Revert.md` |
+| **Checkpoint** | "create checkpoint", "save current state", "tag this point" | `references/Checkpoint.md` |
+| **Compare** | "compare versions", "diff two commits", "what's different" | `references/Compare.md` |
 | **CreateBranch** | "create branch", "new branch for testing", "branch for feature" | `references/CreateBranch.md` |
-| **SwitchBranch** | "switch branch", "change branch", "checkout branch" | `references/SwitchBranch.md` |
+| **SwitchBranch** | "switch branch", "checkout branch", "change branch" | `references/SwitchBranch.md` |
 | **ListBranches** | "list branches", "show branches", "what branches exist" | `references/ListBranches.md` |
 | **DescribeBranch** | "describe branch", "update branch info", "set branch purpose" | `references/DescribeBranch.md` |
 | **DeleteBranch** | "delete branch", "remove branch" | `references/DeleteBranch.md` |
-| **HandlePendingAction** | "handle pending changes", "review changes", "commit or branch" | `references/HandlePendingAction.md` |
-| **CheckChanges** | "check for changes", "what changed in PAI", "review PAI changes" | `references/CheckChanges.md` |
+| **HandlePendingAction** | "handle pending changes", "commit or branch", "review pending VC action" | `references/HandlePendingAction.md` |
+| **CheckChanges** | "check for changes", "what is uncommitted", "review working tree" | `references/CheckChanges.md` |
 
-## Examples
+## Repository selection
 
-**Example 1: Initialize version control**
-```
-User: "Set up version control for the PAI framework"
-→ Invokes Initialize workflow
-→ Creates git repository in .claude
-→ Sets up .gitignore
-→ Creates initial commit
-→ Configures auto-commit hooks
-```
+Scripts use this precedence for the git root:
 
-**Example 2: View recent changes**
-```
-User: "What changed in the PAI framework recently?"
-→ Invokes ViewHistory workflow
-→ Shows git log with recent commits
-→ Displays file changes summary
-```
+1. `REPO_ROOT`
+2. `GIT_WORK_TREE`
+3. `process.cwd()`
 
-**Example 3: Handle pending action**
-```
-User: "I changed some PAI files—commit or create a branch?"
-→ Invokes CheckChanges then HandlePendingAction workflow
-→ Reviews changed files
-→ User chooses commit, branch, or skip
-→ Executes chosen action and clears pending state
-```
+Run commands from the repository root or export `REPO_ROOT` before invoking scripts.
 
-## Architecture
+**Script path placeholder:** `$VC_SCRIPTS` means the directory containing these scripts (e.g. `.../version-control/scripts`). Examples use `bun run $VC_SCRIPTS/<Script>.ts`.
 
-The VersionControl skill works in two modes:
+## Optional automation (hooks)
 
-### Claude Code (Automatic via Hooks)
-- **SessionStart Hook**: Loads current branch context and informs AI about branch purpose
-- **PostToolUse Hook**: Detects changes to PAI files and creates pending action (user-in-the-loop)
-- **PreToolUse Hook**: Validates git operations to prevent dangerous commands
-- **SessionEnd Hook**: Creates session summary commit
+If the environment wires **PostToolUse** (or similar) to create a pending-action file and notify the user, the **HandlePendingAction** and **CheckChanges** flows apply. In editors without those hooks, invoke `CheckAndPrompt.ts` manually after edits.
 
-### Cursor / Manual Usage (Standalone Tools)
-- All tools work independently without hooks
-- Use `CheckAndPrompt.ts` to manually check for changes
-- Tools can be invoked directly by the AI or user
-- No automatic detection - requires explicit invocation
+## User-in-the-loop
 
-**Note:** Hooks only work in Claude Code. In Cursor, use the tools directly.
+When a pending-action file is present, the user chooses commit, branch, or skip. See `references/UserInTheLoop.md`.
 
-## User-in-the-Loop
+## Branch metadata
 
-Changes to PAI files are detected (via hooks in Claude Code or CheckAndPrompt in Cursor); a pending action is created and the user chooses commit, branch, or skip. See `references/UserInTheLoop.md`.
-
-## Branch Management
-
-Branch metadata (purpose, description, timestamps) is stored in `.pai-branches.json` and loaded at session start for AI context. See `references/BranchManagement.md`.
+Optional JSON sidecar in the repo root: **`.vc-branches.json`**. Older tooling may have written the same data under a different filename; that file is still read if the canonical one is absent. Used for purpose/description when listing branches. See `references/BranchManagement.md`.
 
 ## Tools
 
-- `scripts/InitializeGit.ts` - Initialize git repository in .claude (auto-updates state)
-- `scripts/CommitChanges.ts` - Commit current changes with message (auto-updates state)
-- `scripts/ViewHistory.ts` - Display git log and change history
-- `scripts/RevertChange.ts` - Revert to specific commit or file version (auto-updates state)
-- `scripts/CreateCheckpoint.ts` - Create tagged checkpoint (auto-updates state)
-- `scripts/CompareVersions.ts` - Compare two commits or versions
-- `scripts/GetStatus.ts` - Show current git status
-- `scripts/ManageBranches.ts` - Create, switch, list, describe, and delete branches with metadata (auto-updates state)
-- `scripts/HandlePendingAction.ts` - Review and handle pending version control actions (commit/branch/skip)
-- `scripts/StateIntegration.ts` - Helper module for StateManagement integration
+- `scripts/InitializeGit.ts` — `git init` and baseline commit in the selected repo
+- `scripts/CommitChanges.ts` — stage and commit with optional auto-generated message
+- `scripts/ViewHistory.ts` — log and history variants
+- `scripts/RevertChange.ts` — revert commit, restore paths, or reset
+- `scripts/CreateCheckpoint.ts` — annotated tags as checkpoints
+- `scripts/CompareVersions.ts` — diff between refs
+- `scripts/GetStatus.ts` — short status and recent commits
+- `scripts/ManageBranches.ts` — create/switch/list/describe/delete + metadata
+- `scripts/HandlePendingAction.ts` — commit/branch/skip for pending-action files
+- `scripts/CheckAndPrompt.ts` — print uncommitted changes and suggested next commands
+- `scripts/repoRoot.ts` — shared resolver for `REPO_ROOT` / `GIT_WORK_TREE` / cwd
+- `scripts/StateIntegration.ts` — optional state mirror when `STATE_MANAGER_SCRIPT` and project detection apply
 
-## StateManagement Integration
+## State integration (optional)
 
-The VersionControl skill automatically integrates with StateManagement to track version control operations in project state:
+If `STATE_MANAGER_SCRIPT` points to an executable state updater and the workspace matches your project layout, commit/checkpoint/branch/revert/init operations may record metadata there. Failures are non-blocking. Details: `references/STATEMANAGEMENT_INTEGRATION.md`.
 
-- **Commits** - Records commit hash, message, and changed files in state
-- **Checkpoints** - Records checkpoint name, commit hash, and message
-- **Branch Operations** - Records branch creation and switches
-- **Reverts** - Records revert operations and target commits
-- **Initialization** - Records git repository initialization
+## Examples
 
-State updates are automatic and happen silently in the background. If a project is detected (via workspace path), state will be updated. If no project is detected or StateManagement is not available, operations continue normally without state updates.
+**Example 1: Initialize a repo**
 
-## Excluded Files
+```text
+User: "Initialize git in this folder."
+→ Initialize workflow
+→ Run InitializeGit.ts with REPO_ROOT set (or cwd = repo root)
+→ Initial commit when there are files to commit
+```
 
-The following are excluded from version control (via .gitignore):
-- `history/` - Session history files
-- `debug/` - Debug output files
-- `projects/` - Project-specific data
-- `session-env/` - Session environment state
-- `statsig/` - Statsig cache files
-- `todos/` - Todo files
-- `file-history/` - File history cache
-- `shell-snapshots/` - Shell snapshots
-- `plugins/` - External plugins
+**Example 2: Inspect history**
+
+```text
+User: "What changed recently?"
+→ ViewHistory workflow
+→ ViewHistory.ts with appropriate --limit / --since
+```
+
+**Example 3: Pending action**
+
+```text
+User: "I have pending changes—commit or branch?"
+→ CheckChanges / HandlePendingAction
+→ User chooses --commit, --branch, or --skip
+```

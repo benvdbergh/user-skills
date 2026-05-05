@@ -1,16 +1,14 @@
 #!/usr/bin/env bun
 
 /**
- * Commit current changes to PAI repository
- * Generates descriptive commit messages based on file changes
+ * Stage and commit changes in the selected repository.
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
 import { updateStateForVCOperation, getCurrentCommitHash } from "./StateIntegration";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 interface CommitOptions {
   message?: string;
@@ -20,7 +18,7 @@ interface CommitOptions {
 
 async function generateCommitMessage(files: string[]): Promise<string> {
   if (files.length === 0) {
-    return "Update PAI framework";
+    return "Update repository";
   }
 
   const categories: Record<string, string[]> = {
@@ -83,7 +81,8 @@ async function generateCommitMessage(files: string[]): Promise<string> {
 }
 
 async function commitChanges(options: CommitOptions = {}): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
@@ -96,7 +95,7 @@ async function commitChanges(options: CommitOptions = {}): Promise<void> {
   if (options.files && options.files.length > 0) {
     changedFiles = options.files;
   } else {
-    const statusOutput = await $`cd ${PAI_DIR} && git status --porcelain`.text();
+    const statusOutput = await $`cd ${repoRoot} && git status --porcelain`.text();
     changedFiles = statusOutput
       .split("\n")
       .filter((line) => line.trim())
@@ -114,23 +113,23 @@ async function commitChanges(options: CommitOptions = {}): Promise<void> {
   if (!commitMessage && options.autoMessage !== false) {
     commitMessage = await generateCommitMessage(changedFiles);
   } else if (!commitMessage) {
-    commitMessage = "Update PAI framework";
+    commitMessage = "Update repository";
   }
 
   // Stage files
   if (options.files && options.files.length > 0) {
     for (const file of options.files) {
-      const fullPath = join(PAI_DIR, file);
+      const fullPath = join(repoRoot, file);
       if (existsSync(fullPath)) {
-        await $`cd ${PAI_DIR} && git add ${file}`.quiet();
+        await $`cd ${repoRoot} && git add ${file}`.quiet();
       }
     }
   } else {
-    await $`cd ${PAI_DIR} && git add -A`.quiet();
+    await $`cd ${repoRoot} && git add -A`.quiet();
   }
 
   // Commit
-  await $`cd ${PAI_DIR} && git commit -m ${commitMessage}`.quiet();
+  await $`cd ${repoRoot} && git commit -m ${commitMessage}`.quiet();
 
   // Get commit hash for state update
   const commitHash = await getCurrentCommitHash();

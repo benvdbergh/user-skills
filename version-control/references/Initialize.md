@@ -1,30 +1,32 @@
-# Initialize Version Control
+# Initialize
 
-Initialize git repository for PAI framework.
+Initialize a git repository for the selected working tree.
 
 ## Steps
 
-1. Check if git repository already exists
-2. Initialize git repository if needed
-3. Configure git user (from environment or defaults)
-4. Verify .gitignore exists
-5. Create initial commit with current state
+1. Confirm whether `.git` already exists
+2. Run `git init` if needed
+3. Configure `user.name` / `user.email` from environment or defaults
+4. Recommend a `.gitignore` when missing
+5. Create an initial commit when there are tracked files
 
 ## Usage
 
+Set `REPO_ROOT` (or `GIT_WORK_TREE`) to the repository root, or run from that directory. `VC_SCRIPTS` is the path to `version-control/scripts`.
+
 ```bash
-bun run $PAI_DIR/skills/version-control/scripts/InitializeGit.ts
+bun run $VC_SCRIPTS/InitializeGit.ts
 ```
 
-## Environment Variables
+## Environment variables
 
-- `GIT_USER_NAME` - Git user name (default: "PAI System")
-- `GIT_USER_EMAIL` - Git user email (default: "pai@local")
+- `REPO_ROOT` / `GIT_WORK_TREE` — git working tree (default: current working directory)
+- `GIT_USER_NAME` — default: `Version Control`
+- `GIT_USER_EMAIL` — default: `version-control@local`
 
 ## Output
 
-- Creates `.git` directory in PAI_DIR
-- Configures git user
-- Creates initial commit if files exist
+- `.git` under the chosen root
+- Optional initial commit
 
-**Done when:** `.git` exists, `.gitignore` is in place, and initial commit is created (or repo was already initialized).
+**Done when:** the tree is a git repository and an initial commit exists when there was content to commit.

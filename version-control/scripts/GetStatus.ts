@@ -1,18 +1,17 @@
 #!/usr/bin/env bun
 
 /**
- * Get current git status for PAI repository
- * Shows uncommitted changes, branch info, and recent commits
+ * Git status, branch, and recent commits for the selected repository.
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 async function getStatus(): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
@@ -21,16 +20,16 @@ async function getStatus(): Promise<void> {
 
   try {
     // Get branch info
-    const branch = await $`cd ${PAI_DIR} && git branch --show-current`.text();
+    const branch = await $`cd ${repoRoot} && git branch --show-current`.text();
     console.log(`Branch: ${branch.trim() || "main"}`);
 
     // Get current commit
-    const commit = await $`cd ${PAI_DIR} && git rev-parse --short HEAD`.text();
+    const commit = await $`cd ${repoRoot} && git rev-parse --short HEAD`.text();
     console.log(`Commit: ${commit.trim()}`);
 
     // Get status
     console.log("\nStatus:");
-    const status = await $`cd ${PAI_DIR} && git status --short`.text();
+    const status = await $`cd ${repoRoot} && git status --short`.text();
     if (status.trim()) {
       console.log(status);
     } else {
@@ -39,7 +38,7 @@ async function getStatus(): Promise<void> {
 
     // Get recent commits
     console.log("\nRecent commits:");
-    const log = await $`cd ${PAI_DIR} && git log --oneline -5`.text();
+    const log = await $`cd ${repoRoot} && git log --oneline -5`.text();
     console.log(log);
   } catch (error) {
     console.error("Failed to get status:", error);
