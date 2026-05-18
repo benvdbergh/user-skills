@@ -48,6 +48,27 @@ export class SkillGraphService {
     return this.buildGraph(filters);
   }
 
+  /** Incident edge counts per skill node id (`skill:{scope}:{name}`), unpaginated. */
+  getSkillRelationshipCounts(): Record<string, number> {
+    const map = this.mapRepo.read();
+    const index = this.buildScopeIndex(map);
+    const nodes = this.buildAllNodes(map, index);
+    const edges = map.relationships.map((rel) => this.mapEdge(rel, index));
+    const skillIds = new Set(
+      nodes.filter((n) => n.type === "skill").map((n) => n.id),
+    );
+    const counts: Record<string, number> = {};
+    for (const edge of edges) {
+      if (skillIds.has(edge.from)) {
+        counts[edge.from] = (counts[edge.from] ?? 0) + 1;
+      }
+      if (skillIds.has(edge.to)) {
+        counts[edge.to] = (counts[edge.to] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }
+
   neighbors(query: GraphNeighborsQuery): SkillGraphResult {
     const { nodeId, depth = 1, ...filters } = query;
     const cappedDepth = Math.min(Math.max(depth, 1), 3);

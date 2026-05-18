@@ -132,6 +132,61 @@ describe("HTTP read API (STORY-2-4)", () => {
     expect(res.status).toBe(400);
   });
 
+  it("GET /api/graph/skill-relationship-counts returns skill edge counts", async () => {
+    const { pkg, app, graph } = loadFixtureApi();
+    tempDirs.push(pkg);
+    const expected = graph.getSkillRelationshipCounts();
+    const res = await app.request("/api/graph/skill-relationship-counts");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { counts: Record<string, number> };
+    expect(body.counts).toEqual(expected);
+    expect(body.counts["skill:user:demo-skill"]).toBeGreaterThan(0);
+  });
+
+  it("GET /* rejects path traversal when staticDir is set", async () => {
+    const { pkg } = loadFixtureApi();
+    tempDirs.push(pkg);
+    const staticDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "skill-lab-web-dist-"),
+    );
+    tempDirs.push(staticDir);
+    fs.writeFileSync(
+      path.join(staticDir, "index.html"),
+      "<!doctype html><html></html>",
+    );
+
+    const config = loadConfig(pkg);
+    const catalog = new SkillCatalogService(config);
+    const graph = new SkillGraphService(config, catalog);
+    const health = new SkillHealthService(config, catalog);
+    const app = createApi({ catalog, graph, health }, { staticDir });
+
+    const res = await app.request("/../../../etc/passwd");
+    expect(res.status).toBe(404);
+  });
+
+  it("GET /* serves SPA index when staticDir is set", async () => {
+    const { pkg } = loadFixtureApi();
+    tempDirs.push(pkg);
+    const staticDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "skill-lab-web-dist-"),
+    );
+    tempDirs.push(staticDir);
+    const indexHtml = "<!doctype html><html><body>dashboard</body></html>";
+    fs.writeFileSync(path.join(staticDir, "index.html"), indexHtml);
+
+    const config = loadConfig(pkg);
+    const catalog = new SkillCatalogService(config);
+    const graph = new SkillGraphService(config, catalog);
+    const health = new SkillHealthService(config, catalog);
+    const app = createApi({ catalog, graph, health }, { staticDir });
+
+    const res = await app.request("/graph");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    expect(await res.text()).toBe(indexHtml);
+  });
+
   it("POST /api/health returns catalog health report", async () => {
     const { pkg, app, health } = loadFixtureApi();
     tempDirs.push(pkg);

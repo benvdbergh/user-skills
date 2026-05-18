@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { Hono } from "hono";
 import { z } from "zod";
 import { PathAccessError } from "../config/pathGuard.js";
@@ -35,7 +37,111 @@ export interface ApiServices {
   health: SkillHealthService;
 }
 
-export function createApi(services: ApiServices): Hono {
+export interface CreateApiOptions {
+  /** Built dashboard assets (`web/dist`). Enables static + SPA fallback when present. */
+  staticDir?: string;
+}
+
+const STATIC_MIME: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".png": "image/png",
+  ".woff2": "font/woff2",
+};
+
+function containsTraversalSegment(requestPath: string): boolean {
+  try {
+    const decoded = decodeURIComponent(requestPath);
+    return decoded.split(/[/\\]/).some((segment) => segment === "..");
+  } catch {
+    return true;
+  }
+}
+
+function isSpaClientRoute(requestPath: string): boolean {
+  if (requestPath === "/") return true;
+  if (requestPath.startsWith("/graph")) return true;
+  if (requestPath.startsWith("/health")) return true;
+  if (requestPath.startsWith("/proposals")) return true;
+  if (requestPath.startsWith("/skills/")) return true;
+  return false;
+}
+
+function isPathInsideRoot(filePath: string, root: string): boolean {
+  const resolved = path.resolve(filePath);
+  const resolvedRoot = path.resolve(root);
+  const relative = path.relative(resolvedRoot, resolved);
+  return (
+    relative === "" ||
+    (!relative.startsWith("..") && !path.isAbsolute(relative))
+  );
+}
+
+function resolveStaticFile(
+  staticDir: string,
+  requestPath: string,
+  indexPath: string,
+): string | null {
+  if (containsTraversalSegment(requestPath)) {
+    return null;
+  }
+
+  const staticRoot = path.resolve(staticDir);
+  const resolvedIndex = path.resolve(indexPath);
+  const relative =
+    requestPath === "/" ? "index.html" : requestPath.replace(/^\//, "");
+  const candidate = path.resolve(staticRoot, relative);
+
+  if (!isPathInsideRoot(candidate, staticRoot)) {
+    return null;
+  }
+
+  if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+    return candidate;
+  }
+
+  if (
+    isSpaClientRoute(requestPath) &&
+    isPathInsideRoot(resolvedIndex, staticRoot)
+  ) {
+    return resolvedIndex;
+  }
+
+  return null;
+}
+
+function registerDashboardStatic(app: Hono, staticDir: string): void {
+  const indexPath = path.join(staticDir, "index.html");
+  if (!fs.existsSync(indexPath)) {
+    return;
+  }
+
+  app.get("*", (c) => {
+    if (c.req.path.startsWith("/api")) {
+      return c.notFound();
+    }
+
+    const filePath = resolveStaticFile(staticDir, c.req.path, indexPath);
+    if (!filePath || !fs.existsSync(filePath)) {
+      return c.notFound();
+    }
+
+    const ext = path.extname(filePath);
+    const body = fs.readFileSync(filePath);
+    return c.body(body, 200, {
+      "Content-Type": STATIC_MIME[ext] ?? "application/octet-stream",
+    });
+  });
+}
+
+export function createApi(
+  services: ApiServices,
+  options?: CreateApiOptions,
+): Hono {
   const { catalog, graph, health } = services;
   const app = new Hono();
 
@@ -96,6 +202,11 @@ export function createApi(services: ApiServices): Hono {
     }
   });
 
+  app.get("/api/graph/skill-relationship-counts", (c) => {
+    const counts = graph.getSkillRelationshipCounts();
+    return c.json({ counts });
+  });
+
   app.get("/api/graph/neighbors", (c) => {
     try {
       const raw = graphNeighborsFromSearchParams(
@@ -116,6 +227,10 @@ export function createApi(services: ApiServices): Hono {
     const report = buildCatalogHealthPayload(health);
     return c.json({ report });
   });
+
+  if (options?.staticDir) {
+    registerDashboardStatic(app, options.staticDir);
+  }
 
   return app;
 }

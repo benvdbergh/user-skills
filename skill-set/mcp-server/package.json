@@ -15,6 +15,9 @@
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "mcp": "node dist/cli.js mcp",
+    "web:install": "npm install --prefix web",
+    "web:dev": "npm run dev --prefix web",
+    "web:build": "npm run build --prefix web",
     "test": "npm run build && vitest run",
     "test:watch": "vitest"
   },

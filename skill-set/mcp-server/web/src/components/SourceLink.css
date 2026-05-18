@@ -1,0 +1,21 @@
+.source-link {
+  display: inline-block;
+}
+
+.source-link-anchor {
+  font-weight: 500;
+}
+
+.source-link-relative {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+.source-link-path {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.7rem;
+  opacity: 0.75;
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

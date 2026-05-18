@@ -1,0 +1,79 @@
+.skill-lab-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.skill-lab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, canvas 92%, transparent);
+}
+
+.skill-lab-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skill-lab-brand h1 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.skill-lab-logo {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.skill-lab-nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.skill-lab-nav-link {
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.skill-lab-nav-link:hover:not(.is-disabled) {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.skill-lab-nav-link.is-active {
+  opacity: 1;
+  font-weight: 600;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.skill-lab-nav-link.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.skill-lab-main {
+  flex: 1;
+  padding: 1.25rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.page-placeholder h2 {
+  margin: 0 0 0.5rem;
+}
+
+.page-placeholder p {
+  margin: 0;
+  opacity: 0.8;
+}

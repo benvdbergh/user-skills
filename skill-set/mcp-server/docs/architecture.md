@@ -1,32 +1,35 @@
 # Skill Lab — Architecture Decisions
 
-Status: **Build Ready** for **R0.2 — Graph, Health & Shared HTTP API** (EPIC-2). R0.1 foundation (EPIC-1) delivered.
+Status: **Build Ready** for **R0.3 — Read-Only Skill Lab Dashboard** (EPIC-3). **R0.2** (graph, health, shared HTTP API) and **R0.1** (catalog, MCP) are delivered.
 
-## Milestone scope (R0.2)
+## Milestone scope (R0.3)
 
-| Story | Component | Spec trace |
-|-------|-----------|------------|
-| STORY-2-1 | `SkillGraphService`, `RelationshipMapRepository`, graph DTOs | FR-011–015, US-007–010 |
-| STORY-2-2 | `SkillHealthService`, health scan DTOs | FR-016–021, US-011, AC-005, NFR-002 |
-| STORY-2-6 | Graph filter/query contract, benchmarks, path edge-case catalog | NFR-004, runway for R0.3 |
-| STORY-2-3 | MCP graph/health tools + catalog resources | FR-035–036, US-022–023 |
-| STORY-2-4 | Hono HTTP read API (localhost) | FR-038, HTTP API Draft, NFR-011 |
+| Story | Linear | Component | Spec trace |
+|-------|--------|-----------|------------|
+| STORY-3-1 | BEN-25 | `web/` package scaffold, shell layout, dev proxy | FR-039–040, AC-004 |
+| STORY-3-2 | BEN-26 | Catalog view — search, filters, health highlights | US-001–003, FR-039, FR-041 |
+| STORY-3-3 | BEN-27 | Skill detail — metadata, workflows, relationships | US-004–006 |
+| STORY-3-4 | BEN-28 | Graph view — global/local, filters, high-risk overlay | US-007–010, NFR-004 |
+| STORY-3-5 | BEN-29 | Health findings view with source links | US-011, FR-042 |
+| STORY-3-6 | BEN-30 | UI/API contract doc, shared `SourceLink`, split criteria | FR-040–042, risk: UI as SSOT |
 
-**Exit criteria:** Agents and HTTP clients can query graph and run catalog health using shared domain services; DTOs match Zod + `schemas/`; E2E suite `tests/e2e-r02.test.ts` passes.
+**R0.3 in scope:** Read-only browser dashboard for **catalog**, **skill detail**, **graph**, and **health**; environment switching; source-path links on displayed facts. **Out of scope (placeholders only):** validation scorecards, AI proposals, gated writes (R0.4–R0.5).
+
+**Exit criteria:** A developer runs `skill-lab serve` (or equivalent), opens the dashboard on localhost, and navigates catalog → detail → graph → health using **only** the HTTP API (**FR-040**, **AC-004**). Milestone gate: `tests/e2e-r03.test.ts`.
 
 ## System context
 
 ```text
-┌─────────────┐     stdio      ┌──────────────────────────────────────┐
-│ Cursor /    │◄──────────────►│ skill-set/mcp-server (TypeScript)    │
-│ Claude MCP  │                │  mcp/          http/ (Hono)          │
-└─────────────┘                │       \        /                     │
-                               │        domain/                       │
-┌─────────────┐     HTTP       │  SkillCatalogService                 │
-│ Dashboard   │◄──────────────►│  SkillGraphService    (R0.2)         │
-│ (R0.3)      │  localhost     │  SkillHealthService   (R0.2)         │
-└─────────────┘                └──────────┬───────────────────────────┘
-                                          │ read-only FS (path guard)
+┌─────────────┐     stdio      ┌──────────────────────────────────────────────┐
+│ Cursor /    │◄──────────────►│ skill-set/mcp-server (TypeScript)            │
+│ Claude MCP  │                │  mcp/          http/ (Hono)                  │
+└─────────────┘                │       \        /                             │
+                               │        domain/  (R0.1–R0.2 — delivered)      │
+┌─────────────┐     HTTP       │  SkillCatalogService                         │
+│ Browser     │◄──────────────►│  SkillGraphService                           │
+│ dashboard   │  localhost     │  SkillHealthService                          │
+│ web/ (R0.3) │  + static UI   └──────────┬───────────────────────────────────┘
+└─────────────┘                          │ read-only FS (path guard)
                                           ▼
                                ┌──────────────────────┐
                                │ skills repo (Git)    │
@@ -36,59 +39,74 @@ Status: **Build Ready** for **R0.2 — Graph, Health & Shared HTTP API** (EPIC-2
                                └──────────────────────┘
 ```
 
-Humans use the dashboard (R0.3) over HTTP; agents use MCP. Both adapters call the **same domain services** — **FR-038**. No file parsing in `mcp/` or `http/`.
+Humans use the dashboard (**R0.3**) over HTTP; agents use MCP. Both adapters call the **same domain services** — **FR-038**. The browser **never** reads the skills filesystem; it only calls `/api/*` (**FR-040**).
 
 ## Technology choices
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Runtime | Node 20+, TypeScript | Spec default; one stack for MCP + HTTP/UI |
+| Runtime | Node 20+, TypeScript | Spec default; one stack for MCP + HTTP + UI tooling |
 | MCP SDK | `@modelcontextprotocol/sdk` | Official SDK, stdio transport |
 | HTTP | Hono | Lightweight; shared bootstrap with MCP package |
 | DTO validation | Zod | Runtime checks + JSON Schema mirrors |
 | Frontmatter | `gray-matter` | YAML `SKILL.md` parsing |
 | Tests | Vitest | Unit, fixture, milestone E2E |
-| UI location | `mcp-server/web/` (R0.3+) | Colocate until UI complexity grows |
+| UI location | `mcp-server/web/` | Colocated per spec; split to `skill-lab-ui/` only when criteria in STORY-3-6 are met |
+| UI framework | **Vite + React 19 + TypeScript** | Matches team TS stack; fast dev proxy; component ecosystem for tables and graph |
+| UI routing | React Router (data routes) | Shell nav: Catalog \| Graph \| Health \| Proposals (disabled placeholder) |
+| Graph rendering | **@xyflow/react** | Local + filtered graphs; pan/zoom; node cap enforced via API filters (NFR-004) |
+| API client | Thin `fetch` wrappers in `web/src/api/` | Typed against shared DTO shapes; no domain logic in React |
 
-## Repository layout (R0.2 target)
+## Repository layout (R0.3 target)
 
 ```text
 skill-set/mcp-server/
-  src/
-    config/           loadConfig, pathGuard, pathModel
+  src/                              # backend (R0.1–R0.2 delivered)
+    config/
     domain/
-      SkillCatalogService.ts        # R0.1
-      SkillGraphService.ts          # R0.2 — STORY-2-1
-      SkillHealthService.ts         # R0.2 — STORY-2-2
-      SkillMdParser.ts
-      types.ts                      # + graph/health DTOs
+      SkillCatalogService.ts
+      SkillGraphService.ts
+      SkillHealthService.ts
+      types.ts
     repositories/
-      FileSystemSkillRepository.ts
-      SkillIndexRepository.ts
-      EnvironmentMapRepository.ts
-      RelationshipMapRepository.ts  # R0.2 — STORY-2-1
     mcp/
-      server.ts
-      tools.ts                      # catalog (R0.1) + graph/health (R0.2)
-      resources.ts                  # R0.2 — STORY-2-3
     http/
-      api.ts                        # Hono app factory — STORY-2-4
-      routes/                       # thin handlers → domain
-      problemDetails.ts             # RFC 9457 helpers
-    git/  ai/  prompts/             # stubs / partial — later epics
-  schemas/
-    skill-summary.schema.json
-    skill-detail.schema.json
-    health-finding.schema.json
-    skill-graph-node.schema.json    # R0.2
-    skill-graph-edge.schema.json    # R0.2
-    catalog-health-report.schema.json # R0.2
+      api.ts                        # + static fallback for web/dist (R0.3)
+      problemDetails.ts
+      queryParams.ts
+    cli.ts                          # + serve command (R0.3)
+  web/                              # R0.3 — STORY-3-1
+    package.json
+    vite.config.ts                  # proxy /api → httpPort
+    index.html
+    src/
+      main.tsx
+      App.tsx                       # shell + router
+      api/
+        client.ts                   # base URL, error → Problem Details
+        catalog.ts
+        graph.ts
+        health.ts
+      components/
+        SourceLink.tsx              # STORY-3-6 — FR-042
+        EnvironmentSwitcher.tsx     # FR-041
+        Layout.tsx
+      routes/
+        CatalogPage.tsx             # STORY-3-2
+        SkillDetailPage.tsx         # STORY-3-3
+        GraphPage.tsx               # STORY-3-4
+        HealthPage.tsx              # STORY-3-5
+        ProposalsPlaceholder.tsx
+      hooks/                        # presentation-only (filters, pagination UI state)
+  schemas/                          # unchanged; UI consumes same JSON shapes
   docs/
     architecture.md
-    graph-query-contract.md         # R0.2 — STORY-2-6
+    graph-query-contract.md
+    ui-api-compatibility.md         # STORY-3-6 — versioning + client rules
   tests/
     e2e-r01.test.ts
-    e2e-r02.test.ts                 # R0.2 milestone gate
+    e2e-r02.test.ts
+    e2e-r03.test.ts                 # R0.3 milestone gate
 ```
 
 ## Configuration
@@ -103,144 +121,215 @@ File: `skill-lab.config.json` or `skill-lab.config.local.json` in package root.
 | `relationshipMapRelativePath` | Default `skill-set/maps/skill-relationships.json` |
 | `writesEnabled` | Default `false` (NFR-007) |
 | `environmentOverrides` | Per-env path overrides |
-| `httpHost` | Default `127.0.0.1` (local-only R0.2) |
+| `httpHost` | Default `127.0.0.1` (local-only R0.3) |
 | `httpPort` | Default `3847` |
 
 Env overrides: `SKILL_LAB_SKILLS_ROOT`, `SKILL_LAB_HTTP_PORT`.
 
-**Path safety (NFR-009):** All reads through `assertPathUnderRoots()` against `[skillsRoot, skillSetRoot]`.
+**Path safety (NFR-009):** All reads through `assertPathUnderRoots()` against `[skillsRoot, skillSetRoot]`. The UI receives **repo-relative or absolute paths only via API fields** (`sourcePath`, etc.); it does not construct paths from user input beyond navigation params (`environmentId`, `skillName`).
 
-## Domain services (R0.2)
+## Domain services (delivered — R0.2 foundation)
+
+R0.3 adds **no new domain services**. The dashboard consumes existing services through HTTP only.
 
 ### SkillGraphService
 
-- **Input:** `RelationshipMapRepository`, `SkillCatalogService` (for skill node ids and scope).
-- **Source file:** `skill-set/maps/skill-relationships.json` (FR-011).
-- **Nodes (FR-012):** `skill`, `mcp_tool`, `environment`, `workflow`, `reference`, `script` — stable ids: `{type}:{scope}:{name}` (e.g. `skill:user:skill-set`).
-- **Edges (FR-013):** relationship map entries → `SkillGraphEdge` with `type`, `confidence`, `mappingIsApproximate`, `evidence`, `notes`.
-- **Filters (FR-014):** `nodeTypes[]`, `relationshipTypes[]`, `scope`, `project`, `confidenceMin`/`confidenceMax`, `healthStatus` (joins catalog health on skill nodes).
-- **High-risk overlay (FR-015):** expose `highRiskRefactorSequences[]` from map metadata as first-class panel data (not separate graph edges).
-- **Local graph:** `graph_neighbors(centerNodeId, depth)` — default `depth=1`, hard cap `depth≤3` (STORY-2-6).
-- **Pagination:** `limit` + `cursor` on `getGraph()` for large responses; default `limit=500` edges.
+- **Input:** `RelationshipMapRepository`, `SkillCatalogService`.
+- **Source:** `skill-set/maps/skill-relationships.json` (FR-011).
+- **Nodes (FR-012):** `skill`, `mcp_tool`, `environment`, `workflow`, `reference`, `script`.
+- **Filters (FR-014):** `nodeTypes[]`, `relationshipTypes[]`, `scope`, `project`, `confidenceMin`/`confidenceMax`, `healthStatus`.
+- **High-risk overlay (FR-015):** `highRiskRefactorSequences[]` in graph payload — rendered as side panel in Graph view (STORY-3-4).
+- **Local graph:** `graph_neighbors(centerNodeId, depth)` — default `depth=1`, cap `depth≤3`.
+- **Pagination:** `limit` + `cursor` on `getGraph()`; default `limit=500` edges.
 
 ### SkillHealthService
 
-- **Orchestrates** catalog, graph, environment, and index repos (read-only).
-- **Checks (FR-016–020):** index count mismatches; unknown relationship endpoints; stale generated timestamps; non-resolvable env paths; missing `references/skill-escalation.md`; broken `SKILL.md` refs (delegates detail scan where needed).
-- **Output:** `CatalogHealthReport` — `findings: HealthFinding[]`, `scannedAt`, `durationMs`, summary counts by severity.
-- **Performance (NFR-002):** single pass where possible; target &lt;5s for 250 skills / 1k edges on dev laptop.
+- **Checks (FR-016–020):** index mismatches, unknown endpoints, stale generated timestamps, non-resolvable env paths, missing escalation files, broken refs.
+- **Output:** `CatalogHealthReport` with `HealthFinding.sourcePath` for every finding.
 
-## Shared DTOs
+Contract detail: `docs/graph-query-contract.md`.
 
-Zod in `src/domain/types.ts`; JSON Schema mirrors in `schemas/`. MCP `structuredContent` and HTTP JSON bodies use the **same parsed objects** (NFR-011).
+## Shared DTOs (UI consumes via HTTP)
 
-| DTO | Used by |
-|-----|---------|
-| `SkillSummary`, `SkillDetail` | catalog MCP/HTTP (R0.1) |
-| `Environment` | environments list |
-| `SkillGraphNode`, `SkillGraphEdge` | graph MCP/HTTP |
-| `GraphFilter`, `GraphNeighborsQuery` | graph queries |
-| `HealthFinding`, `CatalogHealthReport` | health MCP/HTTP |
-| `HighRiskRefactorSequence` | graph overlay |
+Zod in `src/domain/types.ts`; JSON Schema in `schemas/`. MCP `structuredContent` and HTTP JSON use the **same objects** (NFR-011). The UI types its client against these shapes; **no UI-specific response envelopes**.
 
-Errors: **RFC 9457** Problem Details (`application/problem+json`) from HTTP; MCP tools use `isError` + stable `error` codes for not-found/validation.
+| DTO | Dashboard use |
+|-----|----------------|
+| `Environment` | Environment switcher (**FR-041**) |
+| `SkillSummary` | Catalog table; link to detail |
+| `SkillDetail` | Detail page (**US-004–006**); `sourcePath`, refs, escalation |
+| `SkillGraphNode`, `SkillGraphEdge`, `HighRiskRefactorSequence` | Graph + overlay |
+| `GraphFilter`, `GraphNeighborsQuery` | Graph filter bar → query params |
+| `CatalogHealthReport`, `HealthFinding` | Health page (**US-011**, **FR-042**) |
+
+Errors: HTTP returns **RFC 9457** Problem Details; UI maps `type`/`title`/`detail` to inline error states (no stack traces).
 
 ## Graph query contract (MCP + HTTP parity)
 
-Documented in `docs/graph-query-contract.md` (STORY-2-6). Summary:
+Documented in `docs/graph-query-contract.md`. Dashboard **must** use the same query parameter names as HTTP (camelCase). Summary:
 
-| Parameter | MCP tool | HTTP |
-|-----------|----------|------|
-| Full graph + filters | `get_skill_graph` | `GET /api/graph?...` |
-| Local neighborhood | `graph_neighbors` | `GET /api/graph/neighbors?nodeId=&depth=` |
-| Health scan | `check_catalog_health` | `POST /api/health` |
+| UI action | HTTP |
+|-----------|------|
+| Full graph + filters | `GET /api/graph?...` |
+| Local neighborhood | `GET /api/graph/neighbors?nodeId=&depth=` |
+| Health scan | `POST /api/health` |
 
-Query params mirror tool input fields (camelCase JSON). Unknown fields ignored on read paths (forwards-compatible).
+Client rules (STORY-3-6): ignore unknown JSON fields; do not send write verbs except `POST /api/health` in R0.3.
 
-## MCP surface (R0.2)
+## Dashboard architecture (R0.3)
 
-**Tools (add to R0.1 catalog tools):**
-
-| Tool | Domain call | Writes? |
-|------|-------------|---------|
-| `get_skill_graph` | `SkillGraphService.getGraph(filters)` | No |
-| `graph_neighbors` | `SkillGraphService.neighbors(...)` | No |
-| `check_catalog_health` | `SkillHealthService.scan()` | No |
-
-**Resources (STORY-2-3):**
+### Adapter boundary
 
 ```text
-skill-lab://environments
-skill-lab://skill-index/{environmentId}
-skill-lab://relationships
-skill-lab://graph
-skill-lab://health/latest
+web/src/routes/*  →  web/src/api/*  →  HTTP /api/*  →  domain/
 ```
 
-Resources return JSON text; URIs are stable; content refreshed on read (no cache invalidation layer in R0.2).
+- **Allowed in React:** formatting, sorting UI state, client-side search over already-fetched lists (catalog), graph layout/selection, link URL building from `sourcePath`.
+- **Forbidden in React:** parsing `SKILL.md`, reading relationship JSON, health rule evaluation, graph BFS, path guard logic.
 
-## HTTP API (R0.2)
+### Shell and navigation (STORY-3-1)
 
-Base: `http://127.0.0.1:{httpPort}`. No `/v1` prefix until first breaking change.
+| Route | View | API |
+|-------|------|-----|
+| `/` | Catalog (default) | `GET /api/environments`, `GET /api/skills` |
+| `/skills/:environmentId/:skillName` | Skill detail | `GET /api/skills/:environmentId/:skillName`, graph neighbors for relationships |
+| `/graph` | Graph explorer | `GET /api/graph`, `GET /api/graph/neighbors` |
+| `/health` | Health findings | `POST /api/health` |
+| `/proposals` | Placeholder (“R0.4”) | — |
 
-| Route | Method | Domain |
-|-------|--------|--------|
-| `/api/environments` | GET | `SkillCatalogService.listEnvironments()` |
-| `/api/skills` | GET | `listSkills` — query: `environmentId` |
-| `/api/skills/:environmentId/:skillName` | GET | `getSkillDetail` |
-| `/api/graph` | GET | `getGraph` — filter query params |
-| `/api/graph/neighbors` | GET | `neighbors` — `nodeId`, `depth` |
-| `/api/health` | POST | `scan()` — empty body OK |
+Global **environment filter** (optional `environmentId` on catalog; required context on detail): **FR-041**.
 
-CLI: `skill-lab http` (or `npm run dev -- http`) starts Hono only; `skill-lab mcp` unchanged (stdio). Optional future: combined `serve` for dev.
+### Catalog view (STORY-3-2)
 
-**Adapter rules:** `http/routes/*` validates query/body with Zod → calls domain → maps domain errors to Problem Details. **No** duplicate parsing of `SKILL.md` or relationship JSON in HTTP layer.
+- Fetch skills for selected environment (or all environments with env column).
+- Client search across name, description, triggers; filter chips for scope, tier, health status (and project when present on summary).
+- Columns: name, scope, environment, tier, trigger/workflow counts, health badge.
+- Row click → skill detail route.
+- Highlight rows with `health.status !== 'ok'` or high `health.findings`.
+
+### Skill detail view (STORY-3-3)
+
+- Sections: frontmatter, triggers, description length, workflows, references/scripts/assets with exists/missing badges.
+- Escalation: `hasSkillEscalation` prominent callout (**US-005**).
+- `missingReferences` list with **SourceLink** per path (**US-006**).
+- Relationships: `GET /api/graph/neighbors?nodeId=skill:…&depth=1` (incoming/outgoing lists + link to Graph centered on node).
+
+### Graph view (STORY-3-4)
+
+- **Global mode:** `GET /api/graph` with filter bar (node type, relationship type, scope, confidence, health).
+- **Local mode:** center on skill node from catalog/detail; `depth` 1–3.
+- Edge styling: `confidence`, `mappingIsApproximate`.
+- **High-risk panel:** render `highRiskRefactorSequences` from graph payload (**US-010**).
+- Performance: default filters + edge `limit`; prompt user to narrow before rendering &gt;500 edges (NFR-004).
+
+### Health view (STORY-3-5)
+
+- Trigger scan on mount or button; show `summary` counts + sortable findings table.
+- Each row: severity, category, message, **SourceLink**(`sourcePath`), optional `recommendation`.
+
+### Source links (STORY-3-6, FR-042)
+
+Shared `SourceLink` component:
+
+| Input | Behavior |
+|-------|----------|
+| `sourcePath` from API | Display basename + full path tooltip |
+| `href` | Configurable strategy in `ui-api-compatibility.md`: default `vscode://file/{absolutePath}` when path is absolute under `skillsRoot`; else repo-relative display only |
+
+Graph nodes/edges: use `sourcePath` / `evidence.sourceFile` when present.
+
+### Dev and production serving
+
+| Mode | Command | Behavior |
+|------|---------|----------|
+| Dev | `npm run dev -- serve` (target) | Hono on `127.0.0.1:{httpPort}` + Vite dev server proxies `/api` |
+| Dev (split) | `http` + `web` `npm run dev` | Two terminals; Vite proxy to API |
+| Static | `web` build → `web/dist` | Hono serves `web/dist` + `/api/*` on same origin (avoids CORS) |
+
+CLI additions (R0.3): `serve` — combined API + UI for local dashboard use (**AC-001**, **AC-004**).
+
+## MCP surface (delivered — R0.2)
+
+Unchanged for R0.3. Agents do not use the browser.
+
+| Tool | Domain call |
+|------|-------------|
+| `get_skill_graph` | `SkillGraphService.getGraph(filters)` |
+| `graph_neighbors` | `SkillGraphService.neighbors(...)` |
+| `check_catalog_health` | `SkillHealthService.scan()` |
+
+Resources: `skill-lab://environments`, `skill-lab://graph`, `skill-lab://health/latest`, etc.
+
+## HTTP API (delivered — R0.2; consumed by R0.3 UI)
+
+Base: `http://127.0.0.1:{httpPort}`. No `/v1` prefix until first breaking change (documented in `ui-api-compatibility.md`).
+
+| Route | Method | Dashboard |
+|-------|--------|-----------|
+| `/api/environments` | GET | Environment switcher |
+| `/api/skills` | GET | Catalog |
+| `/api/skills/:environmentId/:skillName` | GET | Skill detail |
+| `/api/graph` | GET | Graph view |
+| `/api/graph/neighbors` | GET | Detail relationships, local graph |
+| `/api/health` | POST | Health view |
+| `/*` (non-API) | GET | SPA fallback → `web/dist/index.html` (R0.3) |
 
 ## Process bootstrap
 
 ```text
 cli.ts
-  mcp  → loadConfig → domain services → McpServer + tools + resources
-  http → loadConfig → domain services → createApi(services) → serve localhost
-  doctor → config + catalog counts (existing)
+  mcp    → loadConfig → domain services → McpServer (stdio)
+  http   → loadConfig → domain services → createApi → serve localhost
+  serve  → loadConfig → domain services → createApi + static UI (R0.3)
+  doctor → config + catalog counts
 ```
 
 ## Dependency direction
 
 ```text
+web/  →  http/ (fetch only, no import from src/domain)
 mcp/, http/  →  domain/  →  repositories/  →  config/
 ```
 
-No domain imports from MCP or HTTP. `SkillHealthService` may depend on `SkillCatalogService` and `SkillGraphService`; graph does not depend on health.
+No `domain/` imports from `web/`, `mcp/`, or `http/`.
 
 ## Write confirmation (EPIC-5 — design only)
 
-Unchanged from Gate 2; write tools not enabled in R0.2:
+Unchanged; write tools not enabled in R0.3. Proposals nav is a disabled placeholder.
 
-1. `writesEnabled: false` — write tools absent or `403` with stable type.
-2. Two-step apply: `propose_*` → `patchToken`; `apply_approved_patch` requires confirmation.
-3. HTTP: `X-Skill-Lab-Confirm` on POST apply routes.
-4. Every write returns change summary + paths for Git review (NFR-008).
+## NFR gates
 
-## NFR gates (R0.2)
+| NFR | R0.2 (delivered) | R0.3 (target) |
+|-----|------------------|---------------|
+| NFR-002 | Health scan &lt;5s — `graph-perf.test.ts`, E2E | Reuse; Health view triggers same scan |
+| NFR-003 | — | Catalog/detail first paint &lt;1s after API response (250 skills) — manual + optional perf hook |
+| NFR-004 | Graph contract + benchmarks | Graph UI usable at 250 nodes / 1k edges via filters + local mode |
+| NFR-009 | Path guard on repository reads | UI never bypasses API |
+| NFR-011 | MCP === HTTP JSON shape | UI consumes HTTP JSON as-is |
 
-| NFR | Gate |
-|-----|------|
-| NFR-002 | Health scan &lt;5s — benchmark in `tests/graph-perf.test.ts` + E2E smoke |
-| NFR-004 | Graph filter + local depth + pagination documented; 250 node fixture benchmark |
-| NFR-009 | Path guard on all repository reads |
-| NFR-011 | MCP `structuredContent` === HTTP JSON shape for same operation |
+## UI/API compatibility (STORY-3-6)
+
+Artifact: `docs/ui-api-compatibility.md`
+
+| Topic | Policy |
+|-------|--------|
+| Versioning | Unversioned `/api/*`; breaking changes require migration note + optional `/v1` |
+| Client tolerance | Ignore unknown JSON properties |
+| Logic placement | Presentation-only in `web/`; rules stay in `domain/` |
+| Split criteria | Extract `skill-lab-ui/` when: separate release cadence, distinct CI, or `web/` &gt; ~15k LOC / second framework |
 
 ## Open questions (recorded)
 
 | # | Decision for MVP |
 |---|------------------|
-| 1 Local vs remote | Local-only; HTTP binds `127.0.0.1` in R0.2 |
-| 2 Report storage | `skill-set/mcp-server/.generated/reports/` (gitignored) — validation in R0.4 |
-| 4 Multi-repo | Single `skillsRoot`; inventories via environment map |
+| 1 Local vs remote | **Local-only** for R0.3; bind `127.0.0.1` |
+| 2 Report storage | `.generated/reports/` — validation UI in R0.4 |
+| 4 Multi-repo | Single `skillsRoot` |
 | 6 Write tools | Absent/disabled until `writesEnabled` |
 
-## R0.3+ (out of scope for R0.2)
+## R0.4+ (out of scope for R0.3)
 
-- Browser UI (`web/`), validation/AI proposals (EPIC-3–4), gated writes (EPIC-5).
-- Routes: `/api/validation/*`, `/api/proposals/*`, `/api/git/*` — same domain pattern when added.
+- Validation scorecards, AI proposals, `PromptSourceService` (EPIC-4).
+- Routes: `/api/validation/*`, `/api/proposals/*` — same domain pattern when added.
+- Gated writes, Git review UI (EPIC-5).
+- Populate **Proposals** nav when proposal endpoints exist.

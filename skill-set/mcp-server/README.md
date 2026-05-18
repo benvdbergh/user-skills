@@ -45,6 +45,23 @@ Configure Cursor MCP (stdio), for example:
 
 See [docs/architecture.md](docs/architecture.md) for Gate 2 decisions, DTO schemas, and write-confirmation design.
 
+## Dashboard (R0.3)
+
+Split dev (Vite proxies `/api` to the HTTP API — no browser filesystem access):
+
+```bash
+npm run web:install
+npm run dev -- http          # terminal 1 — API on 127.0.0.1:3847
+npm run web:dev              # terminal 2 — Vite dev server
+```
+
+Combined serve (after building the UI):
+
+```bash
+npm run web:build
+npm run dev -- serve         # API + web/dist on one port
+```
+
 ## Tests
 
 ```bash
