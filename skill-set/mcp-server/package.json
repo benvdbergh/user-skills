@@ -19,6 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.14",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "gray-matter": "^4.0.3",
     "hono": "^4.7.10",

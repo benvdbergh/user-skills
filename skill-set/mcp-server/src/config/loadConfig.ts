@@ -12,6 +12,9 @@ const ConfigFileSchema = z.object({
   environmentMapRelativePath: z
     .string()
     .default("skill-set/catalog/environment-skill-index-map.json"),
+  relationshipMapRelativePath: z
+    .string()
+    .default("skill-set/maps/skill-relationships.json"),
   writesEnabled: z.boolean().default(false),
   environmentOverrides: z
     .record(
@@ -22,6 +25,8 @@ const ConfigFileSchema = z.object({
       }),
     )
     .optional(),
+  httpHost: z.string().default("127.0.0.1"),
+  httpPort: z.number().int().positive().default(3847),
 });
 
 export type SkillLabConfig = z.infer<typeof ConfigFileSchema> & {
@@ -29,6 +34,7 @@ export type SkillLabConfig = z.infer<typeof ConfigFileSchema> & {
   skillsRoot: string;
   skillSetRoot: string;
   environmentMapPath: string;
+  relationshipMapPath: string;
   allowedRoots: string[];
 };
 
@@ -84,6 +90,10 @@ export function loadConfig(packageRoot = defaultPackageRoot()): SkillLabConfig {
     skillsRoot,
     parsed.environmentMapRelativePath,
   );
+  const relationshipMapPath = path.resolve(
+    skillsRoot,
+    parsed.relationshipMapRelativePath,
+  );
   let allowedRoots = [skillsRoot, skillSetRoot];
   if (fs.existsSync(environmentMapPath)) {
     allowedRoots = extendAllowedRootsFromEnvironmentMap(
@@ -94,13 +104,21 @@ export function loadConfig(packageRoot = defaultPackageRoot()): SkillLabConfig {
   }
 
   assertPathUnderRoots(environmentMapPath, allowedRoots);
+  assertPathUnderRoots(relationshipMapPath, allowedRoots);
+
+  const httpPortEnv = process.env.SKILL_LAB_HTTP_PORT?.trim();
+  const httpPort = httpPortEnv
+    ? z.coerce.number().int().positive().parse(httpPortEnv)
+    : parsed.httpPort;
 
   return {
     ...parsed,
+    httpPort,
     packageRoot,
     skillsRoot,
     skillSetRoot,
     environmentMapPath,
+    relationshipMapPath,
     allowedRoots,
   };
 }
