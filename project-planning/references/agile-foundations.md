@@ -24,12 +24,14 @@ Set `slice: vertical` or `slice: horizontal` (or `spike`) on the work item.
 
 ## Definition of Ready (DoR)
 
-Before marking a story `ready`:
+Before marking a story ready in the backlog **SSOT**:
 
-- Dependencies identified (`depends_on`) and feasible ordering exists.
-- Acceptance criteria are testable.
-- Source traceability (`traces_to`) points at specs/ADRs where applicable.
+- Dependencies identified and feasible ordering exists (`depends_on` in markdown, or blocker relations in a tracker — [dependencies-and-sequencing.md](dependencies-and-sequencing.md)).
+- Acceptance criteria are testable (frontmatter/body or issue description).
+- Source traceability points at specs/ADRs (`traces_to` or tracker “Sources” — [traceability-and-sources.md](traceability-and-sources.md)).
 - Unknowns are either small or spun out as spikes.
+
+When `delivery_tracker: linear`, map “ready” to the team’s issue states per [linear-adoption.md](linear-adoption.md).
 
 ## Definition of Done (DoD)
 

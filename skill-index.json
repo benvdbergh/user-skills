@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-17T20:42:57.758751Z",
+  "generated": "2026-05-18T20:21:09.573714Z",
   "totalSkills": 37,
   "alwaysLoadedCount": 0,
   "deferredCount": 37,
@@ -404,7 +404,7 @@
     "project-planning": {
       "name": "project-planning",
       "path": "project-planning/SKILL.md",
-      "fullDescription": "Applies agile decomposition, traceability, and dependency-aware planning using markdown work items and an optional .project-planning.yaml manifest; discovers specs/ADRs, shards sources into epics and stories, and validates plans with scripts. Use when agile planning, epic/story breakdown, shard PRD or spec, dependency ordering, Definition of Ready, story mapping, workflow init, LintPlan, ScanSources, manifest-driven planning paths, or planning review.",
+      "fullDescription": "Applies agile decomposition, traceability, and dependency-aware planning with a single source of truth per project: markdown epics/stories by default, or a delivery tracker (e.g. Linear, Jira) when configured—never both. Discovers specs/ADRs, shards into epics and stories, and validates plans. Use when agile planning, epic/story breakdown, shard PRD or spec, dependency ordering, Definition of Ready, story mapping, workflow init, LintPlan, ScanSources, manifest-driven planning paths, or planning review.",
       "triggers": [
         "agile planning",
         "epic/story breakdown",

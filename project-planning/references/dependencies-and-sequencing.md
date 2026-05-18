@@ -2,7 +2,9 @@
 
 ## Modeling dependencies
 
-Use frontmatter `depends_on: [STORY-1, EPIC-2]` for **hard** prerequisites: the item should not start until those ids are done.
+**`delivery_tracker: files`** — use frontmatter `depends_on: [STORY-1, EPIC-2]` for **hard** prerequisites: the item should not start until those ids are done.
+
+**Tracker SSOT (e.g. `linear`)** — use issue **relations** (`blocks` / `blocked by`) for the same semantics; map planning ids in descriptions if needed. See [linear-adoption.md](linear-adoption.md).
 
 - **Upstream** — Items listed in `depends_on`.
 - **Downstream** — Items that list this id in their `depends_on` (can be derived by `LintPlan.ts` / graph output).

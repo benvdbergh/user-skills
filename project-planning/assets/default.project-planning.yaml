@@ -17,3 +17,8 @@ naming:
   epic_prefix: Epic-
   story_prefix: Story-
   task_prefix: Task-
+
+# Backlog SSOT (omit = files = markdown Epics/ and Stories/)
+# delivery_tracker: files   # default — use EpicManager, StoryManager, LintPlan
+# delivery_tracker: linear  # backlog in Linear only — references/linear-adoption.md
+# tracker_index: planning/tracker-index.md   # optional URL pointers when using a tracker

@@ -17,7 +17,7 @@ import { contextFromArgs } from "./lib/cliShared";
 import type { PlanningContext } from "./lib/types";
 import { getEpicsDir, getStoriesDir, getBriefPath } from "./lib/planningPaths";
 import { getPaiDir } from "./lib/paiDir";
-import { MANIFEST_FILENAME } from "./lib/loadManifest";
+import { MANIFEST_FILENAME, backlogUsesMarkdownFiles, getDeliveryTracker } from "./lib/loadManifest";
 
 function projectNameForState(ctx: PlanningContext): string {
   return ctx.legacyProjectName ?? basename(ctx.projectRoot);
@@ -84,6 +84,8 @@ function generateBrief(projectLabel: string, brief: string): string {
 async function initializeWorkflow(ctx: PlanningContext, brief: string): Promise<void> {
   const projectDir = ctx.projectRoot;
   const projectLabel = projectNameForState(ctx);
+  const tracker = getDeliveryTracker(ctx.manifest);
+  const filesBacklog = backlogUsesMarkdownFiles(ctx.manifest);
 
   if (!existsSync(projectDir)) {
     mkdirSync(projectDir, { recursive: true });
@@ -92,16 +94,23 @@ async function initializeWorkflow(ctx: PlanningContext, brief: string): Promise<
 
   ensureManifest(ctx);
 
-  const epicsDir = getEpicsDir(ctx);
-  if (!existsSync(epicsDir)) {
-    mkdirSync(epicsDir, { recursive: true });
-    console.log(`✓ Created epics directory: ${epicsDir}`);
-  }
+  if (filesBacklog) {
+    const epicsDir = getEpicsDir(ctx);
+    if (!existsSync(epicsDir)) {
+      mkdirSync(epicsDir, { recursive: true });
+      console.log(`✓ Created epics directory: ${epicsDir}`);
+    }
 
-  const storiesDir = getStoriesDir(ctx);
-  if (!existsSync(storiesDir)) {
-    mkdirSync(storiesDir, { recursive: true });
-    console.log(`✓ Created stories directory: ${storiesDir}`);
+    const storiesDir = getStoriesDir(ctx);
+    if (!existsSync(storiesDir)) {
+      mkdirSync(storiesDir, { recursive: true });
+      console.log(`✓ Created stories directory: ${storiesDir}`);
+    }
+  } else {
+    console.log(`✓ Backlog SSOT: ${tracker} (skipped Epics/Stories markdown dirs)`);
+    if (ctx.manifest.tracker_index) {
+      console.log(`  Optional index: ${ctx.manifest.tracker_index}`);
+    }
   }
 
   const specsDir = join(projectDir, "specs");
@@ -140,20 +149,30 @@ async function initializeWorkflow(ctx: PlanningContext, brief: string): Promise<
   console.log(`\n✓ Workflow initialized at: ${projectDir}`);
   console.log(`\nNext steps:`);
   console.log(`  1. PRD/spec: specification skill or add PRD.md under root`);
-  console.log(
-    `  2. Shard: bun run ${paiDir}/skills/project-planning/scripts/ShardFromSources.ts --root "${projectDir}"`
-  );
+  if (filesBacklog) {
+    console.log(
+      `  2. Shard: bun run ${paiDir}/skills/project-planning/scripts/ShardFromSources.ts --root "${projectDir}"`
+    );
+  } else {
+    console.log(
+      `  2. Plan backlog in ${tracker}: see skills/project-planning/references/${tracker}-adoption.md (or SKILL.md § Delivery tracker)`
+    );
+  }
 }
 
 function reviewPlanning(ctx: PlanningContext): void {
   const projectDir = ctx.projectRoot;
   const projectLabel = projectNameForState(ctx);
+  const tracker = getDeliveryTracker(ctx.manifest);
+  const filesBacklog = backlogUsesMarkdownFiles(ctx.manifest);
+
   if (!existsSync(projectDir)) {
     console.error(`Project not found: ${projectDir}`);
     process.exit(1);
   }
 
   console.log(`\nPlanning review: ${projectLabel}`);
+  console.log(`Backlog SSOT: ${filesBacklog ? "files (markdown)" : tracker}`);
   console.log("=".repeat(50));
 
   const requiredFiles = ["brief.md", "PRD.md"];
@@ -167,18 +186,29 @@ function reviewPlanning(ctx: PlanningContext): void {
     }
   }
 
-  const epicsDir = getEpicsDir(ctx);
-  if (existsSync(epicsDir)) {
-    console.log(`✓ Epics directory exists`);
-  } else {
-    console.log(`⚠️  Epics directory missing`);
-  }
+  if (filesBacklog) {
+    const epicsDir = getEpicsDir(ctx);
+    if (existsSync(epicsDir)) {
+      console.log(`✓ Epics directory exists`);
+    } else {
+      console.log(`⚠️  Epics directory missing`);
+    }
 
-  const storiesDir = getStoriesDir(ctx);
-  if (existsSync(storiesDir)) {
-    console.log(`✓ Stories directory exists`);
+    const storiesDir = getStoriesDir(ctx);
+    if (existsSync(storiesDir)) {
+      console.log(`✓ Stories directory exists`);
+    } else {
+      console.log(`⚠️  Stories directory missing`);
+    }
   } else {
-    console.log(`⚠️  Stories directory missing`);
+    console.log(`ℹ️  Markdown Epics/Stories not required (backlog in ${tracker})`);
+    const epicsDir = getEpicsDir(ctx);
+    const storiesDir = getStoriesDir(ctx);
+    if (existsSync(epicsDir) || existsSync(storiesDir)) {
+      console.log(
+        `⚠️  Legacy markdown backlog dirs present — archive if migrated to ${tracker} (see plan-quality-review.md)`
+      );
+    }
   }
 
   const stateDir = join(projectDir, ".state");
@@ -188,7 +218,13 @@ function reviewPlanning(ctx: PlanningContext): void {
     console.log(`⚠️  State directory missing`);
   }
 
-  console.log(`\nRun LintPlan.ts and see references/plan-quality-review.md for full gates.`);
+  if (filesBacklog) {
+    console.log(`\nRun LintPlan.ts and see references/plan-quality-review.md (files checklist).`);
+  } else {
+    console.log(
+      `\nReview backlog in ${tracker}; see references/plan-quality-review.md (tracker checklist) and references/${tracker}-adoption.md if present.`
+    );
+  }
 
   if (missingFiles.length > 0) {
     console.log(`\n❌ Missing files: ${missingFiles.join(", ")}`);
@@ -228,6 +264,8 @@ Options:
   --brief <text>     Required for init
   --action <name>    init (default) | review
   -h, --help
+
+Manifest delivery_tracker: files (default) creates Epics/Stories; tracker SSOT skips them.
 `);
     process.exit(0);
   }

@@ -1,5 +1,9 @@
 # Frontmatter schema (normative)
 
+**Scope:** Epic/story/task **markdown** work items when `delivery_tracker: files` (or omitted). When a delivery tracker is backlog SSOT, do not create parallel markdown backlog files — use tracker fields per [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot) and the platform guide (e.g. [linear-adoption.md](linear-adoption.md)).
+
+Manifest keys at the end of this file apply to all modes.
+
 Work items are Markdown files with YAML frontmatter. Scripts (`LintPlan.ts`, managers) use these fields. **`kind` + `id` + `title` are required** for lint validation of new content.
 
 ## Common fields
@@ -93,6 +97,8 @@ Stored at the **project root** (or path passed via `--config`). Keys:
 | `naming.epic_prefix` | string | Filename prefix (default `Epic-`) |
 | `naming.story_prefix` | string | Filename prefix (default `Story-`) |
 | `naming.task_prefix` | string | Filename prefix for tasks (default `Task-`) |
+| `delivery_tracker` | string | **Backlog SSOT.** `files` (default) = epic/story markdown; `linear`, `jira`, `github-issues`, `monday` = backlog in tracker only — no parallel markdown. See [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot). |
+| `tracker_index` | string | Optional path to URL-only index (e.g. `planning/tracker-index.md`) when using a tracker; not backlog SSOT. |
 
 Obsolete keys in older manifests (e.g. `prompt_files`) are ignored by scripts.
 
