@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-18T20:21:09.573714Z",
+  "generated": "2026-05-18T21:08:05.397465Z",
   "totalSkills": 37,
   "alwaysLoadedCount": 0,
   "deferredCount": 37,
@@ -221,21 +221,19 @@
     "minimalist-coding": {
       "name": "minimalist-coding",
       "path": "minimalist-coding/SKILL.md",
-      "fullDescription": "Search-first coding workflow enforcing YAGNI principles, Clean Architecture layering, and DDD structural standards. USE WHEN implementing features, writing code, modifying codebase, structuring layers, applying clean architecture, DDD, naming conventions, library-first approach, OR user requests code changes. Enforces Locate→Modify→Create hierarchy, two-phase coding loop, and automatic refactoring.",
+      "fullDescription": "Search-first coding workflow enforcing YAGNI, Clean Architecture layering, and DDD standards. Keeps delivery-tracker work items transparent when a story or issue is in scope. USE WHEN implementing features, writing code, modifying codebase, executing a story or task, or user requests code changes. Enforces Locate→Modify→Create, two-phase coding loop, and refactor pass.",
       "triggers": [
         "implementing features",
         "writing code",
         "modifying codebase",
-        "structuring layers",
-        "applying clean architecture",
-        "DDD",
-        "naming conventions",
-        "library-first approach",
-        "user requests code changes. Enforces Locate→Modify→Create hierarchy",
+        "executing a story",
+        "task",
+        "user requests code changes. Enforces Locate→Modify→Create",
         "two-phase coding loop",
-        "and automatic refactoring"
+        "and refactor pass"
       ],
       "workflows": [
+        "delivery-tracker-execution",
         "SearchPlanImplement",
         "RefactorPass",
         "clean-architecture-and-ddd"

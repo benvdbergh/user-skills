@@ -10,6 +10,7 @@
 
 ## Does not own
 
+- Execution-time status updates, implementation evidence comments, or “in progress / done” transitions during coding (`minimalist-coding` — [delivery-tracker-execution.md](../../minimalist-coding/references/delivery-tracker-execution.md)).
 - Product vision, initiative horizons, or portfolio roadmap framing (`product-roadmap`).
 - PRD/spec/constitution authoring (`specification`).
 - Technical architecture and ADR content (`software-architecture`).
@@ -25,6 +26,7 @@
 | System design, NFRs, API topology | `software-architecture` |
 | Version bump, release notes, tagging | `release-versioning` |
 | Git history, branches, checkpoints | `version-control` |
+| Implement story/task, update tracker while coding | `minimalist-coding` |
 
 ## Composition with delivery trackers
 
