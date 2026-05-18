@@ -1,0 +1,21 @@
+# Skill Lab MCP control plane — project-planning manifest
+# Run scripts with: --config skill-set/mcp-server/.project-planning.yaml
+#   or --root skill-set/mcp-server (when cwd is skills repo root)
+# See project-planning skill: references/frontmatter-schema.md
+
+version: 1
+
+defaults:
+  epics_dir: Epics
+  stories_dir: Stories
+
+# Backlog SSOT: Linear (milestones = epics, issues = stories). No Epics/ or Stories/ markdown.
+delivery_tracker: linear
+tracker_index: tracker-index.md
+
+source_globs:
+  - spec/skill-lab-mcp-control-plane.md
+  - brief.md
+  - ../SKILL.md
+  - ../references/**/*.md
+  - ../catalog/**/*.md

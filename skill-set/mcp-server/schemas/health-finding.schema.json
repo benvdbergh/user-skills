@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/health-finding.json",
+  "title": "HealthFinding",
+  "type": "object",
+  "required": ["id", "severity", "category", "message", "sourcePath"],
+  "properties": {
+    "id": { "type": "string" },
+    "severity": { "enum": ["info", "warning", "error"] },
+    "category": { "type": "string" },
+    "message": { "type": "string" },
+    "sourcePath": { "type": "string" },
+    "recommendation": { "type": "string" }
+  },
+  "additionalProperties": false
+}

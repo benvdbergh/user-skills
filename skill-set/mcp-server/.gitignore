@@ -1,0 +1,4 @@
+node_modules/
+dist/
+skill-lab.config.local.json
+*.log

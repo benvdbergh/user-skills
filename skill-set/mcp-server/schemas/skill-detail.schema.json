@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/skill-detail.json",
+  "title": "SkillDetail",
+  "allOf": [{ "$ref": "skill-summary.schema.json" }],
+  "required": [
+    "descriptionLength",
+    "references",
+    "scripts",
+    "assets",
+    "hasSkillEscalation",
+    "missingReferences",
+    "sourcePath"
+  ],
+  "properties": {
+    "license": { "type": "string" },
+    "compatibility": { "type": "string" },
+    "allowedTools": { "type": "string" },
+    "metadata": { "type": "object" },
+    "descriptionLength": { "type": "integer", "minimum": 0 },
+    "references": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
+    "scripts": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
+    "assets": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
+    "hasSkillEscalation": { "type": "boolean" },
+    "missingReferences": { "type": "array", "items": { "type": "string" } },
+    "sourcePath": { "type": "string" }
+  },
+  "$defs": {
+    "fileRef": {
+      "type": "object",
+      "required": ["kind", "relativePath", "exists"],
+      "properties": {
+        "kind": { "enum": ["reference", "script", "asset"] },
+        "relativePath": { "type": "string" },
+        "exists": { "type": "boolean" }
+      }
+    }
+  }
+}
