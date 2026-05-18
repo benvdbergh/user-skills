@@ -357,22 +357,24 @@ Needs project-specific skill inventory, wrappers, and impact analysis without ed
 
 ### Tools
 
-| Tool | Purpose | Writes? |
-|------|---------|---------|
-| `list_skills` | Return normalized skill summaries across configured environments. | No |
-| `search_skills` | Search by name, trigger, workflow, reference, script, or description. | No |
-| `get_skill_detail` | Return parsed detail for one skill. | No |
-| `get_skill_graph` | Return graph nodes and edges with filters. | No |
-| `graph_neighbors` | Return local graph around one node. | No |
-| `check_catalog_health` | Run catalog/index/map/path health checks. | No |
-| `lint_skill` | Run structural checks for one skill. | No by default |
-| `validate_skill` | Generate validation analysis for one skill. | Optional report write |
-| `suggest_relationship_edges` | Propose relationship edges with evidence quotes. | No |
-| `detect_trigger_conflicts` | Analyze overlapping trigger phrases and ambiguous descriptions. | No |
-| `propose_skill_patch` | Generate a reviewable patch proposal for a target skill. | No direct write |
-| `apply_approved_patch` | Apply a previously reviewed patch token. | Yes, gated |
-| `regenerate_skill_index` | Run index regeneration for a configured skills root. | Yes, gated |
-| `sync_relationship_map` | Run relationship-map list synchronization. | Yes, gated |
+
+| Tool                         | Purpose                                                               | Writes?               |
+| ---------------------------- | --------------------------------------------------------------------- | --------------------- |
+| `list_skills`                | Return normalized skill summaries across configured environments.     | No                    |
+| `search_skills`              | Search by name, trigger, workflow, reference, script, or description. | No                    |
+| `get_skill_detail`           | Return parsed detail for one skill.                                   | No                    |
+| `get_skill_graph`            | Return graph nodes and edges with filters.                            | No                    |
+| `graph_neighbors`            | Return local graph around one node.                                   | No                    |
+| `check_catalog_health`       | Run catalog/index/map/path health checks.                             | No                    |
+| `lint_skill`                 | Run structural checks for one skill.                                  | No by default         |
+| `validate_skill`             | Generate validation analysis for one skill.                           | Optional report write |
+| `suggest_relationship_edges` | Propose relationship edges with evidence quotes.                      | No                    |
+| `detect_trigger_conflicts`   | Analyze overlapping trigger phrases and ambiguous descriptions.       | No                    |
+| `propose_skill_patch`        | Generate a reviewable patch proposal for a target skill.              | No direct write       |
+| `apply_approved_patch`       | Apply a previously reviewed patch token.                              | Yes, gated            |
+| `regenerate_skill_index`     | Run index regeneration for a configured skills root.                  | Yes, gated            |
+| `sync_relationship_map`      | Run relationship-map list synchronization.                            | Yes, gated            |
+
 
 ### Resources
 
@@ -402,19 +404,21 @@ Each prompt must be generated from or explicitly cite `skill-set` source referen
 
 ## HTTP API Draft
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/environments` | GET | List configured environments. |
-| `/api/skills` | GET | List normalized skills. |
-| `/api/skills/:environmentId/:skillName` | GET | Skill detail. |
-| `/api/graph` | GET | Filtered graph. |
-| `/api/graph/neighbors` | GET | Local graph around a node. |
-| `/api/health` | POST | Run health scan. |
-| `/api/validation/:environmentId/:skillName` | POST | Run or retrieve validation report. |
-| `/api/proposals/relationships` | POST | Suggest relationship edges. |
-| `/api/proposals/skill-patch` | POST | Generate skill patch proposal. |
-| `/api/git/status` | GET | Current Git status. |
-| `/api/git/diff` | GET | Diff for current or proposed changes. |
+
+| Endpoint                                    | Method | Purpose                               |
+| ------------------------------------------- | ------ | ------------------------------------- |
+| `/api/environments`                         | GET    | List configured environments.         |
+| `/api/skills`                               | GET    | List normalized skills.               |
+| `/api/skills/:environmentId/:skillName`     | GET    | Skill detail.                         |
+| `/api/graph`                                | GET    | Filtered graph.                       |
+| `/api/graph/neighbors`                      | GET    | Local graph around a node.            |
+| `/api/health`                               | POST   | Run health scan.                      |
+| `/api/validation/:environmentId/:skillName` | POST   | Run or retrieve validation report.    |
+| `/api/proposals/relationships`              | POST   | Suggest relationship edges.           |
+| `/api/proposals/skill-patch`                | POST   | Generate skill patch proposal.        |
+| `/api/git/status`                           | GET    | Current Git status.                   |
+| `/api/git/diff`                             | GET    | Diff for current or proposed changes. |
+
 
 The API should return stable domain DTOs shared with MCP response schemas where practical.
 
@@ -575,15 +579,17 @@ This is an explicit exception to the "one runtime per skill scripts" guidance be
 
 ## Risks and Mitigations
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
+
+| Risk                                             | Impact | Mitigation                                                                                                                |
+| ------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------- |
 | Service code bloats the `skill-set` skill folder | Medium | Keep `SKILL.md` concise; document `mcp-server/` as optional service package; do not load service code into agent context. |
-| MCP and HTTP APIs diverge | High | Use shared domain services and DTO schemas. |
-| AI edits corrupt skill files | High | Proposal-first lifecycle, diff preview, dirty-file checks, explicit apply only. |
-| Paths in catalog are machine-specific | Medium | Add path resolution status and environment overrides. |
-| Relationship suggestions hallucinate edges | High | Require evidence quote, source file, confidence score, and human approval. |
-| Graph becomes too dense | Medium | Local graph, filters, clusters, and high-risk overlays. |
-| UI becomes a source of truth | High | Keep Git files canonical; no hidden database required for MVP. |
+| MCP and HTTP APIs diverge                        | High   | Use shared domain services and DTO schemas.                                                                               |
+| AI edits corrupt skill files                     | High   | Proposal-first lifecycle, diff preview, dirty-file checks, explicit apply only.                                           |
+| Paths in catalog are machine-specific            | Medium | Add path resolution status and environment overrides.                                                                     |
+| Relationship suggestions hallucinate edges       | High   | Require evidence quote, source file, confidence score, and human approval.                                                |
+| Graph becomes too dense                          | Medium | Local graph, filters, clusters, and high-risk overlays.                                                                   |
+| UI becomes a source of truth                     | High   | Keep Git files canonical; no hidden database required for MVP.                                                            |
+
 
 ## Acceptance Criteria
 
