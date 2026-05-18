@@ -1,53 +1,105 @@
-import type { ReactNode } from "react";
-import { NavLink } from "react-router-dom";
-import { EnvironmentSwitcher } from "./EnvironmentSwitcher";
-import "./Layout.css";
+import { useEffect, useRef, type ReactNode } from "react";
+import { useNavHealth } from "../context/NavHealthContext";
+import {
+  DetailPanelSlotProvider,
+  useDetailPanelSlot,
+} from "../context/DetailPanelSlotContext";
+import { SkillDetailPanel } from "./SkillDetailPanel";
+import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
+import { ShellIcon } from "./ShellIcon";
 
-const navItems = [
-  { to: "/", label: "Catalog", end: true as const },
-  { to: "/graph", label: "Graph" },
-  { to: "/health", label: "Health" },
-  { to: "/proposals", label: "Proposals", disabled: true as const },
-];
+function DetailPanelNotFound({
+  skillName,
+  onClose,
+}: {
+  skillName: string;
+  onClose: () => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+  }, [skillName]);
+
+  return (
+    <aside
+      className="sl-detail sl-detail-panel"
+      aria-label="Skill not found"
+    >
+      <header className="sl-detail-header">
+        <h2 id="detail-heading">Skill not found</h2>
+        <p className="sl-detail-desc">
+          <code>{skillName}</code> is not in the current catalog view. Clear
+          filters or pick another environment.
+        </p>
+        <div className="sl-detail-actions">
+          <button
+            ref={closeRef}
+            type="button"
+            className="sl-icon-btn"
+            onClick={onClose}
+            aria-label="Close skill detail"
+          >
+            <ShellIcon name="close" size={16} />
+          </button>
+        </div>
+      </header>
+    </aside>
+  );
+}
+
+function MainWithDetailPanel({ children }: { children: ReactNode }) {
+  const { config, closePanel } = useDetailPanelSlot();
+  const panelOpen = Boolean(config);
+
+  return (
+    <main
+      className={`sl-main${panelOpen ? " detail-open" : ""}`}
+      id="main-content"
+      tabIndex={-1}
+    >
+      <div className="sl-page">{children}</div>
+      {config?.notFound ? (
+        <DetailPanelNotFound
+          skillName={`${config.environmentId}/${config.skillName}`}
+          onClose={closePanel}
+        />
+      ) : config ? (
+        <SkillDetailPanel
+          mode="panel"
+          environmentId={config.environmentId}
+          skillName={config.skillName}
+          catalogSearch={config.catalogSearch}
+          scope={config.scope}
+          description={config.description}
+          sourcePath={config.sourcePath}
+          health={config.health}
+          onClose={closePanel}
+        />
+      ) : null}
+    </main>
+  );
+}
+
+function LayoutShell({ children }: { children: ReactNode }) {
+  const { counts } = useNavHealth();
+
+  return (
+    <div className="sl-shell">
+      <Sidebar healthCounts={counts} />
+      <div className="sl-workspace">
+        <TopBar />
+        <MainWithDetailPanel>{children}</MainWithDetailPanel>
+      </div>
+    </div>
+  );
+}
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="skill-lab-shell">
-      <header className="skill-lab-header">
-        <div className="skill-lab-brand">
-          <span className="skill-lab-logo" aria-hidden>
-            ◆
-          </span>
-          <h1>Skill Lab</h1>
-        </div>
-        <EnvironmentSwitcher />
-        <nav className="skill-lab-nav" aria-label="Main">
-          {navItems.map((item) =>
-            item.disabled ? (
-              <span
-                key={item.to}
-                className="skill-lab-nav-link is-disabled"
-                aria-disabled="true"
-                title="Planned for R0.4"
-              >
-                {item.label}
-              </span>
-            ) : (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={"end" in item ? item.end : false}
-                className={({ isActive }) =>
-                  `skill-lab-nav-link${isActive ? " is-active" : ""}`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ),
-          )}
-        </nav>
-      </header>
-      <main className="skill-lab-main">{children}</main>
-    </div>
+    <DetailPanelSlotProvider>
+      <LayoutShell>{children}</LayoutShell>
+    </DetailPanelSlotProvider>
   );
 }

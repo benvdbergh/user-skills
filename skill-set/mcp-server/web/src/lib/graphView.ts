@@ -30,15 +30,6 @@ export function mergeGraphResults(
   };
 }
 
-const NODE_COLORS: Record<string, string> = {
-  skill: "#1565c0",
-  mcp_tool: "#6a1b9a",
-  environment: "#2e7d32",
-  workflow: "#ef6c00",
-  reference: "#00838f",
-  script: "#5d4037",
-};
-
 export function buildAdjacency(
   edges: SkillGraphEdge[],
 ): Map<string, Set<string>> {
@@ -112,39 +103,27 @@ export function toFlowGraph(
 
   const flowNodes: Node[] = nodes.map((node) => ({
     id: node.id,
+    type: "skillGraph",
     position: positions.get(node.id) ?? { x: 0, y: 0 },
+    // Explicit size so React Flow can compute edge anchor points for custom nodes.
+    width: 96,
+    height: 56,
     data: {
       label: node.label,
       nodeType: node.type,
       health: node.health?.status,
     },
-    style: {
-      background: NODE_COLORS[node.type] ?? "#546e7a",
-      color: "#fff",
-      border: "1px solid rgba(0,0,0,0.15)",
-      borderRadius: 6,
-      padding: "6px 10px",
-      fontSize: 12,
-      maxWidth: 180,
-    },
   }));
 
-  const flowEdges: Edge[] = edges.map((edge) => {
-    const approx = edge.mappingIsApproximate;
-    const pct = Math.round(edge.confidence * 100);
-    return {
-      id: edge.id,
-      source: edge.from,
-      target: edge.to,
-      label: `${edge.type} · ${pct}%${approx ? " ~" : ""}`,
-      animated: approx,
-      style: {
-        strokeWidth: 1 + edge.confidence * 2,
-        strokeDasharray: approx ? "6 4" : undefined,
-      },
-      labelStyle: { fontSize: 10, fill: "currentColor" },
-    };
-  });
+  const flowEdges: Edge[] = edges.map((edge) => ({
+    id: edge.id,
+    source: edge.from,
+    target: edge.to,
+    data: {
+      confidence: edge.confidence,
+      approximate: edge.mappingIsApproximate,
+    },
+  }));
 
   return { nodes: flowNodes, edges: flowEdges };
 }

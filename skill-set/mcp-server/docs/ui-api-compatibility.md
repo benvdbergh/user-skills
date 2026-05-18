@@ -31,7 +31,7 @@ The dashboard **must not** parse `SKILL.md`, relationship maps, or health rules.
 
 ## Source links (FR-042)
 
-Shared component: `web/src/components/SourceLink.tsx`  
+Shared component: `web/src/components/SourceLink.tsx` (styles: `sl-source-link*` in `styles/primitives.css`)  
 Helpers: `web/src/lib/sourceLink.ts`
 
 | Input | Behavior |
@@ -77,6 +77,16 @@ Until then, keep `web/` colocated under `skill-set/mcp-server/web/` per architec
 | `/api/graph/neighbors` | GET | Graph (local), Skill detail |
 | `/api/health` | POST | Health |
 | non-`/api` GET | GET | SPA static (`web/dist`) when `serve` / `staticDir` |
+
+## Dashboard routing (skill names)
+
+| Mechanism | Format | Notes |
+|-----------|--------|--------|
+| Catalog side panel | `?skill={environmentId}/{skillName}` | **Preferred** when `skillName` contains `/` (parsed on first `/` only) |
+| Full-page detail | `/skills/:environmentId/:skillName` | Shareable URL; `skillName` is a **single** path segment (slashes not supported) |
+| Environment filter | `?environmentId=` | Preserved across catalog, panel, and detail links |
+
+The UI must not construct filesystem paths from user input; only display `sourcePath` values returned by the API.
 
 ## Related docs
 

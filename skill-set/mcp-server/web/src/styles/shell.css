@@ -1,0 +1,286 @@
+/* Shell — sidebar, nav, environment switcher (from web-js/styles-1.css) */
+
+.sl-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.sl-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-1);
+  min-height: 0;
+}
+
+.sl-workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sl-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 0;
+}
+
+.sl-brand-mark {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
+}
+
+.sl-brand-name {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.sl-brand-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-dim);
+}
+
+.sl-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sl-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  color: var(--fg-muted);
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  text-decoration: none;
+  transition:
+    background 120ms,
+    color 120ms;
+}
+
+.sl-nav-item:hover {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+
+.sl-nav-item.is-active {
+  background: var(--bg-2);
+  color: var(--fg);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.sl-nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 2px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.sl-nav-item.is-disabled {
+  color: var(--fg-faint);
+  cursor: not-allowed;
+}
+
+.sl-nav-item.is-disabled:hover {
+  background: transparent;
+}
+
+.sl-nav-item > .sl-nav-label {
+  flex: 1;
+}
+
+.sl-nav-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 5px;
+  background: var(--bg-3);
+  color: var(--fg-dim);
+  border-radius: 3px;
+}
+
+.sl-nav-pip {
+  display: inline-flex;
+}
+
+.sl-sidebar-foot {
+  margin-top: auto;
+  padding: 10px 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sl-sidebar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-dim);
+}
+
+.sl-sidebar-meta code {
+  color: var(--fg-muted);
+}
+
+/* Environment switcher */
+.sl-env {
+  position: relative;
+}
+
+.sl-env-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: left;
+  transition: border-color 120ms;
+}
+
+.sl-env-btn:hover {
+  border-color: var(--border-2);
+}
+
+.sl-env.is-open .sl-env-btn {
+  border-color: var(--accent);
+}
+
+.sl-env-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: var(--bg-3);
+  color: var(--fg-muted);
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+
+.sl-env-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.sl-env-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-dim);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sl-env-name {
+  display: block;
+  font-weight: 500;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sl-env-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.sl-env-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  z-index: 51;
+  padding: 4px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.sl-env-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.sl-env-opt:hover {
+  background: var(--bg-3);
+}
+
+.sl-env-opt.is-active {
+  background: color-mix(in oklch, var(--accent) 12%, transparent);
+}
+
+.sl-env-opt.is-warn .sl-env-name {
+  color: var(--warn);
+}
+
+.sl-env-opt-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sl-env-opt .sl-env-path {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-dim);
+  margin-top: 1px;
+}
+
+.sl-env-opt .sl-env-name {
+  font-size: 12.5px;
+}
+
+.sl-env-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.sl-env-warn {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--warn);
+  background: var(--warn-bg);
+  margin-left: 6px;
+  padding: 1px 5px;
+  border-radius: 3px;
+}

@@ -1,5 +1,4 @@
 import { getSourceLinkPresentation } from "../lib/sourceLink";
-import "./SourceLink.css";
 
 export interface SourceLinkProps {
   sourcePath: string;
@@ -17,18 +16,18 @@ export function SourceLink({
     getSourceLinkPresentation(sourcePath);
 
   return (
-    <span className={["source-link", className].filter(Boolean).join(" ")}>
+    <span className={["sl-source-link", className].filter(Boolean).join(" ")}>
       {isLinkable ? (
-        <a href={href} title={fullPath} className="source-link-anchor">
+        <a href={href} title={fullPath} className="sl-source-link-anchor">
           {label}
         </a>
       ) : (
-        <span title={fullPath} className="source-link-relative">
+        <span title={fullPath} className="sl-source-link-relative">
           {label}
         </span>
       )}
       {showFullPath && (
-        <code className="source-link-path" title={fullPath}>
+        <code className="sl-source-link-path" title={fullPath}>
           {fullPath}
         </code>
       )}

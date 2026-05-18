@@ -90,13 +90,22 @@ skill-set/mcp-server/
       components/
         SourceLink.tsx              # STORY-3-6 — FR-042
         EnvironmentSwitcher.tsx     # FR-041
-        Layout.tsx
+        Layout.tsx                  # Sidebar + TopBar shell
+        Sidebar.tsx
+        TopBar.tsx
+        SkillDetailPanel.tsx
+        SkillDetailContent.tsx
+      styles/                       # tokens, shell, page CSS (sl-*)
+      context/
+        EnvironmentContext.tsx
+        DetailPanelSlotContext.tsx
+        NavHealthContext.tsx
       routes/
         CatalogPage.tsx             # STORY-3-2
         SkillDetailPage.tsx         # STORY-3-3
         GraphPage.tsx               # STORY-3-4
         HealthPage.tsx              # STORY-3-5
-        ProposalsPlaceholder.tsx
+        ProposalsPage.tsx           # R0.4 sketch (read-only)
       hooks/                        # presentation-only (filters, pagination UI state)
   schemas/                          # unchanged; UI consumes same JSON shapes
   docs/
@@ -187,24 +196,36 @@ web/src/routes/*  →  web/src/api/*  →  HTTP /api/*  →  domain/
 - **Allowed in React:** formatting, sorting UI state, client-side search over already-fetched lists (catalog), graph layout/selection, link URL building from `sourcePath`.
 - **Forbidden in React:** parsing `SKILL.md`, reading relationship JSON, health rule evaluation, graph BFS, path guard logic.
 
-### Shell and navigation (STORY-3-1)
+### Shell and navigation (STORY-3-1, STORY-3-8)
+
+```text
+┌──────────────┬────────────────────────────────────────┐
+│ Sidebar      │ TopBar (breadcrumb, env context)       │
+│ · brand      ├────────────────────────────────────────┤
+│ · env switch │ Main workspace                         │
+│ · nav        │  · route page (catalog / graph / …)    │
+│ · health pip │  · optional skill detail panel (right) │
+└──────────────┴────────────────────────────────────────┘
+```
 
 | Route | View | API |
 |-------|------|-----|
-| `/` | Catalog (default) | `GET /api/environments`, `GET /api/skills` |
-| `/skills/:environmentId/:skillName` | Skill detail | `GET /api/skills/:environmentId/:skillName`, graph neighbors for relationships |
+| `/` | Catalog (default); `?skill=` opens side panel | `GET /api/environments`, `GET /api/skills` |
+| `/skills/:environmentId/:skillName` | Skill detail (fullscreen / shareable) | `GET /api/skills/:environmentId/:skillName`, graph neighbors |
 | `/graph` | Graph explorer | `GET /api/graph`, `GET /api/graph/neighbors` |
 | `/health` | Health findings | `POST /api/health` |
-| `/proposals` | Placeholder (“R0.4”) | — |
+| `/proposals` | R0.4 proposals sketch (disabled actions) | — |
 
-Global **environment filter** (optional `environmentId` on catalog; required context on detail): **FR-041**.
+Global **environment filter** via `?environmentId=` on any route: **FR-041**. Sidebar health pip reflects catalog row health counts and last health-scan summary when available.
+
+**Skill detail (hybrid, STORY-3-10):** Catalog row sets `?skill={environmentId}/{skillName}` and opens a **side panel** without losing filters. Full-page route remains for deep links. Skill names may contain `/`; use `?skill=` for those — see `docs/ui-api-compatibility.md`.
 
 ### Catalog view (STORY-3-2)
 
 - Fetch skills for selected environment (or all environments with env column).
 - Client search across name, description, triggers; filter chips for scope, tier, health status (and project when present on summary).
 - Columns: name, scope, environment, tier, trigger/workflow counts, health badge.
-- Row click → skill detail route.
+- Row click → `?skill=` side panel (filters preserved); “Full page” / direct URL → `/skills/...` route.
 - Highlight rows with `health.status !== 'ok'` or high `health.findings`.
 
 ### Skill detail view (STORY-3-3)

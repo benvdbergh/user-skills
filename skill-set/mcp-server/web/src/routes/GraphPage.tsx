@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   DEFAULT_GRAPH_LIMIT,
@@ -9,23 +9,38 @@ import {
   type GraphNodeType,
   type GraphQueryParams,
   type HighRiskRefactorSequence,
+  type SkillGraphEdge,
+  type SkillGraphNode,
   type SkillGraphResult,
 } from "../api/graph";
 import { ApiError } from "../api/client";
 import { SkillGraphCanvas } from "../components/SkillGraphCanvas";
 import { SourceLink } from "../components/SourceLink";
 import {
+  HealthPill,
+  MonoPath,
+  PageHeader,
+} from "../components/ShellPrimitives";
+import { ShellIcon } from "../components/ShellIcon";
+import {
   collectRelationshipTypes,
   mergeGraphResults,
   toFlowGraph,
 } from "../lib/graphView";
-import type { HealthStatus } from "../api/catalog";
-import "./GraphPage.css";
 
 const EMPTY_RESULT: SkillGraphResult = {
   nodes: [],
   edges: [],
   highRiskRefactorSequences: [],
+};
+
+const NODE_TYPE_LABEL: Record<GraphNodeType, string> = {
+  skill: "Skill",
+  mcp_tool: "MCP tool",
+  environment: "Environment",
+  workflow: "Workflow",
+  reference: "Reference",
+  script: "Script",
 };
 
 export function GraphPage() {
@@ -42,21 +57,24 @@ export function GraphPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [knownRelTypes, setKnownRelTypes] = useState<string[]>([]);
-  const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [centerInput, setCenterInput] = useState(nodeId);
 
-  const selectedNodeTypes = parseListParam(
-    searchParams.get("nodeTypes"),
-  ) as GraphNodeType[];
-  const selectedRelTypes = parseListParam(
-    searchParams.get("relationshipTypes"),
+  const nodeTypesParam = searchParams.get("nodeTypes") ?? "";
+  const relationshipTypesParam = searchParams.get("relationshipTypes") ?? "";
+  const selectedNodeTypes = useMemo(
+    () => parseListParam(nodeTypesParam || null) as GraphNodeType[],
+    [nodeTypesParam],
+  );
+  const selectedRelTypes = useMemo(
+    () => parseListParam(relationshipTypesParam || null),
+    [relationshipTypesParam],
   );
   const confidenceMin = searchParams.get("confidenceMin") ?? "";
   const confidenceMax = searchParams.get("confidenceMax") ?? "";
   const scope = searchParams.get("scope") ?? "";
   const project = searchParams.get("project") ?? "";
-  const healthStatus = (searchParams.get("healthStatus") ?? "") as
-    | HealthStatus
-    | "";
+  const healthStatus = searchParams.get("healthStatus") ?? "";
   const limit = Number(searchParams.get("limit") ?? DEFAULT_GRAPH_LIMIT);
   const cursor = searchParams.get("cursor") ?? "";
 
@@ -68,7 +86,9 @@ export function GraphPage() {
     if (confidenceMax) q.confidenceMax = Number(confidenceMax);
     if (scope) q.scope = scope;
     if (project) q.project = project;
-    if (healthStatus) q.healthStatus = healthStatus;
+    if (healthStatus === "ok" || healthStatus === "warning" || healthStatus === "error") {
+      q.healthStatus = healthStatus;
+    }
     return q;
   }, [
     selectedNodeTypes,
@@ -83,9 +103,9 @@ export function GraphPage() {
   ]);
 
   const loadGraph = useCallback(async () => {
-    setLoading(true);
-    setError(null);
     const appendPage = Boolean(cursor) && !isLocal;
+    setLoading((prev) => (appendPage ? prev : true));
+    setError(null);
     try {
       const result = isLocal
         ? await fetchGraphNeighbors({ ...baseQuery, nodeId, depth })
@@ -118,26 +138,37 @@ export function GraphPage() {
     void loadGraph();
   }, [loadGraph]);
 
+  useEffect(() => {
+    setCenterInput(nodeId);
+    if (nodeId) setSelectedNodeId(nodeId);
+  }, [nodeId]);
+
   const flow = useMemo(
     () => toFlowGraph(graph.nodes, graph.edges, nodeId || undefined),
     [graph, nodeId],
   );
 
-  const focusedNode = useMemo(
-    () => graph.nodes.find((n) => n.id === focusedNodeId),
-    [graph.nodes, focusedNodeId],
+  const nodeById = useMemo(
+    () => new Map(graph.nodes.map((n) => [n.id, n])),
+    [graph.nodes],
   );
 
-  const focusedEdges = useMemo(() => {
-    if (!focusedNodeId) return [];
+  const selectedNode = selectedNodeId
+    ? nodeById.get(selectedNodeId)
+    : undefined;
+
+  const selectedEdges = useMemo(() => {
+    if (!selectedNodeId) return [];
     return graph.edges.filter(
-      (e) => e.from === focusedNodeId || e.to === focusedNodeId,
+      (e) => e.from === selectedNodeId || e.to === selectedNodeId,
     );
-  }, [graph.edges, focusedNodeId]);
+  }, [graph.edges, selectedNodeId]);
 
   const showEdgeWarning =
     graph.edges.length >= HIGH_EDGE_WARNING_THRESHOLD ||
     (graph.nextCursor && graph.edges.length > 0);
+
+  const minConfValue = confidenceMin ? Number(confidenceMin) : 0;
 
   const updateParams = (updates: Record<string, string | null>) => {
     setSearchParams(
@@ -182,269 +213,351 @@ export function GraphPage() {
   };
 
   return (
-    <section className="graph-page" aria-labelledby="graph-heading">
-      <header className="graph-header">
-        <div>
-          <h2 id="graph-heading">Graph explorer</h2>
-          <p className="graph-subtitle">
-            {isLocal
-              ? `Local neighborhood · depth ${depth}`
-              : "Global graph (filtered)"}
-          </p>
-        </div>
-        <p className="graph-stats" aria-live="polite">
-          {loading
-            ? "Loading…"
-            : `${graph.nodes.length} nodes · ${graph.edges.length} edges`}
-        </p>
-      </header>
+    <div className="sl-graph">
+      <PageHeader
+        eyebrow="Topology"
+        title="Graph explorer"
+        subtitle={
+          isLocal
+            ? `Local neighborhood · depth ${depth}`
+            : loading
+              ? "Loading…"
+              : `${graph.nodes.length} nodes · ${graph.edges.length} edges`
+        }
+        right={
+          isLocal ? (
+            <div className="sl-page-header-actions">
+              <button
+                type="button"
+                className="sl-btn sl-btn-ghost"
+                onClick={exitLocalMode}
+              >
+                <ShellIcon name="close" size={14} />
+                Exit local mode
+              </button>
+            </div>
+          ) : undefined
+        }
+      />
 
       {error && (
-        <div className="graph-error" role="alert">
+        <div className="sl-graph-banner sl-graph-banner-error" role="alert">
           {error}
         </div>
       )}
 
       {showEdgeWarning && !loading && (
-        <div className="graph-warning" role="status">
+        <div className="sl-graph-banner" role="status">
           Large result set ({graph.edges.length} edges
           {graph.nextCursor ? ", more available" : ""}). Narrow filters or use
-          local mode (depth 1–3) for better performance (NFR-004).
+          local mode (depth 1–3) for better performance.
         </div>
       )}
 
-      <aside className="graph-toolbar" aria-label="Graph filters">
-        <div className="graph-mode">
-          <span className="graph-mode-label">Mode</span>
-          {isLocal ? (
-            <>
-              <code className="graph-center-id">{nodeId}</code>
-              <label className="graph-depth">
-                Depth
-                <select
-                  value={depth}
-                  onChange={(e) =>
-                    updateParams({ depth: e.target.value, cursor: null })
-                  }
-                >
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-              </label>
-              <button type="button" onClick={exitLocalMode}>
-                Global graph
-              </button>
-            </>
-          ) : (
-            <label className="graph-local-input">
-              Center nodeId
+      <div className="sl-graph-layout">
+        <aside className="sl-graph-filters" aria-label="Graph filters">
+          {!isLocal && (
+            <FilterBlock title="Center node (local mode)">
               <input
                 type="text"
+                className="sl-graph-filter-input"
                 placeholder="skill:user:demo-skill"
-                defaultValue={nodeId}
+                value={centerInput}
+                onChange={(e) => setCenterInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    const v = (e.target as HTMLInputElement).value.trim();
+                    const v = centerInput.trim();
                     if (v) enterLocalMode(v);
                   }
                 }}
               />
-            </label>
+            </FilterBlock>
           )}
-        </div>
 
-        <fieldset className="graph-filter-group">
-          <legend>Node types</legend>
-          <div className="graph-chips">
-            {GRAPH_NODE_TYPES.map((type) => (
-              <label key={type} className="graph-chip">
-                <input
-                  type="checkbox"
-                  checked={selectedNodeTypes.includes(type)}
-                  onChange={() => toggleNodeType(type)}
-                />
-                {type}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+          <FilterBlock title="Node types">
+            <div className="sl-filter-stack">
+              {GRAPH_NODE_TYPES.map((type) => (
+                <label key={type} className="sl-check">
+                  <input
+                    type="checkbox"
+                    checked={selectedNodeTypes.includes(type)}
+                    onChange={() => toggleNodeType(type)}
+                  />
+                  <span className={`sl-node-swatch sl-node-${type}`} />
+                  <span>{NODE_TYPE_LABEL[type]}</span>
+                </label>
+              ))}
+            </div>
+          </FilterBlock>
 
-        <fieldset className="graph-filter-group">
-          <legend>Relationship types</legend>
-          <div className="graph-chips">
-            {knownRelTypes.length === 0 && (
-              <span className="graph-muted">Load graph to discover types</span>
-            )}
-            {knownRelTypes.map((type) => (
-              <label key={type} className="graph-chip">
-                <input
-                  type="checkbox"
-                  checked={selectedRelTypes.includes(type)}
-                  onChange={() => toggleRelType(type)}
-                />
-                {type}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+          <FilterBlock title="Relationships">
+            <div className="sl-filter-stack">
+              {knownRelTypes.length === 0 && (
+                <span className="sl-muted">Load graph to discover types</span>
+              )}
+              {knownRelTypes.map((type) => (
+                <label key={type} className="sl-check">
+                  <input
+                    type="checkbox"
+                    checked={selectedRelTypes.includes(type)}
+                    onChange={() => toggleRelType(type)}
+                  />
+                  <code>{type}</code>
+                </label>
+              ))}
+            </div>
+          </FilterBlock>
 
-        <label className="graph-scope">
-          Scope
-          <input
-            type="text"
-            value={scope}
-            placeholder="user, project…"
-            onChange={(e) =>
-              updateParams({ scope: e.target.value || null, cursor: null })
-            }
-          />
-        </label>
+          <FilterBlock title="Min confidence">
+            <div className="sl-slider">
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={minConfValue}
+                onChange={(e) =>
+                  updateParams({
+                    confidenceMin: e.target.value === "0" ? null : e.target.value,
+                    cursor: null,
+                  })
+                }
+              />
+              <output>{(minConfValue * 100).toFixed(0)}%</output>
+            </div>
+          </FilterBlock>
 
-        <label className="graph-project">
-          Project
-          <input
-            type="text"
-            value={project}
-            placeholder="environment / project id"
-            onChange={(e) =>
-              updateParams({ project: e.target.value || null, cursor: null })
-            }
-          />
-        </label>
-
-        <label className="graph-health">
-          Health
-          <select
-            value={healthStatus}
-            onChange={(e) =>
-              updateParams({
-                healthStatus: e.target.value || null,
-                cursor: null,
-              })
-            }
-          >
-            <option value="">All</option>
-            <option value="ok">OK</option>
-            <option value="warning">Warning</option>
-            <option value="error">Error</option>
-          </select>
-        </label>
-
-        <label className="graph-confidence">
-          Min confidence
-          <input
-            type="number"
-            min={0}
-            max={1}
-            step={0.1}
-            value={confidenceMin}
-            onChange={(e) =>
-              updateParams({
-                confidenceMin: e.target.value || null,
-                cursor: null,
-              })
-            }
-          />
-        </label>
-
-        <label className="graph-confidence">
-          Max confidence
-          <input
-            type="number"
-            min={0}
-            max={1}
-            step={0.1}
-            value={confidenceMax}
-            onChange={(e) =>
-              updateParams({
-                confidenceMax: e.target.value || null,
-                cursor: null,
-              })
-            }
-          />
-        </label>
-
-        {!isLocal && (
-          <label className="graph-limit">
-            Edge limit
+          <FilterBlock title="Max confidence">
             <input
               type="number"
-              min={50}
-              max={2000}
-              step={50}
-              value={limit}
+              className="sl-graph-filter-input"
+              min={0}
+              max={1}
+              step={0.1}
+              value={confidenceMax}
+              placeholder="1.0"
               onChange={(e) =>
-                updateParams({ limit: e.target.value, cursor: null })
+                updateParams({
+                  confidenceMax: e.target.value || null,
+                  cursor: null,
+                })
               }
             />
-          </label>
-        )}
+          </FilterBlock>
 
-        {graph.nextCursor && (
-          <button
-            type="button"
-            className="graph-load-more"
-            disabled={loading}
-            onClick={() => updateParams({ cursor: graph.nextCursor ?? null })}
-          >
-            Load more edges
-          </button>
-        )}
-      </aside>
-
-      <div className="graph-main">
-        <div className="graph-canvas-panel">
-          {focusedNode && (
-            <div className="graph-focus-panel">
-              {focusedNode.sourcePath && (
-                <p className="graph-node-source">
-                  <SourceLink
-                    sourcePath={focusedNode.sourcePath}
-                    showFullPath
-                  />
-                </p>
-              )}
-              {focusedEdges.length > 0 && (
-                <ul className="graph-edge-evidence">
-                  {focusedEdges.map((edge) => (
-                    <li key={edge.id}>
-                      <span className="graph-edge-label">
-                        {edge.type} · {(edge.confidence * 100).toFixed(0)}%
-                        {edge.mappingIsApproximate ? " ~" : ""}
-                      </span>
-                      {edge.evidence?.sourceFile && (
-                        <SourceLink
-                          sourcePath={edge.evidence.sourceFile}
-                          showFullPath
-                        />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+          {isLocal && (
+            <FilterBlock title="Depth">
+              <div className="sl-segmented" role="group" aria-label="Neighborhood depth">
+                {[1, 2, 3].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    className={depth === d ? "is-active" : ""}
+                    onClick={() =>
+                      updateParams({ depth: String(d), cursor: null })
+                    }
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </FilterBlock>
           )}
+
+          <FilterBlock title="Scope">
+            <input
+              type="text"
+              className="sl-graph-filter-input"
+              value={scope}
+              placeholder="user, project…"
+              onChange={(e) =>
+                updateParams({ scope: e.target.value || null, cursor: null })
+              }
+            />
+          </FilterBlock>
+
+          <FilterBlock title="Project">
+            <input
+              type="text"
+              className="sl-graph-filter-input"
+              value={project}
+              placeholder="environment / project id"
+              onChange={(e) =>
+                updateParams({ project: e.target.value || null, cursor: null })
+              }
+            />
+          </FilterBlock>
+
+          <FilterBlock title="Health">
+            <select
+              className="sl-graph-filter-input"
+              value={healthStatus}
+              onChange={(e) =>
+                updateParams({
+                  healthStatus: e.target.value || null,
+                  cursor: null,
+                })
+              }
+            >
+              <option value="">All</option>
+              <option value="ok">OK</option>
+              <option value="warning">Warning</option>
+              <option value="error">Error</option>
+            </select>
+          </FilterBlock>
+
+          {!isLocal && (
+            <FilterBlock title="Edge limit">
+              <input
+                type="number"
+                className="sl-graph-filter-input"
+                min={50}
+                max={2000}
+                step={50}
+                value={limit}
+                onChange={(e) =>
+                  updateParams({ limit: e.target.value, cursor: null })
+                }
+              />
+            </FilterBlock>
+          )}
+
+          {graph.nextCursor && (
+            <button
+              type="button"
+              className="sl-btn sl-btn-ghost"
+              disabled={loading}
+              onClick={() => updateParams({ cursor: graph.nextCursor ?? null })}
+            >
+              Load more edges
+            </button>
+          )}
+        </aside>
+
+        <div className="sl-graph-canvas-wrap">
           {loading && !flow.nodes.length ? (
-            <p className="graph-muted graph-canvas-empty">Loading graph…</p>
+            <p className="sl-graph-canvas-empty">Loading graph…</p>
           ) : flow.nodes.length === 0 ? (
-            <p className="graph-muted graph-canvas-empty">No nodes to display.</p>
+            <p className="sl-graph-canvas-empty">No nodes to display.</p>
           ) : (
             <SkillGraphCanvas
               nodes={flow.nodes}
               edges={flow.edges}
-              onNodeClick={(id) => setFocusedNodeId(id)}
+              layoutKey={`${graph.nodes.length}:${graph.edges.length}:${nodeId}`}
+              selectedNodeId={selectedNodeId}
+              focusedNodeId={nodeId || null}
+              onNodeClick={(id) => setSelectedNodeId(id)}
               onNodeDoubleClick={(id) => {
-                setFocusedNodeId(id);
+                setSelectedNodeId(id);
                 enterLocalMode(id);
               }}
             />
           )}
+          <div className="sl-graph-legend" aria-hidden>
+            <span>
+              <span className="sl-node-swatch sl-node-skill" /> Skill
+            </span>
+            <span>
+              <span className="sl-node-swatch sl-node-mcp_tool" /> Tool
+            </span>
+            <span>
+              <span className="sl-node-swatch sl-node-environment" /> Env
+            </span>
+            <span>
+              <span className="sl-node-swatch sl-node-workflow" /> Workflow
+            </span>
+            <span className="sl-graph-legend-hint">
+              Click a node to inspect · Double-click to focus
+            </span>
+          </div>
         </div>
 
-        <HighRiskPanel sequences={graph.highRiskRefactorSequences} />
+        <aside className="sl-graph-side">
+          {selectedNode ? (
+            <NodeInspector
+              node={selectedNode}
+              edges={selectedEdges}
+              nodeById={nodeById}
+              onFocus={() => enterLocalMode(selectedNode.id)}
+            />
+          ) : (
+            <HighRiskPanel sequences={graph.highRiskRefactorSequences} />
+          )}
+        </aside>
       </div>
-    </section>
+    </div>
+  );
+}
+
+function FilterBlock({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="sl-filter-block">
+      <h4>{title}</h4>
+      {children}
+    </div>
+  );
+}
+
+function NodeInspector({
+  node,
+  edges,
+  nodeById,
+  onFocus,
+}: {
+  node: SkillGraphNode;
+  edges: SkillGraphEdge[];
+  nodeById: Map<string, SkillGraphNode>;
+  onFocus: () => void;
+}) {
+  return (
+    <div className="sl-inspector">
+      <header>
+        <p className="sl-inspector-eyebrow">{NODE_TYPE_LABEL[node.type]}</p>
+        <h3>{node.label}</h3>
+        {node.health && (
+          <HealthPill status={node.health.status} findings={node.health.findings} />
+        )}
+      </header>
+      <code className="sl-inspector-id">{node.id}</code>
+      {node.sourcePath && (
+        <div className="sl-inspector-path">
+          <MonoPath path={node.sourcePath} maxLen={48} />
+          <SourceLink sourcePath={node.sourcePath} />
+        </div>
+      )}
+      <button
+        type="button"
+        className="sl-btn sl-btn-primary sl-btn-block"
+        onClick={onFocus}
+      >
+        Focus neighborhood
+      </button>
+      <h4>Edges ({edges.length})</h4>
+      <ul className="sl-inspector-edges">
+        {edges.map((edge) => {
+          const isOut = edge.from === node.id;
+          const other = nodeById.get(isOut ? edge.to : edge.from);
+          return (
+            <li key={edge.id}>
+              <span className="sl-rel-arrow">{isOut ? "→" : "←"}</span>
+              <span className="sl-inspector-other">
+                {other?.label ?? (isOut ? edge.to : edge.from)}
+              </span>
+              <span className="sl-rel-type">{edge.type}</span>
+              <span className="sl-rel-conf-mini">
+                {(edge.confidence * 100).toFixed(0)}%
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
@@ -454,33 +567,42 @@ function HighRiskPanel({
   sequences: HighRiskRefactorSequence[];
 }) {
   return (
-    <aside className="graph-risk-panel" aria-labelledby="risk-panel-heading">
-      <h3 id="risk-panel-heading">High-risk refactor sequences</h3>
+    <div className="sl-risk">
+      <header>
+        <p className="sl-inspector-eyebrow">Refactor risk</p>
+        <h3>High-risk sequences</h3>
+        <p className="sl-muted">
+          Edges with broad downstream blast radius. Plan migrations carefully.
+        </p>
+      </header>
       {sequences.length === 0 ? (
-        <p className="graph-muted">None in current map.</p>
+        <p className="sl-muted">None in current map.</p>
       ) : (
-        <ul className="graph-risk-list">
-          {sequences.map((seq) => (
-            <li key={seq.id}>
-              <strong>{seq.sharedCapability}</strong>
-              <p>{seq.whyHighRisk}</p>
-              {seq.downstreamSkills.length > 0 && (
-                <p className="graph-risk-meta">
-                  Downstream: {seq.downstreamSkills.join(", ")}
-                </p>
-              )}
-              {seq.suggestedSafeSequence.length > 0 && (
+        sequences.map((seq) => (
+          <article key={seq.id} className="sl-risk-card">
+            <h4>{seq.sharedCapability}</h4>
+            <p>{seq.whyHighRisk}</p>
+            {seq.downstreamSkills.length > 0 && (
+              <div className="sl-risk-downstream">
+                {seq.downstreamSkills.map((skill) => (
+                  <code key={skill}>{skill}</code>
+                ))}
+              </div>
+            )}
+            {seq.suggestedSafeSequence.length > 0 && (
+              <details>
+                <summary>Suggested safe sequence</summary>
                 <ol>
                   {seq.suggestedSafeSequence.map((step) => (
                     <li key={step}>{step}</li>
                   ))}
                 </ol>
-              )}
-            </li>
-          ))}
-        </ul>
+              </details>
+            )}
+          </article>
+        ))
       )}
-    </aside>
+    </div>
   );
 }
 
