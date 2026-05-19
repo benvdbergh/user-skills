@@ -1,16 +1,14 @@
 #!/usr/bin/env bun
 
 /**
- * Create a checkpoint (tagged commit) in PAI repository
- * Useful for marking important states before major changes
+ * Create an annotated checkpoint tag in the selected repository.
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
 import { updateStateForVCOperation, getCurrentCommitHash } from "./StateIntegration";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 interface CheckpointOptions {
   name: string;
@@ -19,7 +17,8 @@ interface CheckpointOptions {
 }
 
 async function createCheckpoint(options: CheckpointOptions): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
@@ -28,11 +27,11 @@ async function createCheckpoint(options: CheckpointOptions): Promise<void> {
 
   // Commit any uncommitted changes first if requested
   if (options.commitFirst) {
-    const statusOutput = await $`cd ${PAI_DIR} && git status --porcelain`.text();
+    const statusOutput = await $`cd ${repoRoot} && git status --porcelain`.text();
     if (statusOutput.trim()) {
       const commitMessage = options.message || `Checkpoint: ${options.name}`;
-      await $`cd ${PAI_DIR} && git add -A`.quiet();
-      await $`cd ${PAI_DIR} && git commit -m ${commitMessage}`.quiet();
+      await $`cd ${repoRoot} && git add -A`.quiet();
+      await $`cd ${repoRoot} && git commit -m ${commitMessage}`.quiet();
       console.log("✓ Committed current changes");
     }
   }
@@ -41,7 +40,7 @@ async function createCheckpoint(options: CheckpointOptions): Promise<void> {
   const tagMessage = options.message || `Checkpoint: ${options.name}`;
   const tagName = `checkpoint-${options.name.toLowerCase().replace(/\s+/g, "-")}`;
   
-  await $`cd ${PAI_DIR} && git tag -a ${tagName} -m ${tagMessage}`.quiet();
+  await $`cd ${repoRoot} && git tag -a ${tagName} -m ${tagMessage}`.quiet();
 
   // Get commit hash for state update
   const commitHash = await getCurrentCommitHash();

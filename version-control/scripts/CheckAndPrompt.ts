@@ -1,53 +1,52 @@
 #!/usr/bin/env bun
 
 /**
- * Standalone tool to check for pending changes and prompt for action
- * Works in both Claude Code (via hooks) and Cursor (manual invocation)
+ * List uncommitted paths in the selected repository and suggest next steps.
  */
 
 import { existsSync } from "fs";
 import { join } from "path";
 import { $ } from "bun";
+import { getRepoRoot } from "./repoRoot";
 
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+const SCRIPTS_DIR = import.meta.dir;
 
 async function checkForChanges(): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
-  
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
+
   if (!existsSync(gitDir)) {
     console.log("Git repository not initialized. Run InitializeGit.ts first.");
     return;
   }
 
-  // Check for uncommitted changes to PAI files
-  const status = await $`cd ${PAI_DIR} && git status --porcelain`.text();
+  const status = await $`cd ${repoRoot} && git status --porcelain`.text();
   const changedFiles = status
     .split("\n")
     .filter((line) => line.trim())
-    .map((line) => line.substring(3).trim())
-    .filter((file) => {
-      const patterns = [/hooks\//, /skills\//, /scripts\//, /settings\.json$/, /\.gitignore$/];
-      return patterns.some((pattern) => pattern.test(file));
-    });
+    .map((line) => line.substring(3).trim());
 
   if (changedFiles.length === 0) {
-    console.log("✓ No uncommitted changes to PAI framework files");
+    console.log("✓ No uncommitted changes");
     return;
   }
 
-  console.log("\n📋 PAI Framework Changes Detected");
-  console.log("=" .repeat(50));
+  const handleScript = join(SCRIPTS_DIR, "HandlePendingAction.ts");
+
+  console.log("\n📋 Uncommitted changes");
+  console.log("=".repeat(50));
   console.log(`Files changed: ${changedFiles.length}\n`);
-  
+
   changedFiles.forEach((file, i) => {
     console.log(`  ${i + 1}. ${file}`);
   });
 
   console.log("\n💡 Next steps:");
-  console.log("  1. Review changes: bun run $PAI_DIR/skills/version-control/scripts/HandlePendingAction.ts --show");
-  console.log("  2. Commit: bun run $PAI_DIR/skills/version-control/scripts/HandlePendingAction.ts --commit [message]");
-  console.log("  3. Branch: bun run $PAI_DIR/skills/version-control/scripts/HandlePendingAction.ts --branch <name>");
-  console.log("  4. Skip: bun run $PAI_DIR/skills/version-control/scripts/HandlePendingAction.ts --skip");
+  console.log(`  1. Review pending (if any): bun run ${handleScript} --show`);
+  console.log(`  2. Commit: bun run ${handleScript} --commit [message]`);
+  console.log(`  3. Branch: bun run ${handleScript} --branch <name>`);
+  console.log(`  4. Skip pending file: bun run ${handleScript} --skip`);
+  console.log(`  Or commit directly: bun run ${join(SCRIPTS_DIR, "CommitChanges.ts")}`);
   console.log();
 }
 

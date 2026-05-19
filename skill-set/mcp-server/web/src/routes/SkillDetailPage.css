@@ -1,0 +1,231 @@
+.detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 52rem;
+}
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-back {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.detail-back:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.detail-header h2 {
+  margin: 0 0 0.25rem;
+}
+
+.detail-subtitle {
+  margin: 0;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.detail-loading,
+.detail-muted {
+  margin: 0;
+  opacity: 0.75;
+}
+
+.detail-error {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, #c62828 12%, transparent);
+  border: 1px solid color-mix(in srgb, #c62828 35%, transparent);
+}
+
+.detail-escalation {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.9rem;
+}
+
+.detail-escalation-present {
+  background: color-mix(in srgb, #1565c0 14%, transparent);
+  border: 1px solid color-mix(in srgb, #1565c0 35%, transparent);
+}
+
+.detail-escalation-absent {
+  opacity: 0.65;
+  font-size: 0.85rem;
+}
+
+.detail-section {
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 0.5rem;
+  padding: 1rem 1.1rem;
+}
+
+.detail-section h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.detail-section h4 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.detail-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.detail-dl dt {
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.detail-dl dd {
+  margin: 0;
+}
+
+.detail-metadata {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  font-size: 0.75rem;
+  overflow-x: auto;
+}
+
+.detail-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.detail-list li {
+  margin-bottom: 0.25rem;
+}
+
+.detail-length {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.detail-description {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.55;
+}
+
+.detail-file-group + .detail-file-group {
+  margin-top: 0.75rem;
+}
+
+.detail-file-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.detail-file-table th,
+.detail-file-table td {
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.detail-file-missing {
+  background: color-mix(in srgb, #c62828 8%, transparent);
+}
+
+.detail-file-badge {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.detail-file-badge.exists {
+  background: color-mix(in srgb, #2e7d32 18%, transparent);
+}
+
+.detail-file-badge.missing {
+  background: color-mix(in srgb, #c62828 18%, transparent);
+}
+
+.detail-missing-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.detail-missing-list li {
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.35rem;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, #c62828 10%, transparent);
+}
+
+.detail-node-id {
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem !important;
+}
+
+.detail-rel-group + .detail-rel-group {
+  margin-top: 1rem;
+}
+
+.detail-rel-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-rel-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.detail-rel-list li:last-child {
+  border-bottom: none;
+}
+
+.detail-rel-label {
+  display: block;
+  font-weight: 500;
+}
+
+.detail-rel-meta {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-top: 0.15rem;
+}
+
+.detail-rel-path {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  opacity: 0.85;
+}
+
+.detail-graph-link {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+}

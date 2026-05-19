@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "updated": "2026-05-17T00:00:00Z",
+  "description": "Registry of third-party (upstream) skills installed under the user skills root. Embedding metadata lives in skill-set; skill bodies stay in upstream repos for easy git pull or submodule update.",
+  "skills": [
+    {
+      "id": "code-review-skill",
+      "folder": "code-review-skill",
+      "yaml_name": "code-review-excellence",
+      "upstream": {
+        "url": "https://github.com/awesome-skills/code-review-skill.git",
+        "default_branch": "main"
+      },
+      "install": "git_submodule_or_nested_clone",
+      "sidecar": "skill-set/vendor/code-review-skill",
+      "scope": "user",
+      "cluster": "governance",
+      "lint_profile": "vendor",
+      "last_synced_commit": "eb12fb2",
+      "notes": "Folder name matches upstream install path; YAML name differs by design. Do not canonicalize reference/ to references/ without forking upstream."
+    }
+  ]
+}

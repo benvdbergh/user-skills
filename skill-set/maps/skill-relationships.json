@@ -1,11 +1,11 @@
 {
   "title": "Skill Relationship Map",
   "version": 2,
-  "updated": "2026-04-21T21:53:51.443525Z",
+  "updated": "2026-05-17T20:42:57.931456Z",
   "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage). Curators should treat each skill's references/skill-escalation.md as primary boundary evidence when present.",
   "sources": {
-    "user_level_skill_index": "C:\\Users\\vandenbb\\.claude\\skills\\skill-index.json",
-    "project_level_inventory": "C:\\Users\\vandenbb\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json",
+    "user_level_skill_index": "C:\\Users\\benvd\\.claude\\skills\\skill-index.json",
+    "project_level_inventory": "C:\\Users\\benvd\\.claude\\skills\\skill-set\\catalog\\ai-vault-skill-inventory.json",
     "agent_graph_spec": "c:\\Users\\vandenbb\\.claude\\self\\spec\\northstart-agent_graph_architecture.md"
   },
   "edge_vocabulary_reference": {
@@ -73,12 +73,14 @@
     "user_level": [
       "ci-cd-governance",
       "code-discovery-for-docs",
+      "code-review-skill",
       "deep-research",
       "diagram",
       "document-deep-merge",
       "documentation-governance",
       "docx-documentation",
       "enterprise-architecture",
+      "fork-management",
       "low-poly-gen-mcp",
       "minimalist-coding",
       "office-docx",
@@ -110,6 +112,7 @@
     "project_level_ai_vault": [
       "documentation",
       "enterprise-model-store",
+      "feature-model-navigation",
       "kion-design",
       "kion-pptx",
       "market-segmentation-research",
@@ -888,6 +891,48 @@
       },
       "confidence_score": 0.75,
       "notes": "office-docx is intended as the consolidated DOCX capability owner; docx-documentation becomes a candidate deprecation once adoption/migration is complete."
+    },
+    {
+      "id": "rel-0056",
+      "from_skill": "code-review-skill",
+      "to_skill": "minimalist-coding",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "C:\\Users\\benvd\\.claude\\skills\\skill-set\\vendor\\code-review-skill\\skill-escalation.md",
+        "quote": "Implementing fixes or feature work → minimalist-coding."
+      },
+      "confidence_score": 0.9,
+      "notes": "Vendor code-review skill owns review process; defers implementation and coding standards application to minimalist-coding."
+    },
+    {
+      "id": "rel-0057",
+      "from_skill": "code-review-skill",
+      "to_skill": "software-architecture",
+      "relationship_type": "overlaps_or_duplicates_capability",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "C:\\Users\\benvd\\.claude\\skills\\skill-set\\vendor\\code-review-skill\\skill-escalation.md",
+        "quote": "Overlaps software-architecture on architecture reviews—prefer architecture skill for design authority, code-review for PR-level critique."
+      },
+      "confidence_score": 0.85,
+      "notes": "Architecture review triggers appear in both; route design authority to software-architecture, PR critique to code-review-skill."
+    },
+    {
+      "id": "rel-0058",
+      "from_skill": "repo-triage-pr-ops",
+      "to_skill": "code-review-skill",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "C:\\Users\\benvd\\.claude\\skills\\skill-set\\vendor\\code-review-skill\\skill-escalation.md",
+        "quote": "Complements repo-triage-pr-ops (process) with review substance."
+      },
+      "confidence_score": 0.9,
+      "notes": "repo-triage-pr-ops covers maintainer intake and labels; code-review-skill covers review content and quality bars."
     },
     {
       "id": "rel-0053",

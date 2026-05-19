@@ -1,5 +1,7 @@
 # Additional examples
 
+Resolve backlog SSOT first: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot). Examples below assume `delivery_tracker: files` unless noted.
+
 ---
 
 **Create epic**

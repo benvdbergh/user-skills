@@ -1,15 +1,13 @@
 #!/usr/bin/env bun
 
 /**
- * Compare two versions or commits in PAI repository
- * Shows differences between commits, tags, or branches
+ * Diff between two refs in the selected repository.
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 interface CompareOptions {
   from: string;
@@ -19,7 +17,8 @@ interface CompareOptions {
 }
 
 async function compareVersions(options: CompareOptions): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
@@ -27,7 +26,7 @@ async function compareVersions(options: CompareOptions): Promise<void> {
   }
 
   const to = options.to || "HEAD";
-  let gitCommand = `cd ${PAI_DIR} && git diff`;
+  let gitCommand = `cd ${repoRoot} && git diff`;
 
   if (options.stat) {
     gitCommand += " --stat";

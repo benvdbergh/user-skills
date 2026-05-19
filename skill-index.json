@@ -1,8 +1,8 @@
 {
-  "generated": "2026-05-18T09:04:11.661196Z",
-  "totalSkills": 35,
+  "generated": "2026-05-18T21:08:05.397465Z",
+  "totalSkills": 37,
   "alwaysLoadedCount": 0,
-  "deferredCount": 35,
+  "deferredCount": 37,
   "skills": {
     "ci-cd-governance": {
       "name": "ci-cd-governance",
@@ -28,6 +28,26 @@
         "diagrams",
         "wants to trace features to code artifacts",
         "requests documentation-aware change impact for a branch"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "code-review-skill": {
+      "name": "code-review-excellence",
+      "path": "code-review-skill/SKILL.md",
+      "fullDescription": "Provides comprehensive code review guidance for React 19, Vue 3, Angular 17+, Svelte 5, Rust, TypeScript, Java, Python, Django, Go, C#/.NET, Kotlin, NestJS, C/C++, and more. Helps catch bugs, improve code quality, and give constructive feedback. Use when: reviewing pull requests, conducting PR reviews, code review, reviewing code changes, establishing review standards, mentoring developers, architecture reviews, security audits, checking code quality, finding bugs, giving feedback on code.",
+      "triggers": [
+        "reviewing pull requests",
+        "conducting PR reviews",
+        "code review",
+        "reviewing code changes",
+        "establishing review standards",
+        "mentoring developers",
+        "architecture reviews",
+        "security audits",
+        "checking code quality",
+        "finding bugs",
+        "giving feedback on code"
       ],
       "workflows": [],
       "tier": "deferred"
@@ -160,6 +180,25 @@
       ],
       "tier": "deferred"
     },
+    "fork-management": {
+      "name": "fork-management",
+      "path": "fork-management/SKILL.md",
+      "fullDescription": "Governs long-lived GitHub forks using a FORK.md ledger, upstream sync decisions, and contribution workflows back to parent repositories. Use when the user mentions maintaining a fork, syncing with upstream/parent, deciding whether to keep fork patches vs adopt parent changes, documenting fork-only modifications, or opening pull requests from a fork to upstream.",
+      "triggers": [
+        "the user mentions maintaining a fork",
+        "syncing with upstream/parent",
+        "deciding whether to keep fork patches vs adopt parent changes",
+        "documenting fork-only modifications",
+        "opening pull requests from a fork to upstream"
+      ],
+      "workflows": [
+        "bootstrap-fork-ledger",
+        "sync-from-parent",
+        "contribute-upstream-pr",
+        "fork-policy-review"
+      ],
+      "tier": "deferred"
+    },
     "low-poly-gen-mcp": {
       "name": "low-poly-gen-mcp",
       "path": "low-poly-gen-mcp/SKILL.md",
@@ -184,21 +223,19 @@
     "minimalist-coding": {
       "name": "minimalist-coding",
       "path": "minimalist-coding/SKILL.md",
-      "fullDescription": "Search-first coding workflow enforcing YAGNI principles, Clean Architecture layering, and DDD structural standards. USE WHEN implementing features, writing code, modifying codebase, structuring layers, applying clean architecture, DDD, naming conventions, library-first approach, OR user requests code changes. Enforces Locate→Modify→Create hierarchy, two-phase coding loop, and automatic refactoring.",
+      "fullDescription": "Search-first coding workflow enforcing YAGNI, Clean Architecture layering, and DDD standards. Keeps delivery-tracker work items transparent when a story or issue is in scope. USE WHEN implementing features, writing code, modifying codebase, executing a story or task, or user requests code changes. Enforces Locate→Modify→Create, two-phase coding loop, and refactor pass.",
       "triggers": [
         "implementing features",
         "writing code",
         "modifying codebase",
-        "structuring layers",
-        "applying clean architecture",
-        "DDD",
-        "naming conventions",
-        "library-first approach",
-        "user requests code changes. Enforces Locate→Modify→Create hierarchy",
+        "executing a story",
+        "task",
+        "user requests code changes. Enforces Locate→Modify→Create",
         "two-phase coding loop",
-        "and automatic refactoring"
+        "and refactor pass"
       ],
       "workflows": [
+        "delivery-tracker-execution",
         "SearchPlanImplement",
         "RefactorPass",
         "clean-architecture-and-ddd"
@@ -367,7 +404,7 @@
     "project-planning": {
       "name": "project-planning",
       "path": "project-planning/SKILL.md",
-      "fullDescription": "Applies agile decomposition, traceability, and dependency-aware planning using markdown work items and an optional .project-planning.yaml manifest; discovers specs/ADRs, shards sources into epics and stories, and validates plans with scripts. Use when agile planning, epic/story breakdown, shard PRD or spec, dependency ordering, Definition of Ready, story mapping, workflow init, LintPlan, ScanSources, manifest-driven planning paths, or planning review.",
+      "fullDescription": "Applies agile decomposition, traceability, and dependency-aware planning with a single source of truth per project: markdown epics/stories by default, or a delivery tracker (e.g. Linear, Jira) when configured—never both. Discovers specs/ADRs, shards into epics and stories, and validates plans. Use when agile planning, epic/story breakdown, shard PRD or spec, dependency ordering, Definition of Ready, story mapping, workflow init, LintPlan, ScanSources, manifest-driven planning paths, or planning review.",
       "triggers": [
         "agile planning",
         "epic/story breakdown",
@@ -505,6 +542,7 @@
         "optimize",
         "lint",
         "canonicalize",
+        "vendor-skills",
         "standard-reference",
         "authoring-guide",
         "skill-scripts",
@@ -634,14 +672,16 @@
     "version-control": {
       "name": "version-control",
       "path": "version-control/SKILL.md",
-      "fullDescription": "Self-version management for PAI framework. USE WHEN tracking changes to .claude folder, reverting framework modifications, viewing version history, creating checkpoints, managing git repository for PAI infrastructure, OR after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts).",
+      "fullDescription": "Generic git workflow support for any repository: history, checkpoints, diffs, branches with optional branch metadata, and commit/branch/skip prompts when pending-change tooling is used. Use when the user asks for git checkpoints, comparing commits, branch management, reverting changes, viewing history, initializing a repo, or handling uncommitted changes after edits. Set REPO_ROOT or GIT_WORK_TREE to the repository root, or run scripts from that directory (defaults to current working directory). Do not use for fork/upstream policy; use fork-management.",
       "triggers": [
-        "tracking changes to .claude folder",
-        "reverting framework modifications",
-        "viewing version history",
-        "creating checkpoints",
-        "managing git repository for PAI infrastructure",
-        "after modifying PAI files in Cursor (hooks don't auto-run - use CheckAndPrompt.ts)"
+        "the user asks for git checkpoints",
+        "comparing commits",
+        "branch management",
+        "reverting changes",
+        "viewing history",
+        "initializing a repo",
+        "handling uncommitted changes after edits. Set REPO_ROOT",
+        "GIT_WORK_TREE to the repository root"
       ],
       "workflows": [
         "Initialize",

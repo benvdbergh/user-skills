@@ -1,0 +1,6 @@
+{
+  "skillsRoot": "C:/Users/you/.claude/skills",
+  "skillSetRelativePath": "skill-set",
+  "environmentMapRelativePath": "skill-set/catalog/environment-skill-index-map.json",
+  "writesEnabled": false
+}

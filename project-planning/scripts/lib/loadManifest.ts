@@ -69,7 +69,32 @@ export function mergeManifest(partial: unknown): PlanningManifest {
               : base.naming!.task_prefix,
         }
       : base.naming,
+    delivery_tracker:
+      typeof partial.delivery_tracker === "string"
+        ? partial.delivery_tracker
+        : partial.delivery_tracker === null
+          ? null
+          : base.delivery_tracker,
+    tracker_index:
+      typeof partial.tracker_index === "string"
+        ? partial.tracker_index
+        : partial.tracker_index === null
+          ? null
+          : base.tracker_index,
   };
+}
+
+/** Resolved backlog mode: `files` or a tracker id (e.g. `linear`). */
+export function getDeliveryTracker(manifest: PlanningManifest): string {
+  const t = manifest.delivery_tracker?.trim();
+  if (!t || t === "files") {
+    return "files";
+  }
+  return t;
+}
+
+export function backlogUsesMarkdownFiles(manifest: PlanningManifest): boolean {
+  return getDeliveryTracker(manifest) === "files";
 }
 
 export function loadManifestFromFile(absolutePath: string): PlanningManifest {

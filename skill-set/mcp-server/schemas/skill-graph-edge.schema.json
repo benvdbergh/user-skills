@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/skill-graph-edge.json",
+  "title": "SkillGraphEdge",
+  "type": "object",
+  "required": [
+    "id",
+    "from",
+    "to",
+    "type",
+    "confidence",
+    "mappingIsApproximate"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "from": { "type": "string" },
+    "to": { "type": "string" },
+    "type": { "type": "string" },
+    "confidence": { "type": "number" },
+    "mappingIsApproximate": { "type": "boolean" },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "sourceFile": { "type": "string" },
+        "quote": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "notes": { "type": "string" },
+    "candidateAgentGraphEdgeType": { "type": "string" }
+  },
+  "additionalProperties": false
+}

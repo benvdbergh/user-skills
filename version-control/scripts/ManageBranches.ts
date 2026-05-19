@@ -1,17 +1,27 @@
 #!/usr/bin/env bun
 
 /**
- * Branch management tool for PAI repository
- * Create, switch, list, describe, and delete branches with metadata tracking
+ * Branch management with optional metadata in the repository root (.vc-branches.json).
  */
 
 import { $ } from "bun";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { updateStateForVCOperation } from "./StateIntegration";
+import { getRepoRoot } from "./repoRoot";
 
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
-const BRANCHES_METADATA = join(PAI_DIR, ".pai-branches.json");
+const VC_BRANCHES_FILE = ".vc-branches.json";
+const LEGACY_BRANCHES_FILE = ".pai-branches.json";
+
+function branchesMetadataPaths(repoRoot: string): {
+  canonical: string;
+  legacy: string;
+} {
+  return {
+    canonical: join(repoRoot, VC_BRANCHES_FILE),
+    legacy: join(repoRoot, LEGACY_BRANCHES_FILE),
+  };
+}
 
 interface BranchMetadata {
   name: string;
@@ -26,10 +36,12 @@ interface BranchesMetadata {
   branches: Record<string, Omit<BranchMetadata, "name">>;
 }
 
-function loadMetadata(): BranchesMetadata {
-  if (existsSync(BRANCHES_METADATA)) {
+function loadMetadata(repoRoot: string): BranchesMetadata {
+  const { canonical, legacy } = branchesMetadataPaths(repoRoot);
+  for (const path of [canonical, legacy]) {
+    if (!existsSync(path)) continue;
     try {
-      return JSON.parse(readFileSync(BRANCHES_METADATA, "utf-8"));
+      return JSON.parse(readFileSync(path, "utf-8"));
     } catch {
       return { branches: {} };
     }
@@ -37,8 +49,9 @@ function loadMetadata(): BranchesMetadata {
   return { branches: {} };
 }
 
-function saveMetadata(metadata: BranchesMetadata): void {
-  writeFileSync(BRANCHES_METADATA, JSON.stringify(metadata, null, 2), "utf-8");
+function saveMetadata(repoRoot: string, metadata: BranchesMetadata): void {
+  const { canonical } = branchesMetadataPaths(repoRoot);
+  writeFileSync(canonical, JSON.stringify(metadata, null, 2), "utf-8");
 }
 
 async function createBranch(
@@ -47,7 +60,8 @@ async function createBranch(
   purpose: string,
   from?: string
 ): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
     process.exit(1);
@@ -55,20 +69,20 @@ async function createBranch(
 
   // Create branch
   if (from) {
-    await $`cd ${PAI_DIR} && git checkout -b ${name} ${from}`.quiet();
+    await $`cd ${repoRoot} && git checkout -b ${name} ${from}`.quiet();
   } else {
-    await $`cd ${PAI_DIR} && git checkout -b ${name}`.quiet();
+    await $`cd ${repoRoot} && git checkout -b ${name}`.quiet();
   }
 
   // Save metadata
-  const metadata = loadMetadata();
+  const metadata = loadMetadata(repoRoot);
   metadata.branches[name] = {
     description,
     purpose,
     created: new Date().toISOString(),
     lastUsed: new Date().toISOString(),
   };
-  saveMetadata(metadata);
+  saveMetadata(repoRoot, metadata);
 
   // Update state with branch creation
   await updateStateForVCOperation('branch_create', {
@@ -81,27 +95,28 @@ async function createBranch(
 }
 
 async function switchBranch(name: string): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
     process.exit(1);
   }
 
   // Check if branch exists
-  const branches = await $`cd ${PAI_DIR} && git branch --list ${name}`.text();
+  const branches = await $`cd ${repoRoot} && git branch --list ${name}`.text();
   if (!branches.trim()) {
     console.error(`Branch '${name}' does not exist`);
     process.exit(1);
   }
 
   // Switch branch
-  await $`cd ${PAI_DIR} && git checkout ${name}`.quiet();
+  await $`cd ${repoRoot} && git checkout ${name}`.quiet();
 
   // Update last used
-  const metadata = loadMetadata();
+  const metadata = loadMetadata(repoRoot);
   if (metadata.branches[name]) {
     metadata.branches[name].lastUsed = new Date().toISOString();
-    saveMetadata(metadata);
+    saveMetadata(repoRoot, metadata);
   }
 
   // Update state with branch switch
@@ -119,15 +134,16 @@ async function switchBranch(name: string): Promise<void> {
 }
 
 async function listBranches(): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
     process.exit(1);
   }
 
-  const currentBranch = await $`cd ${PAI_DIR} && git branch --show-current`.text();
-  const allBranches = await $`cd ${PAI_DIR} && git branch --list`.text();
-  const metadata = loadMetadata();
+  const currentBranch = await $`cd ${repoRoot} && git branch --show-current`.text();
+  const allBranches = await $`cd ${repoRoot} && git branch --list`.text();
+  const metadata = loadMetadata(repoRoot);
 
   console.log("Branches:\n");
   for (const line of allBranches.split("\n")) {
@@ -148,7 +164,8 @@ async function listBranches(): Promise<void> {
 }
 
 async function describeBranch(name: string, description?: string, purpose?: string): Promise<void> {
-  const metadata = loadMetadata();
+  const repoRoot = getRepoRoot();
+  const metadata = loadMetadata(repoRoot);
   
   if (!metadata.branches[name]) {
     metadata.branches[name] = {
@@ -161,18 +178,19 @@ async function describeBranch(name: string, description?: string, purpose?: stri
     if (purpose) metadata.branches[name].purpose = purpose;
   }
 
-  saveMetadata(metadata);
+  saveMetadata(repoRoot, metadata);
   console.log(`✓ Updated metadata for branch: ${name}`);
 }
 
 async function deleteBranch(name: string, force?: boolean): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
     process.exit(1);
   }
 
-  const currentBranch = await $`cd ${PAI_DIR} && git branch --show-current`.text();
+  const currentBranch = await $`cd ${repoRoot} && git branch --show-current`.text();
   if (name === currentBranch.trim()) {
     console.error("Cannot delete current branch. Switch to another branch first.");
     process.exit(1);
@@ -180,29 +198,30 @@ async function deleteBranch(name: string, force?: boolean): Promise<void> {
 
   // Delete git branch
   if (force) {
-    await $`cd ${PAI_DIR} && git branch -D ${name}`.quiet();
+    await $`cd ${repoRoot} && git branch -D ${name}`.quiet();
   } else {
-    await $`cd ${PAI_DIR} && git branch -d ${name}`.quiet();
+    await $`cd ${repoRoot} && git branch -d ${name}`.quiet();
   }
 
   // Remove metadata
-  const metadata = loadMetadata();
+  const metadata = loadMetadata(repoRoot);
   delete metadata.branches[name];
-  saveMetadata(metadata);
+  saveMetadata(repoRoot, metadata);
 
   console.log(`✓ Deleted branch: ${name}`);
 }
 
 async function getCurrentBranchInfo(): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
   if (!existsSync(gitDir)) {
     console.error("Git repository not initialized. Run InitializeGit.ts first.");
     process.exit(1);
   }
 
-  const currentBranch = await $`cd ${PAI_DIR} && git branch --show-current`.text();
+  const currentBranch = await $`cd ${repoRoot} && git branch --show-current`.text();
   const branchName = currentBranch.trim();
-  const metadata = loadMetadata();
+  const metadata = loadMetadata(repoRoot);
   const branchMeta = metadata.branches[branchName];
 
   console.log(`Current branch: ${branchName}`);

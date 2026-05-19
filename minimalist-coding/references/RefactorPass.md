@@ -1,48 +1,24 @@
 # Refactor Pass Workflow
 
-Mandatory post-implementation cleanup and optimization.
+Post-test cleanup before closing a work item in the tracker.
 
 ## When to Use
 
-- After successful test execution
-- Before marking implementation complete
-- On explicit "refactor" or "cleanup code" request
+- After tests pass (end of SearchPlanImplement Phase 2)
+- On explicit refactor or cleanup request
 
-## Workflow Steps
+## Steps
 
-1. **Run LintAndShrink**
-   - Remove unused imports
-   - Remove dead variables
-   - Simplify complex logic
-   - Apply linting fixes
-
-2. **Complexity Analysis**
-   - Calculate cyclomatic complexity
-   - Identify overly complex functions
-   - Suggest simplifications
-
-3. **Code Quality Gate**
-   - Verify lint score maintained/improved
-   - Check complexity thresholds
-   - Validate no new files (unless justified)
-
-4. **Generate Report**
-   - Lines removed
-   - Complexity reduction
-   - Quality metrics
-
-## Integration
-
-- Uses `LintAndShrink` tool
-- Uses `CodeQualityGate` tool
-- Integrates with `VersionControl` for commit
-
-## Output
-
-- Refactored code with optimizations
-- Quality gate report
-- Metrics on code reduction
+1. **LintAndShrink** — unused imports, dead code, simplify.
+2. **Complexity** — flag functions over threshold.
+3. **CodeQualityGate** — lint score and complexity vs baseline.
+4. **Report** — lines removed, metrics.
 
 ## Completion
 
-Refactor pass is complete when LintAndShrink and CodeQualityGate have been run and the report shows no regressions.
+Done when LintAndShrink and CodeQualityGate show no regressions. If a work item was in scope, run [delivery-tracker-execution.md](delivery-tracker-execution.md) **§ Close** next (not before refactor).
+
+## Integration
+
+- `version-control` — optional commit after close
+- Tools: `LintAndShrink`, `CodeQualityGate` in `scripts/`

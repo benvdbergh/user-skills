@@ -5,38 +5,39 @@ Break specifications into epics and stories using discovered sources—not only 
 ## When to use
 
 - User asks: “shard PRD”, “break down spec”, “epics from requirements”, “plan from docs”
-- After [artifact-discovery.md](artifact-discovery.md) (or parallel) has identified inputs
+- After [artifact-discovery.md](artifact-discovery.md) has identified inputs
+
+Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot) — then follow the matching section below.
 
 ## Mandatory preparation
 
 1. Load [agile-foundations.md](agile-foundations.md) and [decomposition-patterns.md](decomposition-patterns.md).
-2. Build a **source inventory** (manifest `source_globs` + `ScanSources.ts` + user paths).
+2. Build a **source inventory** (`source_globs` + `ScanSources.ts` + user paths).
 3. Apply **vertical slicing** where the material describes user outcomes.
 
-## Steps
+## Steps (`delivery_tracker: files`)
 
-1. **Resolve context** — Project root and `.project-planning.yaml` (`--root` / `--config` / legacy `--project`).
-2. **Collect sources** — Read PRD/spec/architecture excerpts; note ADRs that constrain scope.
-3. **Propose epics** — One theme per epic; set `traces_to` to PRD sections and ADRs.
-4. **Propose stories** — INVEST-sized; `parent` = epic `id`; `depends_on` for real blockers.
-5. **Write files** — Use epic/story templates under manifest directories; see [frontmatter-schema.md](frontmatter-schema.md).
-6. **Validate** — Run `LintPlan.ts`; run [plan-quality-review.md](plan-quality-review.md).
+1. **Resolve context** — Project root and `.project-planning.yaml`.
+2. **Collect sources** — PRD/spec/ADRs.
+3. **Propose epics** — `traces_to` to sources.
+4. **Propose stories** — INVEST; `parent`; `depends_on`.
+5. **Write files** — [frontmatter-schema.md](frontmatter-schema.md).
+6. **Validate** — `LintPlan.ts`; [plan-quality-review.md](plan-quality-review.md) (files checklist).
 
-## CLI
+## Steps (`delivery_tracker: linear`)
 
-Legacy (Knowledge/Projects):
+1. **Collect sources** — same as above.
+2. **Propose epics/stories** — then create **milestones/issues** via [linear-adoption.md](linear-adoption.md) (no `Epic-*.md` / `Story-*.md`).
+3. **Validate** — [plan-quality-review.md](plan-quality-review.md) (tracker checklist).
 
-```bash
-bun run $PAI_DIR/skills/project-planning/scripts/ShardFromSources.ts --project <name> [--prd <path>]
-```
-
-Manifest-based:
+## CLI (`files` only)
 
 ```bash
 bun run $PAI_DIR/skills/project-planning/scripts/ShardFromSources.ts --root <path>
 ```
 
+Do not run when a tracker is backlog SSOT — the script writes markdown epic/story files.
+
 ## Integration
 
-- **specification** skill produces PRDs/plans; reference them via paths in the manifest and `traces_to`.
-- **research-analysis** topics may appear in `traces_to` when research gates scope.
+- **specification** / **research-analysis** — link requirements in SSOT (markdown `traces_to` or tracker descriptions).

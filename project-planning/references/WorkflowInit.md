@@ -6,10 +6,13 @@
 
 ## Steps
 
-1. Choose **context**: legacy `--project <name>` (`$KNOWLEDGE_DIR/Projects/<name>`), or `--root <dir>`, or `--config <manifest.yaml>`, or cwd with `.project-planning.yaml`.
-2. Run **WorkflowInit** with `--brief` — creates dirs from manifest (default `Epics/`, `Stories/`), `brief.md`, optional `.project-planning.yaml` from skill default.
-3. Add or generate PRD/spec; run [artifact-discovery.md](artifact-discovery.md) / **ScanSources.ts** as needed.
-4. Shard with [ShardFromSources.md](ShardFromSources.md).
+1. Choose **context**: legacy `--project <name>`, `--root <dir>`, `--config <manifest.yaml>`, or cwd with `.project-planning.yaml`.
+2. Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot) (`delivery_tracker` in manifest).
+3. Run **WorkflowInit** with `--brief`:
+   - **`files`** — creates `Epics/`, `Stories/`, `brief.md`, manifest if missing.
+   - **Tracker** (e.g. `linear`) — creates `brief.md`, `specs/`, manifest; **does not** create markdown backlog dirs. Record tracker in `brief.md`; optional [tracker-index.md](tracker-index.md).
+4. Add or generate PRD/spec; [artifact-discovery.md](artifact-discovery.md) / **ScanSources.ts** as needed.
+5. Shard per SSOT: [ShardFromSources.md](ShardFromSources.md).
 
 ## CLI
 
@@ -23,6 +26,8 @@ bun run .../WorkflowInit.ts --root <path> --brief "<description>"
 bun run .../WorkflowInit.ts --project <name> --action review
 ```
 
+`WorkflowInit.ts` reads `delivery_tracker` from the manifest (same rules as above for init/review).
+
 ## Legacy profile
 
-`--project` only → same folder layout as before (`Epics/`, `Stories/`, `specs/`, `brief.md`). See [quick-start.md](quick-start.md).
+`--project` only → `$KNOWLEDGE_DIR/Projects/<name>/`; default `delivery_tracker: files` unless manifest specifies otherwise. See [quick-start.md](quick-start.md).

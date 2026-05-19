@@ -1,0 +1,37 @@
+{
+  "name": "@skill-set/skill-lab-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Git-backed MCP control plane for Agent Skills catalog governance",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "skill-lab": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "mcp": "node dist/cli.js mcp",
+    "web:install": "npm install --prefix web",
+    "web:dev": "npm run dev --prefix web",
+    "web:build": "npm run build --prefix web",
+    "test": "npm run build && vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.14",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "gray-matter": "^4.0.3",
+    "hono": "^4.7.10",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}

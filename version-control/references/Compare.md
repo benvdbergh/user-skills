@@ -1,35 +1,15 @@
-# Compare Versions
+# Compare
 
-Compare two versions or commits in PAI repository.
-
-## Steps
-
-1. Verify git repository exists
-2. Identify source and target commits/tags
-3. Generate diff output
-4. Display file changes and statistics
+Diff two refs (commits, tags, or branches).
 
 ## Usage
 
 ```bash
-# Compare two commits
-bun run $PAI_DIR/skills/version-control/scripts/CompareVersions.ts --from <hash1> --to <hash2>
-
-# Compare with HEAD
-bun run $PAI_DIR/skills/version-control/scripts/CompareVersions.ts --from <hash> --to HEAD
-
-# Compare two tags
-bun run $PAI_DIR/skills/version-control/scripts/CompareVersions.ts --from checkpoint-v1 --to checkpoint-v2
-
-# Compare specific file across versions
-bun run $PAI_DIR/skills/version-control/scripts/CompareVersions.ts --from <hash1> --to <hash2> --file hooks/settings.json
+bun run $VC_SCRIPTS/CompareVersions.ts --from <hash1> --to <hash2>
+bun run $VC_SCRIPTS/CompareVersions.ts --from <hash> --to HEAD
+bun run $VC_SCRIPTS/CompareVersions.ts --from checkpoint-v1 --to checkpoint-v2
+bun run $VC_SCRIPTS/CompareVersions.ts --from <hash1> --to <hash2> --file path/to/file.ts
+bun run $VC_SCRIPTS/CompareVersions.ts --from a --to b --stat
 ```
 
-## Options
-
-- `--from REF` - Source commit/tag/branch
-- `--to REF` - Target commit/tag/branch (default: HEAD)
-- `--file PATH` - Compare specific file only
-- `--stat` - Show statistics instead of full diff
-
-**Done when:** User sees the diff (or stat) between the two refs.
+**Done when:** diff or stat output is displayed.

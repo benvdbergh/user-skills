@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: PAI
-  version: 2.7.0
+  version: 2.8.0
 ---
 
 # skill-set
@@ -93,6 +93,7 @@ By embedding `list_mcp_resources` into the skill creation workflow, we ensure:
 | **optimize** | "optimize skill", "improve skill", "refine skill" | `references/optimize.md` |
 | **lint** | "lint skill", "check skill structure", "check compliance" | `references/lint.md` |
 | **canonicalize** | "canonicalize", "migrate skill", "fix skill" | `references/canonicalize.md` |
+| **vendor-skills** | "third-party skill", "vendor skill", "embed upstream skill", "sync skill from github" | `references/vendor-skills.md` |
 
 **Quick Reference:** See `references/standard-reference.md` for the Agent Skills standard rules at a glance.
 
@@ -122,7 +123,9 @@ The skill-set **catalog** (`catalog/`) and **relationship map** (`maps/`) are th
 | `catalog/` | `environment-skill-index-map.json` | Lists every environment and the path to its local `skill-index.json`. Single source for “where the agent runs.” |
 | `catalog/` | `ai-vault-skill-inventory.json` | Project-level skill inventory for Ai-Vault (name, path, purpose, triggers, workflows, tier, indication). Canonical list for this vault. |
 | `catalog/` | `scope-and-conventions.md` | User-level vs project-based scope rules and functional clusters (hubs) for Agent Graph mapping. Do not redefine scope elsewhere; reference this. |
+| `catalog/` | `third-party-skills.json` | Upstream skills (git clone/submodule) with sidecar paths under `vendor/`. |
 | `catalog/` | `README.md` | Catalog schema and usage. Read before creating or updating any catalog file. |
+| `vendor/` | `<folder>/` | Ecosystem-only files (`skill-escalation.md`, `integration.md`) for third-party skills; safe across upstream pulls. |
 | `maps/` | `skill-relationships.json` | Skill Relationship Map: relationships (e.g. may_call_or_wrap, shares_mcp_tool_script, overlaps, specialized_version_of) and high-risk refactor sequences. |
 
 Schema and update rules for each artifact are in `catalog/README.md`.

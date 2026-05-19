@@ -1,103 +1,93 @@
 ---
 name: minimalist-coding
-description: Search-first coding workflow enforcing YAGNI principles, Clean Architecture layering, and DDD structural standards. USE WHEN implementing features, writing code, modifying codebase, structuring layers, applying clean architecture, DDD, naming conventions, library-first approach, OR user requests code changes. Enforces Locate→Modify→Create hierarchy, two-phase coding loop, and automatic refactoring.
+description: >-
+  Search-first coding workflow enforcing YAGNI, Clean Architecture layering, and DDD standards.
+  Keeps delivery-tracker work items transparent when a story or issue is in scope. USE WHEN
+  implementing features, writing code, modifying codebase, executing a story or task, or user
+  requests code changes. Enforces Locate→Modify→Create, two-phase coding loop, and refactor pass.
 license: MIT
+metadata:
+  version: 1.2.0
 ---
 
 # minimalist-coding — Search-First Code Development
 
 ## Overview
 
-This skill enforces a "Search-Plan-Implement-Refactor" workflow over "Generate-and-Test." Makes code reuse the default and new code creation the exception.
+Search-Plan-Implement-Refactor over generate-and-test. Code reuse is default; new code is the exception.
 
 ## Core Principles
 
-### YAGNI (You Ain't Gonna Need It) Hierarchy
+### YAGNI hierarchy
 
-**Strict operation order:** Locate → Modify → Create. This order reduces regression surface and keeps diffs reviewable.
+**Order:** Locate → Modify → Create.
 
-1. **Locate** - Can this be done by calling an existing function?
-2. **Modify** - Can this be done by adding a parameter/logic to an existing function?
-3. **Create** - Only if #1 and #2 are impossible, create a new utility.
+### Two-phase loop
 
-### Two-Phase Coding Loop
+1. **Architect** — search codebase, output Diff Plan.
+2. **Scripter** — execute plan only.
 
-1. **Architect (Planner)** - Reviews story and existing code. Outputs Diff Plan.
-2. **Scripter (Executor)** - Executes only the approved Diff Plan.
+### State reset and refactor
 
-### State Reset & Refactor
+- Roll back to git HEAD on test failure (`version-control`).
+- **Refactor pass** after success — mandatory cleanup.
 
-- **Automatic Rollback** - On test failure, revert to git HEAD before retry
-- **Refactor Pass** - After success, mandatory cleanup (remove dead code, simplify)
+### Work item in scope?
+
+Run [delivery-tracker-execution.md](references/delivery-tracker-execution.md) **§ Start** before code and **§ Close** after refactor pass. Context: `.project-planning.yaml` at project root (`delivery_tracker`, story/task dirs).
 
 ## Workflow Routing
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **SearchPlanImplement** | "implement", "code", "add feature", "modify" | `references/SearchPlanImplement.md` |
-| **RefactorPass** | "refactor", "cleanup code", after implementation success | `references/RefactorPass.md` |
-| **CleanArchitectureAndDDD** | "clean architecture", "DDD", "layer structure", "naming conventions", "library-first", "ports and adapters", "bounded context" | `references/clean-architecture-and-ddd.md` |
+| **DeliveryTrackerExecution** | story/task/issue id, "implement STORY-", Linear issue | `references/delivery-tracker-execution.md` |
+| **SearchPlanImplement** | implement, code, add feature, modify | `references/SearchPlanImplement.md` |
+| **RefactorPass** | refactor, cleanup, after tests pass | `references/RefactorPass.md` |
+| **CleanArchitectureAndDDD** | clean architecture, DDD, ports and adapters | `references/clean-architecture-and-ddd.md` |
+
+Boundaries: [skill-escalation.md](references/skill-escalation.md)
 
 ## Tools
 
-**GrepSymbol.ts** - Search for function/class names globally
-```bash
-bun run $PAI_DIR/skills/minimalist-coding/scripts/GrepSymbol.ts --symbol <name> --type <function|class>
-```
+Run from this skill’s `scripts/` directory (or set `PAI_DIR` to your skills root).
 
-**GetDependencies.ts** - See what calls a specific function
 ```bash
-bun run $PAI_DIR/skills/minimalist-coding/scripts/GetDependencies.ts --symbol <name> --file <path>
-```
-
-**MinimalDiffApply.ts** - Apply specific line changes only
-```bash
-bun run $PAI_DIR/skills/minimalist-coding/scripts/MinimalDiffApply.ts --file <path> --start <line> --end <line> --content <text>
-```
-
-**LintAndShrink.ts** - Post-processing: lint + remove dead code
-```bash
-bun run $PAI_DIR/skills/minimalist-coding/scripts/LintAndShrink.ts --file <path>
-```
-
-**CodeQualityGate.ts** - Check complexity, quality metrics
-```bash
-bun run $PAI_DIR/skills/minimalist-coding/scripts/CodeQualityGate.ts --file <path> --baseline <score>
+bun run scripts/GrepSymbol.ts --symbol <name> --type <function|class>
+bun run scripts/GetDependencies.ts --symbol <name> --file <path>
+bun run scripts/MinimalDiffApply.ts --file <path> --start <n> --end <n> --content <text>
+bun run scripts/LintAndShrink.ts --file <path>
+bun run scripts/CodeQualityGate.ts --file <path> --baseline <score>
 ```
 
 ## Examples
 
-**Example 1: Implement user validation**
+**With work item (STORY-2-1)**
+
 ```
-User: "Add user validation"
-→ Architect: Searches for "validate", "user", "check"
-→ Finds existing validateUser() function
-→ Diff Plan: Modify validateUser() to add new check
-→ Scripter: Applies minimal diff
-→ Refactor: Removes dead code
+→ Read .project-planning.yaml; delivery-tracker § Start
+→ SearchPlanImplement → RefactorPass
+→ delivery-tracker § Close with evidence
 ```
 
-**Example 2: Create new feature**
+**Ad-hoc (no linked item)**
+
 ```
-User: "Add email notification"
-→ Architect: Searches codebase, finds no existing notification code
-→ Diff Plan: Create new NotificationService class
-→ Scripter: Creates minimal implementation
-→ Quality Gate: Validates complexity, lint score
+→ SearchPlanImplement → RefactorPass (skip delivery-tracker)
 ```
 
 ## Success Criteria
 
-**Definition of Done:**
-- ✅ Tests pass
-- ✅ No new files (unless justified)
-- ✅ Lint score maintained or improved
-- ✅ Cyclomatic complexity under threshold
-- ✅ Code delta reasonable for task complexity
+- Tests pass; minimal diff; lint/complexity gates hold.
+- Work item in scope: tracker started before code, closed with outcome + evidence after refactor.
+
+## MCP and safety
+
+Linear execution (`delivery_tracker: linear`): mapping and safety in [delivery-tracker-execution.md](references/delivery-tracker-execution.md) § Linear MCP.
+
+**Tool safety (summary):** Safe to read issues and update state/comments. Confirm with user before archive, delete, or changing milestone/project scope.
 
 ## Integration
 
-- **VersionControl Skill** - Rollback on failure, diff application
-- **Prompting Skill** - YAGNI principles in coding prompts
-- **Agents Skill** - Architect/Scripter personas
-- **ProjectPlanning Skill** - Code quality in story acceptance criteria
+- **project-planning** — backlog SSOT and manifest; not execution status updates.
+- **version-control** — rollback, commits/PRs for tracker evidence.
+- **code-review-skill** — review after handoff; not a substitute for close comment.

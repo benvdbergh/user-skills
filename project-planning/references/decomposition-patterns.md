@@ -8,7 +8,7 @@ An **epic** should have:
 
 - One clear outcome or theme (one-sentence goal).
 - A bounded context: reasoning and tooling fit in one “chunk” for humans and agents.
-- Links to sources via `traces_to` (PRD sections, ADRs, architecture).
+- Links to sources via `traces_to` (markdown backlog) or a “Sources” section in tracker descriptions (PRD sections, ADRs, architecture).
 
 Avoid epics that are “the entire product” unless you immediately decompose to stories.
 

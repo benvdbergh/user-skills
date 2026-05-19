@@ -1,54 +1,49 @@
 #!/usr/bin/env bun
 
 /**
- * Initialize git repository in PAI directory
- * Sets up version control for the .claude folder
+ * Initialize a git repository in the selected working tree (REPO_ROOT / GIT_WORK_TREE / cwd).
  */
 
 import { $ } from "bun";
 import { existsSync } from "fs";
 import { join } from "path";
 import { updateStateForVCOperation } from "./StateIntegration";
-
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
+import { getRepoRoot } from "./repoRoot";
 
 async function initializeGit(): Promise<void> {
-  const gitDir = join(PAI_DIR, ".git");
-  
+  const repoRoot = getRepoRoot();
+  const gitDir = join(repoRoot, ".git");
+
   if (existsSync(gitDir)) {
     console.log("✓ Git repository already initialized");
     return;
   }
 
-  console.log("Initializing git repository for PAI...");
+  console.log("Initializing git repository...");
 
-  // Initialize git repository
-  await $`cd ${PAI_DIR} && git init`.quiet();
+  await $`cd ${repoRoot} && git init`.quiet();
 
-  // Configure git user if not set (use environment or defaults)
-  const gitUser = process.env.GIT_USER_NAME || "PAI System";
-  const gitEmail = process.env.GIT_USER_EMAIL || "pai@local";
+  const gitUser = process.env.GIT_USER_NAME || "Version Control";
+  const gitEmail = process.env.GIT_USER_EMAIL || "version-control@local";
 
   try {
-    await $`cd ${PAI_DIR} && git config user.name "${gitUser}"`.quiet();
-    await $`cd ${PAI_DIR} && git config user.email "${gitEmail}"`.quiet();
+    await $`cd ${repoRoot} && git config user.name "${gitUser}"`.quiet();
+    await $`cd ${repoRoot} && git config user.email "${gitEmail}"`.quiet();
   } catch (error) {
     console.warn("Could not set git user config:", error);
   }
 
-  // Ensure .gitignore exists
-  const gitignorePath = join(PAI_DIR, ".gitignore");
+  const gitignorePath = join(repoRoot, ".gitignore");
   if (!existsSync(gitignorePath)) {
     console.warn("⚠️  .gitignore not found. Please create it manually.");
   }
 
-  // Create initial commit if there are files to commit
   try {
-    await $`cd ${PAI_DIR} && git add -A`.quiet();
-    const status = await $`cd ${PAI_DIR} && git status --porcelain`.text();
-    
+    await $`cd ${repoRoot} && git add -A`.quiet();
+    const status = await $`cd ${repoRoot} && git status --porcelain`.text();
+
     if (status.trim()) {
-      await $`cd ${PAI_DIR} && git commit -m "Initial commit: PAI framework baseline"`.quiet();
+      await $`cd ${repoRoot} && git commit -m "Initial commit"`.quiet();
       console.log("✓ Created initial commit");
     } else {
       console.log("✓ Repository initialized (no files to commit)");
@@ -57,11 +52,10 @@ async function initializeGit(): Promise<void> {
     console.warn("Could not create initial commit:", error);
   }
 
-  // Update state with initialization
-  await updateStateForVCOperation('initialize', {});
+  await updateStateForVCOperation("initialize", {});
 
   console.log("✓ Git repository initialized successfully");
-  console.log(`  Repository: ${PAI_DIR}`);
+  console.log(`  Repository: ${repoRoot}`);
   console.log(`  User: ${gitUser} <${gitEmail}>`);
 }
 

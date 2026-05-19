@@ -1,16 +1,22 @@
 #!/usr/bin/env bun
 
 /**
- * Handle pending version control action
- * Prompts user to commit, branch, or skip changes
+ * Handle pending version control action (commit, branch, or skip).
  */
 
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
+import { existsSync, readFileSync, unlinkSync } from "fs";
 import { join } from "path";
 import { $ } from "bun";
+import { getRepoRoot } from "./repoRoot";
 
-const PAI_DIR = process.env.PAI_DIR || "/home/ben/.claude";
-const PENDING_ACTION_FILE = join(PAI_DIR, ".pai-pending-action.json");
+const SCRIPTS_DIR = import.meta.dir;
+
+function pendingPaths(repoRoot: string): { primary: string; legacy: string } {
+  return {
+    primary: join(repoRoot, ".vc-pending-action.json"),
+    legacy: join(repoRoot, ".pai-pending-action.json"),
+  };
+}
 
 interface PendingAction {
   timestamp: string;
@@ -23,36 +29,48 @@ interface PendingAction {
 }
 
 function loadPendingAction(): PendingAction | null {
-  if (!existsSync(PENDING_ACTION_FILE)) {
-    return null;
+  const repoRoot = getRepoRoot();
+  const { primary, legacy } = pendingPaths(repoRoot);
+  for (const path of [primary, legacy]) {
+    if (!existsSync(path)) continue;
+    try {
+      return JSON.parse(readFileSync(path, "utf-8"));
+    } catch {
+      return null;
+    }
   }
-
-  try {
-    return JSON.parse(readFileSync(PENDING_ACTION_FILE, "utf-8"));
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 function clearPendingAction(): void {
-  if (existsSync(PENDING_ACTION_FILE)) {
-    unlinkSync(PENDING_ACTION_FILE);
+  const repoRoot = getRepoRoot();
+  const { primary, legacy } = pendingPaths(repoRoot);
+  for (const path of [primary, legacy]) {
+    if (existsSync(path)) {
+      unlinkSync(path);
+    }
   }
 }
 
 async function commitChanges(message?: string): Promise<void> {
-  const commitTool = join(PAI_DIR, "skills/version-control/scripts/CommitChanges.ts");
-  
+  const repoRoot = getRepoRoot();
+  const commitTool = join(SCRIPTS_DIR, "CommitChanges.ts");
+
   if (message) {
-    await $`cd ${PAI_DIR} && bun run ${commitTool} --message ${message}`.quiet();
+    await $`cd ${repoRoot} && bun run ${commitTool} --message ${message}`.quiet();
   } else {
-    await $`cd ${PAI_DIR} && bun run ${commitTool}`.quiet();
+    await $`cd ${repoRoot} && bun run ${commitTool}`.quiet();
   }
 }
 
-async function createBranch(name: string, description: string, purpose: string): Promise<void> {
-  const branchTool = join(PAI_DIR, "skills/version-control/scripts/ManageBranches.ts");
-  await $`cd ${PAI_DIR} && bun run ${branchTool} create --name ${name} --description ${description} --purpose ${purpose}`.quiet();
+async function createBranch(
+  name: string,
+  description: string,
+  purpose: string
+): Promise<void> {
+  const repoRoot = getRepoRoot();
+  const branchTool = join(SCRIPTS_DIR, "ManageBranches.ts");
+  await $`cd ${repoRoot} && bun run ${branchTool} create --name ${name} --description ${description} --purpose ${purpose}`.quiet();
 }
 
 async function handleAction(action: PendingAction): Promise<void> {
@@ -68,7 +86,7 @@ async function handleAction(action: PendingAction): Promise<void> {
   }
 
   if (action.action === "commit") {
-    const message = action.commitMessage || "Update PAI framework";
+    const message = action.commitMessage || "Update repository";
     await commitChanges(message);
     clearPendingAction();
     console.log(`✓ Committed changes: ${message}`);
@@ -82,14 +100,13 @@ async function handleAction(action: PendingAction): Promise<void> {
     }
 
     const description = `Branch for: ${action.changedFiles.slice(0, 2).join(", ")}`;
-    const purpose = `Testing/development branch - changes to ${action.changedFiles.length} file(s)`;
+    const purpose = `Development branch — changes to ${action.changedFiles.length} file(s)`;
 
     await createBranch(action.branchName, description, purpose);
-    
-    // Commit changes to the new branch
+
     const message = action.commitMessage || "Initial changes on branch";
     await commitChanges(message);
-    
+
     clearPendingAction();
     console.log(`✓ Created branch ${action.branchName} and committed changes`);
     return;
@@ -98,14 +115,14 @@ async function handleAction(action: PendingAction): Promise<void> {
 
 async function showPendingAction(): Promise<void> {
   const action = loadPendingAction();
-  
+
   if (!action) {
     console.log("No pending version control action");
     return;
   }
 
   console.log("\n📋 Pending Version Control Action");
-  console.log("=" .repeat(50));
+  console.log("=".repeat(50));
   console.log(`Timestamp: ${new Date(action.timestamp).toLocaleString()}`);
   console.log(`Changed files: ${action.changedFiles.length}`);
   console.log("\nFiles:");
@@ -122,7 +139,7 @@ async function showPendingAction(): Promise<void> {
 async function main() {
   try {
     const args = process.argv.slice(2);
-    
+
     if (args.length === 0 || args.includes("--show") || args.includes("status")) {
       await showPendingAction();
       return;
@@ -134,13 +151,15 @@ async function main() {
       process.exit(0);
     }
 
-    // Parse arguments
     if (args.includes("--skip")) {
       action.action = "skip";
     } else if (args.includes("--commit")) {
       action.action = "commit";
       const commitIndex = args.indexOf("--commit");
-      if (commitIndex + 1 < args.length && !args[commitIndex + 1].startsWith("--")) {
+      if (
+        commitIndex + 1 < args.length &&
+        !args[commitIndex + 1].startsWith("--")
+      ) {
         action.commitMessage = args[commitIndex + 1];
       }
     } else if (args.includes("--branch")) {
@@ -148,8 +167,10 @@ async function main() {
       const branchIndex = args.indexOf("--branch");
       if (branchIndex + 1 < args.length && !args[branchIndex + 1].startsWith("--")) {
         action.branchName = args[branchIndex + 1];
-        // Check for optional message
-        if (branchIndex + 2 < args.length && !args[branchIndex + 2].startsWith("--")) {
+        if (
+          branchIndex + 2 < args.length &&
+          !args[branchIndex + 2].startsWith("--")
+        ) {
           action.commitMessage = args[branchIndex + 2];
         }
       } else {

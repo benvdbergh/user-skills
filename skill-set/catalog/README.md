@@ -11,6 +11,7 @@ This directory is the **skill-set catalog**: the canonical place for skill-setâ€
 | `environment-skill-index-map.json` | Single source of truth listing every **environment** (each place the agent runs) and the path to that environmentâ€™s local `skill-index.json`. |
 | `ai-vault-skill-inventory.json` | Project-level skill inventory for Ai-Vault: name, path, purpose, triggers, workflows, tier, indication. Canonical list for this vault. |
 | `scope-and-conventions.md` | Scope and project-based skill conventions: user-level vs project-based placement, functional clusters (hubs), and Agent Graph Skill/Context mapping. Reference this when classifying scope; do not redefine elsewhere. |
+| `third-party-skills.json` | Upstream/vendor skills installed at the skills root: repo URL, folder vs YAML name, sidecar path, last synced commit. See `references/vendor-skills.md`. |
 | `README.md` | This file; documents schema and usage. |
 
 **Relationship map** (in `skills/skill-set/maps/`):

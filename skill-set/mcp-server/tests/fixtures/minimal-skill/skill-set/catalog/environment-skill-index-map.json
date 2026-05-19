@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "environments": [
+    {
+      "id": "user",
+      "scope": "user",
+      "path": ".",
+      "skill_index_path": "skill-index.json",
+      "display_name": "Fixture user"
+    }
+  ]
+}

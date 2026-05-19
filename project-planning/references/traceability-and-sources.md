@@ -1,6 +1,14 @@
 # Traceability and sources
 
-## traces_to
+| Layer | Where links live |
+|-------|------------------|
+| Requirements (PRD, ADR, spec) | Repo files — always |
+| Backlog (`files`) | `traces_to` in epic/story frontmatter |
+| Backlog (tracker) | “Sources” in milestone/issue descriptions; optional [tracker-index.md](tracker-index.md) |
+
+How to choose backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot).
+
+## traces_to (file-based backlog only)
 
 Every **story** moving to `ready` should cite sources in `traces_to` (see [frontmatter-schema.md](frontmatter-schema.md)):
 

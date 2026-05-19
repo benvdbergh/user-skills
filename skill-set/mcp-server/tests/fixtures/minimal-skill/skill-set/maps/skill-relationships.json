@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "updated": "2026-05-18T00:00:00.000Z",
+  "skills": {
+    "user_level": ["demo-skill", "helper-skill"],
+    "project_level_ai_vault": ["vault-skill"]
+  },
+  "relationships": [
+    {
+      "id": "rel-fixture-001",
+      "from_skill": "demo-skill",
+      "to_skill": "helper-skill",
+      "relationship_type": "may_call_or_wrap",
+      "candidate_agent_graph_edge_type": "depends_on",
+      "mapping_is_approximate": true,
+      "evidence": {
+        "source_file": "demo-skill/SKILL.md",
+        "quote": "Delegates to helper-skill for shared utilities."
+      },
+      "confidence_score": 0.9,
+      "notes": "Fixture skill composition edge."
+    },
+    {
+      "id": "rel-fixture-002",
+      "from_skill": "vault-skill",
+      "to_skill": "fixture-mcp-server",
+      "relationship_type": "shares_mcp_tool_script",
+      "candidate_agent_graph_edge_type": "SKILL_MAY_USE_TOOL",
+      "mapping_is_approximate": false,
+      "evidence": {
+        "source_file": "vault-skill/SKILL.md",
+        "quote": "Uses fixture-mcp-server tools for validation."
+      },
+      "confidence_score": 0.8,
+      "notes": "Fixture MCP coupling edge."
+    }
+  ],
+  "high_risk_refactor_sequences": [
+    {
+      "id": "risk-fixture-001",
+      "shared_capability": "helper-skill utilities",
+      "why_high_risk": "demo-skill depends on helper-skill behavior.",
+      "downstream_skills": ["demo-skill"],
+      "suggested_safe_sequence": [
+        "Stabilize helper-skill outputs.",
+        "Refactor demo-skill consumers."
+      ]
+    }
+  ]
+}

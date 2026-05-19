@@ -1,14 +1,16 @@
-# Dependencies
+# Optional integrations (not `depends_on`)
+
+> **Not** [dependencies-and-sequencing.md](dependencies-and-sequencing.md) — that file covers epic/story **blockers** (`depends_on` or tracker relations).
 
 ## Optional workflow dependencies
 
-WorkflowInit and other project-planning workflows assume **StateManagement** and **VersionControl** when available.
+WorkflowInit and other project-planning workflows may use **StateManagement** and **VersionControl** when available.
 
-- **StateManagement** – Used to track planning decisions, state, and knowledge map (e.g. epic/story relationships). If not available: skip state-update steps or record decisions only in artifacts; note in output that state tracking was skipped.
-- **VersionControl** – Used to version planning artifacts (brief, Epics/, Stories/). If not available: still create and update files; note that version control was not applied and recommend the user commit manually if desired.
+- **StateManagement** — planning decisions and knowledge map. If unavailable: record in artifacts only.
+- **VersionControl** — version `brief.md`, specs, and markdown backlog when `delivery_tracker: files`. Tracker backlog is versioned in the tracker.
 
-These steps are **optional** for the planning workflows to complete; the agent can produce a full project layout and epic/story files without them.
+These are optional; planning can complete without them.
 
 ## Other skills
 
-**research-analysis** may still use `CleanupPrompts` and `DocumentationUtils` for topic/research notes; that path is unrelated to project-planning work items.
+**research-analysis** may use its own utilities for research notes; unrelated to backlog work items.

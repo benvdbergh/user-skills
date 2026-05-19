@@ -1,0 +1,16 @@
+{
+  "generated": "2026-01-01T00:00:00Z",
+  "totalSkills": 1,
+  "alwaysLoadedCount": 0,
+  "deferredCount": 1,
+  "skills": {
+    "demo-skill": {
+      "name": "demo-skill",
+      "path": "demo-skill/SKILL.md",
+      "fullDescription": "Demo skill for fixture tests. Use when testing catalog ingestion, parsing workflows, or trigger extraction.",
+      "triggers": ["testing catalog ingestion"],
+      "workflows": [],
+      "tier": "deferred"
+    }
+  }
+}

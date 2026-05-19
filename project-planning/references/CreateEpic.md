@@ -3,21 +3,22 @@
 ## When to use
 
 - "create epic", "new epic", "add epic"
-- Manual epic creation outside of sharding
 
-## Quality bar
+Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot).
 
-Read [agile-foundations.md](agile-foundations.md) and [decomposition-patterns.md](decomposition-patterns.md). Set `traces_to` and `slice` in frontmatter per [frontmatter-schema.md](frontmatter-schema.md).
+- **`files`** — steps below.
+- **`linear`** — create a **project milestone** via [linear-adoption.md](linear-adoption.md) (no `Epic-*.md`).
+- **Other trackers** — platform guide when available.
 
-## Steps
+## Steps (`files` only)
 
 1. Resolve planning context (`--project`, `--root`, or `--config`).
 2. Gather epic name, description, priority.
-3. Run **EpicManager** `create` (writes template under manifest `epics_dir`).
-4. Edit the epic `.md` in place (replace `<!-- TODO -->`, set `traces_to`, etc.).
-5. Run **LintPlan.ts** before marking items `ready`.
+3. Run **EpicManager** `create`.
+4. Edit epic `.md` (`traces_to`, etc.).
+5. Run **LintPlan.ts** before `ready`.
 
-## CLI
+## CLI (`files` only)
 
 ```bash
 bun run $PAI_DIR/skills/project-planning/scripts/EpicManager.ts \
@@ -25,11 +26,8 @@ bun run $PAI_DIR/skills/project-planning/scripts/EpicManager.ts \
   --action create \
   --epic "<name>" \
   --description "<text>"
-# Legacy:
-bun run .../EpicManager.ts --project <name> --action create --epic "..." --description "..."
 ```
 
 ## Integration
 
-- **specification** — PRD/spec paths belong in `traces_to`.
-- **StateManagement** — optional decision tracking.
+- **specification** — PRD/spec in `traces_to` (markdown) or milestone description (tracker).

@@ -4,17 +4,24 @@
 
 - "review plan", "validate planning", "planning review"
 
-## Steps
+Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot). Use the matching checklist in [plan-quality-review.md](plan-quality-review.md).
 
-1. Run **WorkflowInit** `--action review` for a quick file/directory check.
-2. Run **LintPlan.ts** on the project root for frontmatter, `depends_on` DAG, and `traces_to` for `ready` items.
-3. Walk the full checklist in [plan-quality-review.md](plan-quality-review.md).
+## Steps (`delivery_tracker: files`)
 
-## CLI
+1. **WorkflowInit** `--action review` (checks dirs when `files`).
+2. **LintPlan.ts** on markdown backlog.
+3. [plan-quality-review.md](plan-quality-review.md) — **files** section.
+
+## Steps (tracker SSOT, e.g. `linear`)
+
+1. Load [linear-adoption.md](linear-adoption.md).
+2. Review milestones/issues via MCP — **files** section of plan-quality-review does not apply.
+3. [plan-quality-review.md](plan-quality-review.md) — **tracker** section.
+4. Optional [tracker-index.md](tracker-index.md).
+
+## CLI (`files` only)
 
 ```bash
-bun run $PAI_DIR/skills/project-planning/scripts/WorkflowInit.ts --project <name> --action review
+bun run $PAI_DIR/skills/project-planning/scripts/WorkflowInit.ts --root <path> --action review
 bun run $PAI_DIR/skills/project-planning/scripts/LintPlan.ts --root <path>
 ```
-
-The detailed checklist lives in **plan-quality-review.md** (canonical).
