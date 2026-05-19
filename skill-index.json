@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-27T22:16:28.469314Z",
+  "generated": "2026-05-18T09:04:11.661196Z",
   "totalSkills": 35,
   "alwaysLoadedCount": 0,
   "deferredCount": 35,
@@ -55,11 +55,12 @@
     "diagram": {
       "name": "diagram",
       "path": "diagram/SKILL.md",
-      "fullDescription": "Creates, revises, validates, and interprets technical and product diagrams using a format-agnostic semantic model and an opinionated editorial design system. Outputs draw.io files (.drawio XML), standalone HTML/SVG, or Mermaid. Thirteen diagram types: architecture, flowchart, sequence, state machine, ER, timeline, swimlane, quadrant, nested, tree, layer stack, venn, pyramid. USE WHEN: create diagram, update diagram, validate diagram, draw flowchart, architecture diagram, sequence diagram, ER diagram, state machine, swimlane, timeline, quadrant, layer stack, venn, pyramid, nested, tree, diagram from text, text from diagram, explain diagram, summarize diagram.",
+      "fullDescription": "Creates, revises, validates, and interprets technical and product diagrams using a format-agnostic semantic model and an opinionated editorial design system. Outputs draw.io (.drawio XML), HTML/SVG, Mermaid, or Obsidian Canvas (.canvas JSON Canvas 1.0) with vault note cards. Thirteen diagram types. USE WHEN: create diagram, update diagram, validate diagram, Obsidian canvas, draw flowchart, architecture diagram, sequence diagram, ER diagram, state machine, swimlane, timeline, quadrant, layer stack, venn, pyramid, nested, tree, diagram from text, text from diagram, explain diagram, summarize diagram.",
       "triggers": [
         "create diagram",
         "update diagram",
         "validate diagram",
+        "Obsidian canvas",
         "draw flowchart",
         "architecture diagram",
         "sequence diagram",
@@ -80,7 +81,8 @@
       ],
       "workflows": [
         "diagram-mechanics",
-        "type-*"
+        "type-*",
+        "format-obsidian-canvas"
       ],
       "tier": "deferred"
     },

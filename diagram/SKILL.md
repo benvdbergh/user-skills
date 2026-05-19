@@ -3,22 +3,21 @@ name: diagram
 description: >-
   Creates, revises, validates, and interprets technical and product diagrams
   using a format-agnostic semantic model and an opinionated editorial design
-  system. Outputs draw.io files (.drawio XML), standalone HTML/SVG, or Mermaid.
-  Thirteen diagram types: architecture, flowchart, sequence, state machine, ER,
-  timeline, swimlane, quadrant, nested, tree, layer stack, venn, pyramid.
-  USE WHEN: create diagram, update diagram, validate diagram, draw flowchart,
-  architecture diagram, sequence diagram, ER diagram, state machine, swimlane,
-  timeline, quadrant, layer stack, venn, pyramid, nested, tree, diagram from
-  text, text from diagram, explain diagram, summarize diagram.
+  system. Outputs draw.io (.drawio XML), HTML/SVG, Mermaid, or Obsidian Canvas
+  (.canvas JSON Canvas 1.0) with vault note cards. Thirteen diagram types.
+  USE WHEN: create diagram, update diagram, validate diagram, Obsidian canvas,
+  draw flowchart, architecture diagram, sequence diagram, ER diagram, state
+  machine, swimlane, timeline, quadrant, layer stack, venn, pyramid, nested,
+  tree, diagram from text, text from diagram, explain diagram, summarize diagram.
 metadata:
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Diagram
 
 Bidirectional translation between **text** and **diagrams**, with an opinionated editorial design system applied to all output formats.
 
-Three output formats: **draw.io** (`.drawio` XML file), **HTML/SVG** (self-contained `.html`), **Mermaid** (inline DSL). All share the same semantic model and quality bar.
+Four output formats: **draw.io** (`.drawio` XML), **HTML/SVG** (self-contained `.html`), **Mermaid** (inline DSL), **Obsidian Canvas** (`.canvas` JSON). All share the same semantic model and quality bar. For vault boards where cards are mostly linked notes, use Obsidian Canvas — see [`references/format-obsidian-canvas.md`](references/format-obsidian-canvas.md).
 
 ---
 
@@ -34,7 +33,7 @@ Calling skills should provide:
 
 - **Structured input**: graph-like description (nodes, edges, clusters, diagram kind) rather than raw prose where possible
 - **Stable identifiers**: deterministic IDs carried through from upstream systems; diagram node IDs bind to upstream objects, not presentation
-- **Output format + context**: format choice (draw.io default for editable, HTML for editorial), consumption context (docs, standalone artifact, EA view)
+- **Output format + context**: draw.io (editable/technical), HTML (editorial), Mermaid (inline), Obsidian Canvas (vault note boards); consumption context (docs, standalone artifact, EA view, knowledge map)
 
 ---
 
@@ -50,7 +49,7 @@ Open [`references/style-guide.md`](references/style-guide.md) and check the defa
 - **(b)** → accept tokens and write them into `style-guide.md`
 - **(c)** → proceed; optionally remind later
 
-**Skip this gate** once customized (detect by `accent` value differing from `#b5523a`), and for draw.io output (style-guide applies to HTML/SVG only).
+**Skip this gate** once customized (detect by `accent` value differing from `#b5523a`), and for draw.io and Obsidian Canvas output (style-guide applies to HTML/SVG only).
 
 ---
 
@@ -90,7 +89,7 @@ Design system quality standards (§ Design System, § Anti-patterns, § Pre-Outp
 
 Parse input (free text, list, spec, or existing diagram file). Identify:
 - **Diagram type** (see § Diagram Types selection guide)
-- **Output format** (draw.io default for editable/technical; HTML for standalone editorial)
+- **Output format** (draw.io default for editable/technical; HTML for editorial; Obsidian Canvas for vault `.canvas` with `file` note cards)
 - **Action** (Author / Revise / Verify / Interpret)
 
 For Revise/Verify/Interpret: parse the existing artifact into the semantic model first (see [`references/diagram-mechanics.md`](references/diagram-mechanics.md) § Adapter Contract).
@@ -114,8 +113,11 @@ Map semantic model to the target format:
 | **draw.io** (default) | `.drawio` XML file | Editable/technical; share with engineers; embed in VS Code |
 | **HTML/SVG** | `.html` self-contained file | Editorial; standalone; browser-ready; branded |
 | **Mermaid** | Inline DSL string | Simple inline docs; quick author from text |
+| **Obsidian Canvas** | `.canvas` JSON file | Vault knowledge maps; cards as `file` links to notes; groups + edges |
 
-Load the matching `references/type-*.md` **before drawing** — it contains layout conventions, anti-patterns, and examples for that type.
+Load the matching `references/type-*.md` **before drawing** — layout conventions and anti-patterns for the diagram kind.
+
+When format is **Obsidian Canvas**, also load [`references/format-obsidian-canvas.md`](references/format-obsidian-canvas.md) — JSON Canvas schema, semantic→canvas mapping, vault/backlink rules.
 
 ### 4. Verify (optional, always available)
 
@@ -158,7 +160,7 @@ Rules of thumb:
 
 ## Design System
 
-**Applies to HTML/SVG output.** For draw.io XML output, use the draw.io schema rules in [`references/diagram-mechanics.md`](references/diagram-mechanics.md).
+**Applies to HTML/SVG output.** For draw.io XML, use [`references/diagram-mechanics.md`](references/diagram-mechanics.md). For Obsidian Canvas, use preset/hex `color` on ≤2 focal cards per [`references/format-obsidian-canvas.md`](references/format-obsidian-canvas.md).
 
 The design system is skinnable — all tokens live in [`references/style-guide.md`](references/style-guide.md). When specs below reference `ink`, `accent`, `muted`, etc., look up the current hex value there.
 
@@ -307,6 +309,13 @@ Run before producing any diagram in any format.
 - [ ] No special Unicode in attributes (→, ↔)?
 - [ ] File extension is `.drawio`?
 
+**Technical (Obsidian Canvas):**
+- [ ] Loaded `references/format-obsidian-canvas.md`?
+- [ ] Valid JSON; unique 16-char hex ids; integer geometry?
+- [ ] Vault concepts as `file` nodes (not duplicate `text` bodies)?
+- [ ] Edge `fromNode`/`toNode` reference existing ids; ≤2 focal colors?
+- [ ] Groups before children in `nodes[]` z-order?
+
 **Typography (HTML/SVG):**
 - [ ] Human-readable names in Geist sans, not Geist Mono?
 - [ ] Technical sublabels in Geist Mono?
@@ -365,6 +374,16 @@ Single `.html` file: embedded CSS, inline SVG, Google Fonts only (no external im
 Optional **sketchy variant** (SVG turbulence filter): [`references/primitive-sketchy.md`](references/primitive-sketchy.md). Good for essays; not for technical docs.
 
 Optional **annotation callouts** (italic-serif asides with dashed Bézier leader): [`references/primitive-annotation.md`](references/primitive-annotation.md).
+
+### Obsidian Canvas — `.canvas` JSON file
+
+Write valid [JSON Canvas 1.0](https://jsoncanvas.org/spec/1.0/) for Obsidian. **Prefer `file` nodes** (vault note paths) over large `text` cards so backlinks and graph integration work (Obsidian 1.12+).
+
+**Workflow:** semantic skeleton + `type-*.md` layout → map to canvas nodes/edges → verify with format checklist.
+
+**Do not** apply HTML typography or 4px SVG grid; use 10/20 px alignment and spacing rules in the format reference.
+
+Full schema, semantic mapping, vault integration, and verify checklist: [`references/format-obsidian-canvas.md`](references/format-obsidian-canvas.md).
 
 ---
 
@@ -431,6 +450,16 @@ User: "Clean up this diagram's visual style"
 → Emit updated artifact
 ```
 
+**Author — architecture map as Obsidian Canvas**
+```
+User: "Put our integration architecture on a canvas using the existing vault notes"
+→ Classify: type=architecture, format=Obsidian Canvas
+→ Load type-architecture.md + format-obsidian-canvas.md
+→ Semantic skeleton: components = vault paths; clusters = groups; ≤9 file cards
+→ Emit .canvas: group nodes first, file nodes with paths, labeled edges
+→ Run canvas verify checklist; user opens in Obsidian
+```
+
 ---
 
 ## Quick Reference
@@ -441,3 +470,5 @@ User: "Clean up this diagram's visual style"
 - **Interpret**: Parse → semantic graph → summarize/answer in text
 
 For spatial reasoning constraints, ASCII-to-structured conversion, adapter contract, layout engines, edge routing, and DiagramEval-style validation: [`references/diagram-mechanics.md`](references/diagram-mechanics.md).
+
+For Obsidian Canvas (JSON Canvas 1.0, vault `file` cards, groups, edges): [`references/format-obsidian-canvas.md`](references/format-obsidian-canvas.md). Escalation boundaries: [`references/skill-escalation.md`](references/skill-escalation.md).

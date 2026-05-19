@@ -22,6 +22,8 @@ To connect a new platform (draw.io, PlantUML, ArchiMate, etc.) without changing 
 
 Keep coordinate systems, compression (e.g. draw.io), and notation rules inside the adapter so the core skill remains format-agnostic.
 
+**Obsidian Canvas adapter:** Serialize/deserialize `.canvas` (JSON Canvas 1.0). Node ids are 16-char hex strings; clusters map to `group` nodes; vault paths map to `file` nodes. Full schema and vault rules: [`format-obsidian-canvas.md`](format-obsidian-canvas.md).
+
 ---
 
 ## 1. Spatial Reasoning in Token-Based Systems

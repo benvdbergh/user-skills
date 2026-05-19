@@ -50,5 +50,6 @@ Relationships use **target_id** (the target node’s `id`):
 
 ## Obsidian notes
 
-- Notes are created from Neo4j data (e.g. script `.claude/skills/enterprise-model-store/scripts/CreateObsidianNotes.ts` with a JSON export from read-cypher — script lives in the project-local enterprise-model-store skill)
-- Linking: Neo4j node `obsidian_note_id` ↔ Obsidian note frontmatter `entity_id`
+- Notes are created from graph export data (e.g. KuzuDB or Neo4j MCP query → JSON → project-local script `CreateObsidianNotes.ts` under **enterprise-model-store**)
+- Linking: graph node `obsidian_note_id` ↔ Obsidian note frontmatter `entity_id`
+- **Prose layout (Ai-Vault / CAI):** default reader-facing entity pages to human-first structure per project `references/ObsidianEntityNotesAuthoring.md`; reserve the full pipeline section stack for explicit requests or audit workflows
