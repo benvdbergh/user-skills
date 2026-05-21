@@ -1,0 +1,4 @@
+.coverage
+tests/coverage-ui.json
+*.pyc
+__pycache__/

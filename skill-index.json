@@ -1,9 +1,61 @@
 {
-  "generated": "2026-05-18T21:08:05.397465Z",
-  "totalSkills": 37,
+  "generated": "2026-05-21T19:39:20.203986Z",
+  "totalSkills": 44,
   "alwaysLoadedCount": 0,
-  "deferredCount": 37,
+  "deferredCount": 44,
   "skills": {
+    "banner-design": {
+      "name": "banner-design",
+      "path": "banner-design/SKILL.md",
+      "fullDescription": "Designs banners for social media, ads, website heroes, and print with multiple art-direction options and AI-assisted visuals. Use when the user says design banner, create banner, generate banner, social cover, header image, display ad, website hero, or ad creative. Does not own logo design, full brand guides, or video editing.",
+      "triggers": [
+        "the user says design banner",
+        "create banner",
+        "generate banner",
+        "social cover",
+        "header image",
+        "display ad",
+        "website hero",
+        "ad creative. Does not own logo design",
+        "full brand guides",
+        "video editing"
+      ],
+      "workflows": [
+        "skill-escalation",
+        "banner-sizes-and-styles"
+      ],
+      "tier": "deferred"
+    },
+    "brand": {
+      "name": "brand",
+      "path": "brand/SKILL.md",
+      "fullDescription": "Provides brand voice, visual identity, messaging frameworks, asset management, and brand consistency. Use when the user says \"brand guidelines\", \"brand voice\", \"update brand colors\", \"style guide\", \"brand consistency\", \"brand compliance\", or \"tone of voice\".",
+      "triggers": [
+        "the user says \"brand guidelines",
+        "brand voice",
+        "update brand colors",
+        "style guide",
+        "brand consistency",
+        "brand compliance",
+        "tone of voice"
+      ],
+      "workflows": [
+        "update",
+        "voice-framework",
+        "visual-identity",
+        "messaging-framework",
+        "consistency-checklist",
+        "brand-guideline-template",
+        "asset-organization",
+        "color-palette-management",
+        "typography-specifications",
+        "logo-usage-rules",
+        "approval-checklist",
+        "skill-escalation",
+        "*"
+      ],
+      "tier": "deferred"
+    },
     "ci-cd-governance": {
       "name": "ci-cd-governance",
       "path": "ci-cd-governance/SKILL.md",
@@ -69,6 +121,51 @@
       "workflows": [
         "research-workflow",
         "agent-prompts"
+      ],
+      "tier": "deferred"
+    },
+    "design": {
+      "name": "design",
+      "path": "design/SKILL.md",
+      "fullDescription": "Orchestrates brand, design tokens, UI styling, logo generation (55 styles, Gemini), corporate identity (50 deliverables), icons, and social photos. Use when the user says design logo, create CIP, generate mockups, brand identity, design system, social photos, generate icon, or corporate identity. For presentations use slides; for banners use banner-design; for brand voice use brand; for tokens use design-system; for shadcn/Tailwind UI use ui-styling.",
+      "triggers": [
+        "the user says design logo",
+        "create CIP",
+        "generate mockups",
+        "brand identity",
+        "design system",
+        "social photos",
+        "generate icon"
+      ],
+      "workflows": [
+        "design-routing",
+        "skill-escalation",
+        "logo-design",
+        "cip-design",
+        "icon-design",
+        "social-photos-design"
+      ],
+      "tier": "deferred"
+    },
+    "design-system": {
+      "name": "design-system",
+      "path": "design-system/SKILL.md",
+      "fullDescription": "Token architecture, component specifications, and CSS variable generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, Tailwind theme configuration, and slide token validation. Use when user says \"create design tokens\", \"set up CSS variables\", \"define component specs\", \"generate a Tailwind config\", \"build a design system\", \"implement dark mode tokens\", \"audit for hardcoded values\", or \"validate slide tokens\".",
+      "triggers": [
+        "user says \"create design tokens",
+        "set up CSS variables",
+        "define component specs",
+        "generate a Tailwind config",
+        "build a design system",
+        "implement dark mode tokens",
+        "audit for hardcoded values",
+        "validate slide tokens"
+      ],
+      "workflows": [
+        "component-specs",
+        "tailwind-integration",
+        "token-architecture",
+        "skill-escalation"
       ],
       "tier": "deferred"
     },
@@ -552,6 +649,24 @@
       ],
       "tier": "deferred"
     },
+    "slides": {
+      "name": "slides",
+      "path": "slides/SKILL.md",
+      "fullDescription": "Creates strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies. Use when user says \"create slides\", \"build a pitch deck\", \"make a presentation\", \"investor pitch\", \"sales deck\", or \"HTML presentation\".",
+      "triggers": [
+        "user says \"create slides",
+        "build a pitch deck",
+        "make a presentation",
+        "investor pitch",
+        "sales deck",
+        "HTML presentation"
+      ],
+      "workflows": [
+        "create",
+        "skill-escalation"
+      ],
+      "tier": "deferred"
+    },
     "software-architecture": {
       "name": "software-architecture",
       "path": "software-architecture/SKILL.md",
@@ -617,6 +732,65 @@
         "including Office artifact export (Word/PDF/PPTX) via the `office-*` skills"
       ],
       "workflows": [],
+      "tier": "deferred"
+    },
+    "ui-styling": {
+      "name": "ui-styling",
+      "path": "ui-styling/SKILL.md",
+      "fullDescription": "Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.",
+      "triggers": [
+        "building user interfaces",
+        "implementing design systems",
+        "creating responsive layouts",
+        "adding accessible components (dialogs",
+        "dropdowns",
+        "forms",
+        "tables)",
+        "customizing themes and colors",
+        "implementing dark mode",
+        "generating visual designs and posters",
+        "establishing consistent styling patterns across applications"
+      ],
+      "workflows": [
+        "shadcn-components",
+        "shadcn-theming",
+        "shadcn-accessibility",
+        "tailwind-utilities",
+        "tailwind-responsive",
+        "tailwind-customization",
+        "canvas-design-system",
+        "skill-escalation"
+      ],
+      "tier": "deferred"
+    },
+    "ui-ux-pro-max": {
+      "name": "ui-ux-pro-max",
+      "path": "ui-ux-pro-max/SKILL.md",
+      "fullDescription": "UI/UX design intelligence for web and mobile: 50+ styles, 161 color palettes, 57 font pairings, 99 UX guidelines, 25 chart types, and stack-specific guidance (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn, HTML/CSS). Use when planning or reviewing UI/UX, choosing style/color/typography, building landing pages or dashboards, fixing accessibility or layout, or when the user mentions design system, color palette, font pairing, glassmorphism, dark mode, responsive layout, or UI best practices. Does not install components or define brand tokens — escalate to ui-styling or brand.",
+      "triggers": [
+        "planning",
+        "reviewing UI/UX",
+        "choosing style/color/typography",
+        "building landing pages",
+        "dashboards",
+        "fixing accessibility",
+        "layout",
+        "when the user mentions design system",
+        "color palette",
+        "font pairing",
+        "glassmorphism",
+        "dark mode",
+        "responsive layout",
+        "UI best practices. Does not install components",
+        "define brand tokens — escalate to ui-styling",
+        "brand"
+      ],
+      "workflows": [
+        "ux-quick-reference",
+        "pre-delivery-checklist",
+        "app-interaction-rules",
+        "skill-escalation"
+      ],
       "tier": "deferred"
     },
     "ux-designer": {
