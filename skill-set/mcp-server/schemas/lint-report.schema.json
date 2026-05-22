@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/lint-report.json",
+  "title": "LintReport",
+  "type": "object",
+  "required": [
+    "reportId",
+    "environmentId",
+    "skillName",
+    "sourcePath",
+    "scoredAt",
+    "score",
+    "complianceLevel",
+    "categories",
+    "findings",
+    "recommendedFixes"
+  ],
+  "properties": {
+    "reportId": { "type": "string" },
+    "environmentId": { "type": "string" },
+    "skillName": { "type": "string" },
+    "sourcePath": { "type": "string" },
+    "scoredAt": { "type": "string" },
+    "score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "complianceLevel": { "type": "string" },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "passed", "total"],
+        "properties": {
+          "category": { "type": "string" },
+          "passed": { "type": "integer", "minimum": 0 },
+          "total": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "validation-finding.schema.json" }
+    },
+    "recommendedFixes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "persisted": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}

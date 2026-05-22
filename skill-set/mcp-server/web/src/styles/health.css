@@ -3,6 +3,11 @@
    ─────────────────────────────────────────────────────────────────── */
 
 .sl-health-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
   background: color-mix(in oklch, var(--error) 12%, transparent);
@@ -11,10 +16,148 @@
   font-size: 12.5px;
 }
 
+.sl-health-error p {
+  margin: 0;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.sl-health-healthy {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--accent) 28%, transparent);
+}
+
+.sl-health-healthy-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.sl-health-healthy-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.sl-health-healthy-text strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--fg);
+}
+
+.sl-health-healthy-text p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--fg-muted);
+}
+
+.sl-scan-meta-inline {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--fg-dim);
+  cursor: help;
+  border-bottom: 1px dotted var(--border-2);
+}
+
+.sl-health-skeleton .sl-health-summary {
+  margin-bottom: 24px;
+}
+
+.sl-skel-card {
+  min-height: 108px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.sl-skel-toolbar {
+  height: 38px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+}
+
+.sl-skel-findings {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.sl-skel-row {
+  height: 44px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-1);
+}
+
+.sl-skel-row:last-child {
+  border-bottom: 0;
+}
+
+.sl-skel-side-title {
+  height: 18px;
+  width: 120px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+}
+
+.sl-skel-side-row {
+  height: 36px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+}
+
+@keyframes sl-skel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.sl-skel-pulse {
+  animation: sl-skel-pulse 1.4s ease-in-out infinite;
+}
+
+.sl-health-error-retry {
+  margin-top: 8px;
+}
+
+.sl-health-stale-hint {
+  margin: 0 0 16px;
+  padding: 0.65rem 0.85rem;
+  font-size: 12.5px;
+  color: var(--fg-muted);
+  background: color-mix(in oklch, var(--warn) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--warn) 28%, transparent);
+  border-radius: var(--radius-sm);
+}
+
 .sl-scan-meta {
   font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--fg-dim);
+  cursor: help;
+  border-bottom: 1px dotted var(--border-2);
 }
 
 .sl-health-summary {
@@ -22,6 +165,17 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-bottom: 24px;
+}
+
+.sl-health-summary-no-info {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.sl-health-info-hint {
+  margin: -16px 0 24px;
+  font-size: 12.5px;
+  color: var(--fg-muted);
+  line-height: 1.45;
 }
 
 .sl-summary {
@@ -129,6 +283,16 @@
   color: var(--fg-dim);
 }
 
+/* Severity strip — reuses Catalog `.sl-catalog-stats` / `.sl-stat` */
+.sl-health-stats {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 24px;
+}
+
+.sl-stat-info.is-active {
+  box-shadow: inset 0 2px 0 var(--info);
+}
+
 .sl-health-cols {
   display: grid;
   grid-template-columns: 1fr 280px;
@@ -137,64 +301,6 @@
 
 .sl-toolbar-tight {
   margin-bottom: 12px;
-}
-
-.sl-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg-1);
-  color: var(--fg-muted);
-  font-size: 11.5px;
-  text-transform: capitalize;
-  transition: border-color 120ms, background 120ms, color 120ms;
-  cursor: pointer;
-  font: inherit;
-}
-
-.sl-chip:hover {
-  border-color: var(--border-2);
-  color: var(--fg);
-}
-
-.sl-chip.is-active {
-  background: var(--bg-3);
-  border-color: var(--border-2);
-  color: var(--fg);
-}
-
-.sl-chip-count {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  background: var(--bg-3);
-  color: var(--fg-muted);
-  padding: 1px 6px;
-  border-radius: 999px;
-}
-
-.sl-chip.is-active .sl-chip-count {
-  background: var(--bg-1);
-}
-
-.sl-chip-error.is-active {
-  background: var(--error-bg);
-  color: var(--error);
-  border-color: color-mix(in oklch, var(--error) 35%, transparent);
-}
-
-.sl-chip-warning.is-active {
-  background: var(--warn-bg);
-  color: var(--warn);
-  border-color: color-mix(in oklch, var(--warn) 35%, transparent);
-}
-
-.sl-chip-info.is-active {
-  background: var(--info-bg);
-  color: var(--info);
-  border-color: color-mix(in oklch, var(--info) 35%, transparent);
 }
 
 .sl-spinner {
@@ -233,8 +339,9 @@
 
 .sl-finding-head {
   display: grid;
-  grid-template-columns: 88px 200px 1fr 12px;
-  gap: 12px;
+  grid-template-columns: minmax(72px, auto) minmax(0, 140px) minmax(0, 120px) minmax(0, 1fr) auto;
+  grid-template-areas: "sev cat skill msg chev";
+  gap: 8px 12px;
   align-items: center;
   padding: 11px 14px;
   width: 100%;
@@ -247,6 +354,11 @@
   color: inherit;
 }
 
+.sl-finding-head:not(:has(.sl-finding-skill)) {
+  grid-template-columns: minmax(72px, auto) minmax(0, 200px) minmax(0, 1fr) auto;
+  grid-template-areas: "sev cat msg chev";
+}
+
 .sl-finding-head:hover {
   background: var(--bg-2);
 }
@@ -256,6 +368,7 @@
 }
 
 .sl-finding-sev {
+  grid-area: sev;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -278,6 +391,7 @@
 }
 
 .sl-finding-cat {
+  grid-area: cat;
   font-size: 11px;
   color: var(--fg-muted);
   background: var(--bg-2);
@@ -287,6 +401,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.sl-finding-skill {
+  grid-area: skill;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .sl-finding.is-expanded .sl-finding-cat {
@@ -294,16 +420,21 @@
 }
 
 .sl-finding-msg {
+  grid-area: msg;
   font-size: 12.5px;
   color: var(--fg);
+  min-width: 0;
 }
 
-.sl-finding-head .sl-icon {
+.sl-finding-chevron {
+  grid-area: chev;
   color: var(--fg-dim);
+  display: inline-flex;
+  align-items: center;
 }
 
 .sl-finding-body {
-  padding: 12px 18px 16px 130px;
+  padding: 12px 14px 16px;
   border-top: 1px dashed var(--border);
   background: var(--bg-2);
 }
@@ -315,9 +446,31 @@
   margin-bottom: 12px;
 }
 
+.sl-finding-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.sl-finding-copy-hint {
+  font-size: 11.5px;
+  color: var(--fg-muted);
+}
+
 .sl-finding-actions {
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.sl-finding-action-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fg-muted);
+  line-height: 1.45;
+  flex: 1 1 200px;
 }
 
 .sl-side-title {
@@ -340,8 +493,9 @@
 .sl-category-row {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 8px;
-  align-items: center;
+  grid-template-rows: auto auto;
+  gap: 6px 8px;
+  align-items: start;
   padding: 8px 10px;
   width: 100%;
   border-radius: var(--radius-sm);
@@ -354,6 +508,33 @@
   color: inherit;
 }
 
+.sl-category-text {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sl-category-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.sl-category-desc {
+  font-size: 11px;
+  color: var(--fg-dim);
+  line-height: 1.35;
+}
+
+.sl-category-code {
+  font-size: 10px;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+}
+
 .sl-category-row:hover {
   background: var(--bg-2);
 }
@@ -363,20 +544,15 @@
   box-shadow: inset 2px 0 0 var(--accent);
 }
 
-.sl-category-name {
-  font-size: 11px;
-  color: var(--fg-muted);
-  display: block;
-  margin-bottom: 4px;
-}
-
 .sl-category-bars {
   grid-column: 1;
+  grid-row: 2;
   display: flex;
   height: 4px;
   background: var(--bg-3);
   border-radius: 99px;
   overflow: hidden;
+  align-self: end;
 }
 
 .sl-cat-bar {
@@ -397,6 +573,9 @@
 }
 
 .sl-category-count {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  align-self: start;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--fg-muted);
@@ -461,18 +640,71 @@
   color: var(--accent);
 }
 
-@media (max-width: 1000px) {
-  .sl-health-cols {
+@media (max-width: 719px) {
+  .sl-finding-head,
+  .sl-finding-head:not(:has(.sl-finding-skill)) {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "sev chev"
+      "cat cat"
+      "skill skill"
+      "msg msg";
+  }
+
+  .sl-finding-head:not(:has(.sl-finding-skill)) {
+    grid-template-areas:
+      "sev chev"
+      "cat cat"
+      "msg msg";
+  }
+
+  .sl-finding-grid {
     grid-template-columns: 1fr;
   }
 
-  .sl-health-summary {
+  .sl-toolbar-tight {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .sl-health-summary,
+  .sl-health-stats {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+@media (max-width: 1000px) {
+  .sl-health-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 375px) {
+  .sl-health-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sl-summary-count {
+    font-size: 26px;
+  }
+
+  .sl-page-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sl-spinner {
+  .sl-spinner,
+  .sl-skel-pulse {
     animation: none;
+  }
+
+  .sl-summary,
+  .sl-chip,
+  .sl-finding-head {
+    transition: none;
   }
 }

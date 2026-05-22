@@ -7,6 +7,11 @@ import { SkillCatalogService } from "./domain/SkillCatalogService.js";
 import { SkillGraphService } from "./domain/SkillGraphService.js";
 import { SkillHealthService } from "./domain/SkillHealthService.js";
 import { createApi } from "./http/api.js";
+import { createAgentServices } from "./http/createAgentServices.js";
+import { createProposalServices } from "./http/createProposalServices.js";
+import { createValidationService } from "./http/createValidationServices.js";
+import { PromptSourceService } from "./prompts/PromptSourceService.js";
+import { RelationshipMapRepository } from "./repositories/RelationshipMapRepository.js";
 import { startMcpServer } from "./mcp/server.js";
 
 function resolveWebDist(packageRoot: string): string | undefined {
@@ -22,9 +27,23 @@ async function startHttpServer(options?: {
   const catalog = new SkillCatalogService(config);
   const graph = new SkillGraphService(config, catalog);
   const health = new SkillHealthService(config, catalog);
+  const { agent, proposals, prompts } = createAgentServices(config, catalog);
+  const proposalRoutes = createProposalServices(config, catalog, proposals);
+  const validation = createValidationService(config, catalog, agent);
+  const relationshipMap = new RelationshipMapRepository(config);
   const staticDir = options?.staticDir;
   const app = createApi(
-    { catalog, graph, health },
+    {
+      config,
+      catalog,
+      graph,
+      health,
+      validation,
+      agent,
+      prompts,
+      relationshipMap,
+      proposals: proposalRoutes,
+    },
     staticDir ? { staticDir } : undefined,
   );
 

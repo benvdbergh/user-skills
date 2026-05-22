@@ -6,11 +6,14 @@ import { resolvePathInfo } from "../config/pathModel.js";
 import type { SkillCatalogService } from "../domain/SkillCatalogService.js";
 import type { SkillGraphService } from "../domain/SkillGraphService.js";
 import type { SkillHealthService } from "../domain/SkillHealthService.js";
+import type { SkillValidationService } from "../domain/SkillValidationService.js";
 import {
   CatalogHealthReportSchema,
   EnvironmentSchema,
+  LintReportSchema,
   RelationshipMapFileSchema,
   SkillGraphResultSchema,
+  ValidationReportSchema,
 } from "../domain/types.js";
 import type { RelationshipMapRepository } from "../repositories/RelationshipMapRepository.js";
 import type { SkillIndexRepository } from "../repositories/SkillIndexRepository.js";
@@ -21,12 +24,14 @@ export const SKILL_LAB_RESOURCE_URIS = [
   "skill-lab://relationships",
   "skill-lab://graph",
   "skill-lab://health/latest",
+  "skill-lab://validation/{environmentId}/{skillName}/latest",
 ] as const;
 
 export interface CatalogResourcesDeps {
   catalog: SkillCatalogService;
   graph: SkillGraphService;
   health: SkillHealthService;
+  validation?: SkillValidationService;
   relationshipMap: RelationshipMapRepository;
   indexRepo: SkillIndexRepository;
 }
@@ -47,7 +52,8 @@ export function registerCatalogResources(
   server: McpServer,
   deps: CatalogResourcesDeps,
 ): void {
-  const { catalog, graph, health, relationshipMap, indexRepo } = deps;
+  const { catalog, graph, health, validation, relationshipMap, indexRepo } =
+    deps;
 
   server.registerResource(
     "environments",
@@ -144,8 +150,55 @@ export function registerCatalogResources(
       mimeType: "application/json",
     },
     async (uri) => {
-      const report = CatalogHealthReportSchema.parse(health.scan());
+      const latest = health.getLatest();
+      if (!latest) {
+        return jsonResource(uri.href, {
+          error: "not_found",
+          message: "No catalog health scan has been run yet",
+        });
+      }
+      const report = CatalogHealthReportSchema.parse(latest);
       return jsonResource(uri.href, { report });
     },
   );
+
+  if (validation) {
+    const validationTemplate = new ResourceTemplate(
+      "skill-lab://validation/{environmentId}/{skillName}/latest",
+      {
+        list: undefined,
+        complete: {
+          environmentId: async () =>
+            catalog.listEnvironments().map((env) => env.id),
+        },
+      },
+    );
+
+    server.registerResource(
+      "validation-latest",
+      validationTemplate,
+      {
+        description: "Latest persisted lint and/or validation reports for a skill.",
+        mimeType: "application/json",
+      },
+      async (uri, { environmentId, skillName }) => {
+        const latest = validation.getLatest(
+          String(environmentId),
+          String(skillName),
+        );
+        const payload: Record<string, unknown> = {};
+        if (latest.lint) payload.lint = LintReportSchema.parse(latest.lint);
+        if (latest.validation) {
+          payload.validation = ValidationReportSchema.parse(latest.validation);
+        }
+        if (!latest.lint && !latest.validation) {
+          return jsonResource(uri.href, {
+            error: "not_found",
+            message: `No persisted reports for ${environmentId}/${skillName}`,
+          });
+        }
+        return jsonResource(uri.href, payload);
+      },
+    );
+  }
 }

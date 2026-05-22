@@ -3,6 +3,14 @@ import { z } from "zod";
 import type { SkillCatalogService } from "../domain/SkillCatalogService.js";
 import type { SkillGraphService } from "../domain/SkillGraphService.js";
 import type { SkillHealthService } from "../domain/SkillHealthService.js";
+import type { SkillValidationService } from "../domain/SkillValidationService.js";
+import type { ChangeProposalService } from "../domain/ChangeProposalService.js";
+import type { RelationshipSuggestionAdvisor } from "../ai/RelationshipSuggestionAdvisor.js";
+import {
+  RelationshipProposalSchema,
+  SuggestedEdgeInputSchema,
+  TriggerConflictReportSchema,
+} from "../domain/types.js";
 import {
   buildCatalogHealthPayload,
   buildGraphNeighborsPayload,
@@ -11,8 +19,10 @@ import {
 import {
   GraphNodeTypeSchema,
   HealthStatusSchema,
+  LintReportSchema,
   SkillDetailSchema,
   SkillSummarySchema,
+  ValidationReportSchema,
 } from "../domain/types.js";
 
 export {
@@ -234,6 +244,227 @@ export function registerGraphHealthTools(
         ],
         structuredContent: { report },
       };
+    },
+  );
+}
+
+export function registerValidationTools(
+  server: McpServer,
+  validation: SkillValidationService,
+): void {
+  server.registerTool(
+    "lint_skill",
+    {
+      title: "Lint skill",
+      description:
+        "Run deterministic structural lint checks for one skill (no LLM).",
+      inputSchema: {
+        environmentId: z.string(),
+        skillName: z.string(),
+        persist: z
+          .boolean()
+          .optional()
+          .describe("Persist report under .generated/reports when writesEnabled"),
+      },
+    },
+    async ({ environmentId, skillName, persist }) => {
+      try {
+        const report = validation.lint(environmentId, skillName, { persist });
+        const parsed = LintReportSchema.parse(report);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({ lint: parsed }, null, 2),
+            },
+          ],
+          structuredContent: { lint: parsed },
+        };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Lint failed";
+        return {
+          isError: true,
+          content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
+        };
+      }
+    },
+  );
+
+  server.registerTool(
+    "validate_skill",
+    {
+      title: "Validate skill",
+      description:
+        "Run rubric-based content validation for one skill using validate.md sources.",
+      inputSchema: {
+        environmentId: z.string(),
+        skillName: z.string(),
+        persist: z.boolean().optional(),
+        deep: z
+          .boolean()
+          .optional()
+          .describe("Start optional validate-skill agent session when runner is configured"),
+      },
+    },
+    async ({ environmentId, skillName, persist, deep }) => {
+      try {
+        const report = await validation.validate(environmentId, skillName, {
+          persist,
+          deep,
+        });
+        const parsed = ValidationReportSchema.parse(report);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({ validation: parsed }, null, 2),
+            },
+          ],
+          structuredContent: { validation: parsed },
+        };
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Validation failed";
+        return {
+          isError: true,
+          content: [
+            { type: "text" as const, text: JSON.stringify({ error: message }) },
+          ],
+        };
+      }
+    },
+  );
+}
+
+export interface RelationshipProposalToolDeps {
+  catalog: SkillCatalogService;
+  proposals: ChangeProposalService;
+  relationshipAdvisor: RelationshipSuggestionAdvisor;
+}
+
+export function registerRelationshipProposalTools(
+  server: McpServer,
+  deps: RelationshipProposalToolDeps,
+): void {
+  const { catalog, proposals, relationshipAdvisor } = deps;
+
+  server.registerTool(
+    "suggest_relationship_edges",
+    {
+      title: "Suggest relationship edges",
+      description:
+        "Validate and store proposed relationship edges with evidence quotes (does not write skill-relationships.json).",
+      inputSchema: {
+        environmentId: z.string(),
+        skillName: z
+          .string()
+          .optional()
+          .describe("Anchor skill; when edges omitted, drafts from the relationship map"),
+        sessionId: z.string().optional(),
+        edges: z
+          .array(SuggestedEdgeInputSchema)
+          .optional()
+          .describe("Proposed edges from the agent session"),
+      },
+    },
+    async ({ environmentId, skillName, sessionId, edges }) => {
+      try {
+        const edgeInputs =
+          edges ??
+          (skillName
+            ? relationshipAdvisor.draftEdgesForSkill(skillName)
+            : []);
+        const { accepted, rejected } =
+          relationshipAdvisor.validateEdges(edgeInputs);
+        if (accepted.length === 0) {
+          return {
+            isError: true,
+            content: [
+              {
+                type: "text" as const,
+                text: JSON.stringify({
+                  error: "validation_failed",
+                  message:
+                    rejected[0]?.reason ??
+                    "No valid edges; evidence.quote and evidence.sourceFile are required",
+                  rejected,
+                }),
+              },
+            ],
+          };
+        }
+        const proposal = proposals.ingestRelationship({
+          environmentId,
+          skillName,
+          sessionId,
+          edges: accepted,
+          rejectedEdges: rejected.length > 0 ? rejected : undefined,
+        });
+        const parsed = RelationshipProposalSchema.parse(proposal);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({ proposal: parsed, rejectedCount: rejected.length }, null, 2),
+            },
+          ],
+          structuredContent: { proposal: parsed, rejectedCount: rejected.length },
+        };
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Relationship proposal failed";
+        return {
+          isError: true,
+          content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
+        };
+      }
+    },
+  );
+
+  server.registerTool(
+    "detect_trigger_conflicts",
+    {
+      title: "Detect trigger conflicts",
+      description:
+        "Analyze overlapping trigger phrases across skills in the catalog.",
+      inputSchema: {
+        environmentId: z
+          .string()
+          .optional()
+          .describe("Limit analysis to one environment"),
+        sessionId: z.string().optional(),
+      },
+    },
+    async ({ environmentId, sessionId }) => {
+      try {
+        const skills = catalog.listSkills({ environmentId });
+        const conflicts = relationshipAdvisor.detectTriggerConflicts({
+          environmentId,
+        });
+        const report = proposals.ingestTriggerConflicts({
+          environmentId,
+          sessionId,
+          conflicts,
+          scannedSkillCount: skills.length,
+        });
+        const parsed = TriggerConflictReportSchema.parse(report);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({ report: parsed }, null, 2),
+            },
+          ],
+          structuredContent: { report: parsed },
+        };
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Trigger conflict analysis failed";
+        return {
+          isError: true,
+          content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
+        };
+      }
     },
   );
 }

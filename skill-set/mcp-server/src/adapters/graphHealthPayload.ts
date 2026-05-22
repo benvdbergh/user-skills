@@ -5,6 +5,7 @@ import {
   GraphFilterSchema,
   GraphNeighborsQuerySchema,
   SkillGraphResultSchema,
+  type CatalogHealthReport,
   type GraphFilter,
   type GraphNeighborsQuery,
   type SkillGraphResult,
@@ -28,4 +29,12 @@ export function buildGraphNeighborsPayload(
 
 export function buildCatalogHealthPayload(health: SkillHealthService) {
   return CatalogHealthReportSchema.parse(health.scan());
+}
+
+export function buildCatalogHealthLatestPayload(
+  health: SkillHealthService,
+): CatalogHealthReport | null {
+  const latest = health.getLatest();
+  if (!latest) return null;
+  return CatalogHealthReportSchema.parse(latest);
 }

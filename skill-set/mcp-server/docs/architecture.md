@@ -1,45 +1,53 @@
 # Skill Lab — Architecture Decisions
 
-Status: **Build Ready** for **R0.3 — Read-Only Skill Lab Dashboard** (EPIC-3). **R0.2** (graph, health, shared HTTP API) and **R0.1** (catalog, MCP) are delivered.
+Status: **Delivered** for **R0.4 — Validation, Source Prompts & AI Proposals** (EPIC-4). **R0.1–R0.3** (catalog, graph, health, read-only dashboard) were prerequisite. Milestone gate: `tests/e2e-r04.test.ts` (123 tests total in package).
 
-## Milestone scope (R0.3)
+## Milestone scope (R0.4)
 
 | Story | Linear | Component | Spec trace |
 |-------|--------|-----------|------------|
-| STORY-3-1 | BEN-25 | `web/` package scaffold, shell layout, dev proxy | FR-039–040, AC-004 |
-| STORY-3-2 | BEN-26 | Catalog view — search, filters, health highlights | US-001–003, FR-039, FR-041 |
-| STORY-3-3 | BEN-27 | Skill detail — metadata, workflows, relationships | US-004–006 |
-| STORY-3-4 | BEN-28 | Graph view — global/local, filters, high-risk overlay | US-007–010, NFR-004 |
-| STORY-3-5 | BEN-29 | Health findings view with source links | US-011, FR-042 |
-| STORY-3-6 | BEN-30 | UI/API contract doc, shared `SourceLink`, split criteria | FR-040–042, risk: UI as SSOT |
+| STORY-4-1 | BEN-31 | `PromptSourceService`, `SkillReferenceSource`, prompt DTOs | FR-037, NFR-012, **AC-003** |
+| STORY-4-7 | BEN-36 | `AgentSessionRunner`, Claude auth, session HTTP, `.generated/` paths | FR-024–025, NFR-010, OQ #5 ADR |
+| STORY-4-2 | BEN-32 | `SkillValidationService`, lint/validate MCP + HTTP | US-012–014, FR-021–025 |
+| STORY-4-3 | BEN-33 | MCP prompts from loader, `PromptActions` copy | FR-037, NFR-012 |
+| STORY-4-4 | BEN-34 | `RelationshipSuggestionAdvisor`, relationship proposals | FR-027–028, **AC-006** |
+| STORY-4-5 | BEN-35 | `SkillImprovementAdvisor`, `ChangeProposalService`, patch proposals | FR-026, FR-029–030, **AC-007** (preview) |
+| STORY-4-6 | BEN-37 | Proposal workbench, agent session shell, validation UI | FR-039, FR-040, FR-032 (read) |
 
-**R0.3 in scope:** Read-only browser dashboard for **catalog**, **skill detail**, **graph**, and **health**; environment switching; source-path links on displayed facts. **Out of scope (placeholders only):** validation scorecards, AI proposals, gated writes (R0.4–R0.5).
+**R0.4 in scope:** Load lifecycle prompts from Git (**no duplicated registry**); structural lint + validation reports; MCP prompts; **Claude Code** agent sessions (subscription auth, headless/background); relationship and skill **patch proposals** ingested via MCP; workbench with diff preview; session shell (status, logs, attach) — **no apply**, **no embedded chat**, **no relationship-map writes**.
 
-**Exit criteria:** A developer runs `skill-lab serve` (or equivalent), opens the dashboard on localhost, and navigates catalog → detail → graph → health using **only** the HTTP API (**FR-040**, **AC-004**). Milestone gate: `tests/e2e-r03.test.ts`.
+**Out of scope (R0.5 / R1.0):** `apply_approved_patch`, gated index/map regeneration writes, Git commit UI, relationship Accept → `skill-relationships.json`, dirty-tree overlap on apply.
 
-## System context
+**Exit criteria:** `skill-lab serve` → dashboard runs validation on a skill, starts an agent session (or stub in CI), receives patch/relationship proposals with citations, previews diff in workbench — all via HTTP/MCP domain services (**FR-038**, **AC-003**, **AC-006**, **AC-007** partial, **AC-008**). Milestone gate: `tests/e2e-r04.test.ts`.
+
+## Prior milestone (R0.3 — delivered)
+
+Read-only dashboard: catalog, skill detail, graph, health; environment switching; source links. Gate: `tests/e2e-r03.test.ts` (**AC-004**).
+
+## System context (R0.4 target)
 
 ```text
-┌─────────────┐     stdio      ┌──────────────────────────────────────────────┐
-│ Cursor /    │◄──────────────►│ skill-set/mcp-server (TypeScript)            │
-│ Claude MCP  │                │  mcp/          http/ (Hono)                  │
-└─────────────┘                │       \        /                             │
-                               │        domain/  (R0.1–R0.2 — delivered)      │
-┌─────────────┐     HTTP       │  SkillCatalogService                         │
-│ Browser     │◄──────────────►│  SkillGraphService                           │
-│ dashboard   │  localhost     │  SkillHealthService                          │
-│ web/ (R0.3) │  + static UI   └──────────┬───────────────────────────────────┘
-└─────────────┘                          │ read-only FS (path guard)
-                                          ▼
-                               ┌──────────────────────┐
-                               │ skills repo (Git)    │
-                               │ skill-index.json     │
-                               │ maps/skill-relationships.json │
-                               │ SKILL.md, catalogs   │
-                               └──────────────────────┘
+┌─────────────┐     stdio      ┌────────────────────────────────────────────────────────┐
+│ Cursor /    │◄──────────────►│ skill-set/mcp-server                                   │
+│ Claude MCP  │                │  mcp/ (tools + prompts)    http/ (Hono + static web/)   │
+└─────────────┘                │         \                  /                            │
+                               │          domain/ + prompts/ + ai/ + git/               │
+┌─────────────┐     HTTP       │  Catalog · Graph · Health · Validation · Proposals     │
+│ Browser     │◄──────────────►│  PromptSourceService ──► skill-set/references/*.md     │
+│ dashboard   │  localhost     │  AgentSessionRunner ──► claude CLI (-p / --bg)         │
+│ web/        │                └──────────┬───────────────────────┬──────────────────────┘
+└─────────────┘                          │ read FS (path guard)  │ spawn + MCP ingest
+                                          ▼                       ▼
+                               ┌──────────────────────┐   ┌─────────────────────────┐
+                               │ skills repo (Git)    │   │ .generated/ (ephemeral)   │
+                               │ SKILL.md, indexes    │   │ reports/, proposals/,   │
+                               │ maps, references     │   │ agent-sessions/         │
+                               └──────────────────────┘   └─────────────────────────┘
 ```
 
-Humans use the dashboard (**R0.3**) over HTTP; agents use MCP. Both adapters call the **same domain services** — **FR-038**. The browser **never** reads the skills filesystem; it only calls `/api/*` (**FR-040**).
+Humans use the dashboard over HTTP; agents use MCP (including **prompts** and **proposal tools**). Both adapters share domain services — **FR-038**. The browser never reads the skills filesystem — only `/api/*` (**FR-040**).
+
+**Proposal lifecycle (R0.4):** `PromptBundle` → `AgentSessionRunner.start` → Claude session with skill-lab MCP → `propose_skill_patch` / relationship tools → `ChangeProposalService` → HTTP poll → workbench diff preview. Apply deferred to R1.0.
 
 ## Technology choices
 
@@ -57,25 +65,47 @@ Humans use the dashboard (**R0.3**) over HTTP; agents use MCP. Both adapters cal
 | Graph rendering | **@xyflow/react** | Local + filtered graphs; pan/zoom; node cap enforced via API filters (NFR-004) |
 | API client | Thin `fetch` wrappers in `web/src/api/` | Typed against shared DTO shapes; no domain logic in React |
 
-## Repository layout (R0.3 target)
+## Repository layout (R0.4 target)
 
 ```text
 skill-set/mcp-server/
-  src/                              # backend (R0.1–R0.2 delivered)
+  src/
     config/
     domain/
       SkillCatalogService.ts
       SkillGraphService.ts
       SkillHealthService.ts
-      types.ts
+      SkillValidationService.ts     # BEN-32
+      ChangeProposalService.ts      # BEN-35
+      types.ts                      # + prompt, validation, proposal, session DTOs
+    prompts/
+      PromptSourceService.ts        # BEN-31
+      SkillReferenceSource.ts
+    ai/
+      AgentSessionRunner.ts         # port (BEN-36)
+      ClaudeAgentSessionRunner.ts
+      StubAgentSessionRunner.ts     # tests / CI
+      SkillImprovementAdvisor.ts    # BEN-35
+      RelationshipSuggestionAdvisor.ts # BEN-34
+    git/
+      GitStatusService.ts           # BEN-37 read paths
+      GitDiffService.ts
     repositories/
     mcp/
+      tools.ts                      # + lint, validate, proposals
+      prompts.ts                    # BEN-33
+      resources.ts                  # + validation latest
     http/
-      api.ts                        # + static fallback for web/dist (R0.3)
+      api.ts
+      routes/
+        validation.ts               # BEN-32
+        proposals.ts                # BEN-34–35
+        agentSessions.ts            # BEN-36
+        git.ts                      # BEN-37 read
       problemDetails.ts
       queryParams.ts
-    cli.ts                          # + serve command (R0.3)
-  web/                              # R0.3 — STORY-3-1
+    cli.ts
+  web/
     package.json
     vite.config.ts                  # proxy /api → httpPort
     index.html
@@ -83,39 +113,50 @@ skill-set/mcp-server/
       main.tsx
       App.tsx                       # shell + router
       api/
-        client.ts                   # base URL, error → Problem Details
+        client.ts
         catalog.ts
         graph.ts
         health.ts
+        validation.ts               # BEN-32
+        proposals.ts                # BEN-34–35
+        agent.ts                    # BEN-36
+        git.ts                      # BEN-37
       components/
-        SourceLink.tsx              # STORY-3-6 — FR-042
-        EnvironmentSwitcher.tsx     # FR-041
-        Layout.tsx                  # Sidebar + TopBar shell
-        Sidebar.tsx
-        TopBar.tsx
-        SkillDetailPanel.tsx
-        SkillDetailContent.tsx
-      styles/                       # tokens, shell, page CSS (sl-*)
-      context/
-        EnvironmentContext.tsx
-        DetailPanelSlotContext.tsx
-        NavHealthContext.tsx
+        SourceLink.tsx
+        CitationChip.tsx            # BEN-31/32/37 — FR-042
+        EnvironmentSwitcher.tsx
+        Layout.tsx, Sidebar.tsx, TopBar.tsx
+        SkillDetailPanel.tsx, SkillDetailContent.tsx
+        ValidationScorecard.tsx     # BEN-32
+        PromptActions.tsx             # BEN-33
+        ProposalList.tsx            # BEN-37
+        ProposalDetail.tsx
+        ProposalDiffViewer.tsx
+        ProposalToolbar.tsx
+        RelationshipProposalCard.tsx  # BEN-34
+        AgentSessionStrip.tsx         # BEN-37
+        SettingsAiStrip.tsx           # BEN-36
       routes/
-        CatalogPage.tsx             # STORY-3-2
-        SkillDetailPage.tsx         # STORY-3-3
-        GraphPage.tsx               # STORY-3-4
-        HealthPage.tsx              # STORY-3-5
-        ProposalsPage.tsx           # R0.4 sketch (read-only)
-      hooks/                        # presentation-only (filters, pagination UI state)
-  schemas/                          # unchanged; UI consumes same JSON shapes
+        CatalogPage.tsx, SkillDetailPage.tsx, GraphPage.tsx, HealthPage.tsx
+        ProposalsPage.tsx             # BEN-37 workbench (enabled)
+      hooks/
+  schemas/
+    lint-report.schema.json
+    validation-report.schema.json
+    patch-proposal.schema.json
+    relationship-proposal.schema.json
+    agent-session.schema.json
   docs/
     architecture.md
     graph-query-contract.md
-    ui-api-compatibility.md         # STORY-3-6 — versioning + client rules
+    ui-api-compatibility.md         # + R0.4 endpoints
   tests/
-    e2e-r01.test.ts
-    e2e-r02.test.ts
-    e2e-r03.test.ts                 # R0.3 milestone gate
+    e2e-r01.test.ts … e2e-r03.test.ts
+    e2e-r04.test.ts                 # R0.4 milestone gate
+    prompt-source.test.ts
+    validation.test.ts
+    proposals.test.ts
+    agent-session.test.ts
 ```
 
 ## Configuration
@@ -348,9 +389,204 @@ Artifact: `docs/ui-api-compatibility.md`
 | 4 Multi-repo | Single `skillsRoot` |
 | 6 Write tools | Absent/disabled until `writesEnabled` |
 
-## R0.4+ (out of scope for R0.3)
+## R0.4 — Validation, Source Prompts & AI Proposals (EPIC-4)
 
-- Validation scorecards, AI proposals, `PromptSourceService` (EPIC-4).
-- Routes: `/api/validation/*`, `/api/proposals/*` — same domain pattern when added.
-- Gated writes, Git review UI (EPIC-5).
-- Populate **Proposals** nav when proposal endpoints exist.
+Linear milestone: [R0.4](https://linear.app/ben-van-den-bergh/project/skill-lab-987d87409e04/overview#milestone-3fb872a1-eb37-474e-be38-38dde65ab96a). Backlog SSOT: Linear BEN-31–BEN-37 (`tracker-index.md`). Spec: `spec/skill-lab-mcp-control-plane.md` § Source Prompt and Reference Reuse Model.
+
+### ADR: Agent sessions and proposal shapes
+
+| Decision | Choice |
+|----------|--------|
+| Inference | **Claude Code** (`claude` CLI): headless `-p` or background `--bg`; subscription via `claude auth` — Skill Lab does **not** require `ANTHROPIC_API_KEY` |
+| Orchestration | `AgentSessionRunner` spawns sessions with **skill-lab MCP**; proposals ingested via `propose_skill_patch` / `suggest_relationship_edges` / `detect_trigger_conflicts` |
+| Skill proposals | `PatchProposal`: `fileChanges[]` + `patchToken` + `citations[]` + unified diff metadata — default scope `SKILL.md` / `references/skill-escalation.md` |
+| Relationship proposals | `RelationshipProposal` / `TriggerConflictReport` — structured edges, **not** skill Git diff |
+| MCP prompts | **Session input** from `PromptSourceService` — deliverables remain MCP tool outputs |
+| Dashboard | **Session shell** (auth, runtime, status, log tail, attach) — **no** embedded chat |
+| Generated paths | `{skillsRoot}/.generated/reports/{env}/{skill}/`, `agent-sessions/{id}/`, `proposals/` (or in-memory tokens in dev) |
+| Tests | `StubAgentSessionRunner` returns fixture proposals without calling `claude` |
+
+### PromptSourceService (BEN-31)
+
+**Bounded context:** Governance / prompt sources — system of record = Git under `skillSetRoot` and per-skill trees.
+
+| Source | Path pattern |
+|--------|----------------|
+| Skill-set lifecycle | `skill-set/SKILL.md`, `references/*.md`, `assets/*.md` |
+| Target skill | `{skillRoot}/SKILL.md`, `references/`, `scripts/`, `assets/` metadata |
+
+**API:** `loadPromptSource(ref)`, `buildPromptBundle(templateId, context)`, `resolveCitations(refs)`.
+
+**Types (Zod in `domain/types.ts`):**
+
+| Type | Fields (summary) |
+|------|------------------|
+| `PromptSourceRef` | `relativePath`, `sectionHeading?` |
+| `LoadedPromptSection` | `ref`, `content`, `heading?` |
+| `SourceCitation` | `sourcePath`, `heading?`, `quote?` |
+| `PromptBundle` | `templateId`, `sections[]`, `sourceRefs[]`, `assembledPrompt` |
+
+**Consumers:** `SkillValidationService`, `AgentSessionRunner` task builders, `mcp/prompts.ts`, advisors (citations only).
+
+**No-go:** Hardcoded lifecycle rubrics in TypeScript or React; second prompt registry.
+
+### SkillValidationService (BEN-32)
+
+Distinct from **catalog health** (`SkillHealthService`).
+
+| Operation | MCP tool | Behavior |
+|-----------|----------|----------|
+| Structural lint | `lint_skill` | Deterministic checks from `references/lint.md` rules (no LLM) |
+| Content validate | `validate_skill` | Rubric from `validate.md` + `effectiveness-assessment.md`; optional agent session for deep pass |
+| Persist report | — | `.generated/reports/{environmentId}/{skillName}/{reportId}.json` when `writesEnabled` + `persist: true` |
+
+**Types:** `LintReport`, `ValidationReport`, `ValidationDimensionScore`, `ValidationFinding`.
+
+**HTTP:**
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/validation/:environmentId/:skillName` | POST | Run lint and/or validate (`mode`: `lint` \| `validate` \| `both`) |
+| `/api/validation/:environmentId/:skillName/latest` | GET | Latest persisted report |
+| `/api/validation/:environmentId/:skillName/compare` | GET | `?beforeId=&afterId=` — dimension deltas (**US-014**) |
+
+**Resource:** `skill-lab://validation/{environmentId}/{skillName}/latest`
+
+### MCP prompts (BEN-33)
+
+Registered in `mcp/prompts.ts`; bodies from `PromptSourceService` only.
+
+| Prompt name | Source refs (typical) |
+|-------------|----------------------|
+| `skill-lab/improve-skill-description` | `optimize.md`, `authoring-guide.md` |
+| `skill-lab/create-skill-escalation` | `authoring-guide.md`, skill `SKILL.md` |
+| `skill-lab/validate-skill-effectiveness` | `validate.md`, `effectiveness-assessment.md` |
+| `skill-lab/suggest-relationships` | `synthesize.md`, relationship map context |
+| `skill-lab/analyze-trigger-conflicts` | catalog triggers + `lint.md` |
+| `skill-lab/synthesize-new-skill` | `synthesize.md`, `authoring-guide.md` |
+
+**UI:** `PromptActions.tsx` on skill detail — **Copy prompt** only; no in-browser agent execution.
+
+### AgentSessionRunner (BEN-36)
+
+**Port** (`src/ai/AgentSessionRunner.ts`):
+
+```ts
+checkAuth(): Promise<AgentAuthStatus>
+start(request: AgentTaskRequest): Promise<AgentSession>
+getStatus(sessionId: string): Promise<AgentSessionStatus>
+cancel?(sessionId: string): Promise<void>
+```
+
+| Field | Values |
+|-------|--------|
+| `runtime` | `claude-headless` \| `claude-background` \| `stub` (tests) |
+| `kind` | `improve-skill`, `create-escalation`, `validate-skill`, `suggest-relationships`, `analyze-trigger-conflicts`, `skill-patch`, … |
+| `target` | `environmentId`, `skillName`, optional `promptTemplateId` |
+
+**Artifacts:** `.generated/agent-sessions/{id}/manifest.json`, `log.txt` (secrets redacted — **NFR-010**).
+
+**HTTP:**
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/agent/auth` | GET | Proxy `claude auth status` |
+| `/api/agent-sessions` | POST | Start session |
+| `/api/agent-sessions/:id` | GET | Status, `proposalIds`, log tail |
+| `/api/agent-sessions/:id` | DELETE | Cancel (`claude stop` when applicable) |
+
+### ChangeProposalService + advisors (BEN-34, BEN-35)
+
+**ChangeProposalService:** in-memory map + optional `.generated/proposals/{patchToken}.json`; issues tokens; serves GET by token.
+
+| Advisor | Session kind | MCP ingest | Output |
+|---------|--------------|------------|--------|
+| `RelationshipSuggestionAdvisor` | `suggest-relationships` | `suggest_relationship_edges` | `RelationshipProposal[]` |
+| `RelationshipSuggestionAdvisor` | `analyze-trigger-conflicts` | `detect_trigger_conflicts` | `TriggerConflictReport` |
+| `SkillImprovementAdvisor` | `improve-skill`, `create-escalation`, `skill-patch` | `propose_skill_patch` | `PatchProposal` |
+
+**Validation rules:**
+
+- Relationship edges require `evidence.quote` + `evidence.sourceFile`; reject otherwise.
+- Patch proposals require non-empty `fileChanges[]` unless `kind: prompt-export`.
+- **No** writes to `skill-relationships.json` or skill files in R0.4.
+
+**HTTP:**
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/proposals/skill-patch` | POST | Start or return `PatchProposal` (may delegate to agent session) |
+| `/api/proposals/relationships` | POST | Relationship + trigger conflict proposals |
+| `/api/proposals/:patchToken` | GET | Fetch stored proposal |
+| `/api/git/status` | GET | Repo status for workbench context |
+| `/api/git/diff` | GET | `?patchToken=` unified diff preview (**FR-032**) |
+
+### Proposal workbench UI (BEN-37)
+
+| Route | View |
+|-------|------|
+| `/proposals` | List + detail; tabs **Patches** \| **Relationships** |
+| `/proposals?patch={token}` | Deep link to patch detail + diff pane |
+
+**Components:** two-column layout — `ProposalList` | `ProposalDetail` + `ProposalDiffViewer`; `AgentSessionStrip` for active session; Apply disabled (`title="R1.0"`); Export/Ignore via `sessionStorage` until server persistence.
+
+**Skill detail actions:** Improve description, Draft escalation → start session → toast → navigate `?patch=`. **Health:** Suggest fix → same flow.
+
+### Shared DTOs (R0.4 additions)
+
+All Zod-validated; JSON Schema mirrors under `schemas/`; MCP `structuredContent` === HTTP JSON (**NFR-011**).
+
+| DTO | Use |
+|-----|-----|
+| `PatchProposal`, `ProposedFileChange`, `PatchToken` | Workbench, `propose_skill_patch` |
+| `RelationshipProposal`, `SuggestedEdge`, `EvidenceQuote` | Graph proposals tab |
+| `TriggerConflict`, `TriggerConflictReport` | Overlap analysis |
+| `AgentSession`, `AgentAuthStatus`, `AgentTaskRequest` | Session shell |
+| `LintReport`, `ValidationReport` | Skill detail validation section |
+
+### MCP tools (R0.4 additions)
+
+| Tool | Writes? |
+|------|---------|
+| `lint_skill` | No |
+| `validate_skill` | Optional report file when gated |
+| `suggest_relationship_edges` | No |
+| `detect_trigger_conflicts` | No |
+| `propose_skill_patch` | No (stores proposal token only) |
+
+### Process bootstrap (R0.4)
+
+```text
+cli.ts
+  mcp    → … + PromptSourceService + Validation + ChangeProposal + register prompts
+  http   → createApi({ catalog, graph, health, validation, proposals, agent, git })
+  serve  → same + static web/
+```
+
+`loadConfig` unchanged; `writesEnabled` gates report persistence and future apply.
+
+### NFR gates (R0.4)
+
+| NFR | Target |
+|-----|--------|
+| NFR-012 | All lifecycle rubrics loaded via `PromptSourceService`; AC-003 E2E asserts no duplicate registry strings in `src/` |
+| NFR-010 | Agent logs redact env secrets; auth status never returns tokens |
+| NFR-007 | Apply tools absent/disabled; proposal routes do not mutate Git skill files |
+| NFR-002 | Lint path stays &lt;5s; validate-without-LLM ditto |
+
+### Story dependency chain (implementation order)
+
+```text
+BEN-31 (PromptSourceService)
+  ├── BEN-36 (AgentSessionRunner + auth)
+  ├── BEN-32 (Validation)
+  └── BEN-33 (MCP prompts)
+BEN-36 + BEN-31
+  ├── BEN-34 (Relationship proposals)
+  └── BEN-35 (Skill patch proposals)
+BEN-34 + BEN-35 + BEN-36 + BEN-32 + BEN-33 → BEN-37 (Workbench + session shell)
+```
+
+## R0.5+ (out of scope for R0.4)
+
+- Gated writes, `apply_approved_patch`, Git review UI, relationship Accept → map file (EPIC-5 / R1.0).

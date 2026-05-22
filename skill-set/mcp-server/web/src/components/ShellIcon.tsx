@@ -20,7 +20,8 @@ export type ShellIconName =
   | "warning"
   | "info"
   | "check"
-  | "sparkle";
+  | "sparkle"
+  | "copy";
 
 const paths: Record<ShellIconName, ReactNode> = {
   catalog: (
@@ -132,6 +133,12 @@ const paths: Record<ShellIconName, ReactNode> = {
   check: <polyline points="5 12 10 17 19 7" />,
   sparkle: (
     <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8 -5.2L5 10l5.2 -1.8z" />
+  ),
+  copy: (
+    <>
+      <rect x="9" y="9" width="11" height="11" rx="1.5" />
+      <path d="M6 15H5a2 2 0 0 1 -2 -2V5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v1" />
+    </>
   ),
 };
 

@@ -1,9 +1,11 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { AgentSessionProvider } from "../context/AgentSessionContext";
 import { useNavHealth } from "../context/NavHealthContext";
 import {
   DetailPanelSlotProvider,
   useDetailPanelSlot,
 } from "../context/DetailPanelSlotContext";
+import { AgentSessionGlobal } from "./AgentSessionGlobal";
 import { SkillDetailPanel } from "./SkillDetailPanel";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
@@ -90,6 +92,9 @@ function LayoutShell({ children }: { children: ReactNode }) {
       <Sidebar healthCounts={counts} />
       <div className="sl-workspace">
         <TopBar />
+        <div className="sl-agent-global-slot">
+          <AgentSessionGlobal />
+        </div>
         <MainWithDetailPanel>{children}</MainWithDetailPanel>
       </div>
     </div>
@@ -98,8 +103,10 @@ function LayoutShell({ children }: { children: ReactNode }) {
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <DetailPanelSlotProvider>
-      <LayoutShell>{children}</LayoutShell>
-    </DetailPanelSlotProvider>
+    <AgentSessionProvider>
+      <DetailPanelSlotProvider>
+        <LayoutShell>{children}</LayoutShell>
+      </DetailPanelSlotProvider>
+    </AgentSessionProvider>
   );
 }

@@ -1,4 +1,94 @@
-import type { HealthFinding, HealthSeverity } from "../api/health";
+import type {
+  CatalogHealthSummary,
+  HealthFinding,
+  HealthSeverity,
+} from "../api/health";
+
+export function filterFindingsByEnvironment(
+  findings: HealthFinding[],
+  environmentId: string,
+): HealthFinding[] {
+  if (!environmentId) return findings;
+  return findings.filter(
+    (f) => !f.environmentId || f.environmentId === environmentId,
+  );
+}
+
+/** Health page copy — Info tier is scanner severity, not agent proposals (US-026, FR-047). */
+export const INFO_TIER_LABEL = "Info";
+export const INFO_TIER_SUMMARY_NOTE = "Non-blocking scanner notices";
+export const INFO_TIER_EMPTY_HINT = "No info-tier findings from scanner";
+
+export function shouldShowInfoSummaryCard(infoCount: number): boolean {
+  return infoCount > 0;
+}
+
+export function summarizeFindings(
+  findings: HealthFinding[],
+): CatalogHealthSummary {
+  const summary: CatalogHealthSummary = {
+    info: 0,
+    warning: 0,
+    error: 0,
+    total: 0,
+  };
+  for (const f of findings) {
+    summary[f.severity] += 1;
+    summary.total += 1;
+  }
+  return summary;
+}
+
+/** Aligns with `HEALTH_FINDING_CATEGORIES` in SkillHealthService. */
+export const HEALTH_CATEGORY_CODES = [
+  "environment",
+  "index",
+  "staleness",
+  "relationships",
+  "escalation",
+  "references",
+] as const;
+
+export type HealthCategoryCode = (typeof HEALTH_CATEGORY_CODES)[number];
+
+export interface HealthCategoryMeta {
+  label: string;
+  description: string;
+}
+
+export const HEALTH_CATEGORY_META: Record<HealthCategoryCode, HealthCategoryMeta> =
+  {
+    environment: {
+      label: "Environment",
+      description: "Resolvable paths and environment map entries",
+    },
+    index: {
+      label: "Skill index",
+      description: "Index counts vs embedded totals",
+    },
+    staleness: {
+      label: "Staleness",
+      description: "Generated timestamps vs file modification time",
+    },
+    relationships: {
+      label: "Relationships",
+      description: "Unknown or external relationship endpoints",
+    },
+    escalation: {
+      label: "Escalation",
+      description: "Missing skill-escalation reference artifacts",
+    },
+    references: {
+      label: "References",
+      description: "Broken paths linked from SKILL.md",
+    },
+  };
+
+export function getHealthCategoryMeta(code: string): HealthCategoryMeta {
+  const known = HEALTH_CATEGORY_META[code as HealthCategoryCode];
+  if (known) return known;
+  return { label: code, description: "" };
+}
 
 const SEVERITY_ORDER: Record<HealthSeverity, number> = {
   error: 0,
@@ -40,6 +130,23 @@ export function formatScannedAt(iso: string): string {
   }
 }
 
+/** UI hint threshold — results may not reflect current catalog state. */
+export const HEALTH_STALE_AFTER_MS = 5 * 60 * 1000;
+
+export function healthStalenessMessage(
+  scannedAt: string,
+  staleAfterMs: number = HEALTH_STALE_AFTER_MS,
+): string | null {
+  try {
+    const ageMs = Date.now() - new Date(scannedAt).getTime();
+    if (ageMs < staleAfterMs) return null;
+    const relative = relativeScannedAt(scannedAt);
+    return `Results may be outdated (last scanned ${relative}). Run Rescan for current findings.`;
+  } catch {
+    return null;
+  }
+}
+
 export function relativeScannedAt(iso: string): string {
   try {
     const diff = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -70,6 +177,28 @@ export interface CategoryAggregate {
   error: number;
   warning: number;
   info: number;
+}
+
+/** Screen-reader summary for category severity bars (not color-only). */
+export function formatCategorySeveritySummary(
+  counts: CategoryAggregate,
+): string {
+  const parts: string[] = [];
+  if (counts.error > 0) {
+    parts.push(`${counts.error} error${counts.error === 1 ? "" : "s"}`);
+  }
+  if (counts.warning > 0) {
+    parts.push(
+      `${counts.warning} warning${counts.warning === 1 ? "" : "s"}`,
+    );
+  }
+  if (counts.info > 0) {
+    parts.push(`${counts.info} info`);
+  }
+  if (parts.length === 0) {
+    return `${counts.total} finding${counts.total === 1 ? "" : "s"}`;
+  }
+  return parts.join(", ");
 }
 
 export function aggregateByCategory(

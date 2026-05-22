@@ -1,6 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useEnvironment } from "../context/EnvironmentContext";
 import { useNavHealth } from "../context/NavHealthContext";
+import type { AgentSessionKind } from "../api/agent";
+import { useAgentSession } from "../context/AgentSessionContext";
+import { resolveHealthRemediation } from "../lib/healthRemediation";
+import { skillNameFromSourcePath } from "../lib/skillFromPath";
 import {
+  applyHealthUrlUpdates,
+  parseHealthUrlParams,
+} from "../lib/healthUrlParams";
+import {
+  fetchHealthLatest,
   fetchHealthReport,
   type CatalogHealthReport,
   type HealthFinding,
@@ -8,77 +19,196 @@ import {
 } from "../api/health";
 import { ApiError } from "../api/client";
 import { SourceLink } from "../components/SourceLink";
-import { EmptyState, MonoPath, PageHeader } from "../components/ShellPrimitives";
+import { EmptyState, PageHeader } from "../components/ShellPrimitives";
 import { ShellIcon, StatusDot } from "../components/ShellIcon";
 import {
   aggregateByCategory,
   distinctCategories,
+  filterFindingsByEnvironment,
   filterFindingsWithSearch,
+  formatCategorySeveritySummary,
+  formatScannedAt,
+  getHealthCategoryMeta,
+  healthStalenessMessage,
+  INFO_TIER_EMPTY_HINT,
+  INFO_TIER_LABEL,
+  INFO_TIER_SUMMARY_NOTE,
   relativeScannedAt,
+  shouldShowInfoSummaryCard,
   sortFindings,
+  summarizeFindings,
 } from "../lib/healthView";
 
+const SLOW_SCAN_MS = 300;
+
+function healthErrorMessage(err: unknown): string {
+  return err instanceof ApiError
+    ? (err.problem.detail ?? err.problem.title)
+    : err instanceof Error
+      ? err.message
+      : "Health scan failed";
+}
+
 export function HealthPage() {
-  const { setCounts: setNavHealthCounts } = useNavHealth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { environmentId } = useEnvironment();
+  const { setScanCounts: setNavHealthCounts } = useNavHealth();
+  const {
+    sessionId,
+    busy: sessionStarting,
+    authLoading,
+    start: startSession,
+  } = useAgentSession();
+  const sessionBusy =
+    sessionStarting || authLoading || Boolean(sessionId);
   const [report, setReport] = useState<CatalogHealthReport | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [slowScan, setSlowScan] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [severityFilter, setSeverityFilter] = useState<HealthSeverity | "">("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [search, setSearch] = useState("");
+  const urlFilters = useMemo(
+    () => parseHealthUrlParams(searchParams),
+    [searchParams],
+  );
+  const [severityFilter, setSeverityFilter] = useState<HealthSeverity | "">(
+    () => urlFilters.severity,
+  );
+  const [categoryFilter, setCategoryFilter] = useState(() => urlFilters.category);
+  const [search, setSearch] = useState(() => urlFilters.q);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const bootstrapDone = useRef(false);
+
+  useEffect(() => {
+    setSeverityFilter(urlFilters.severity);
+    setCategoryFilter(urlFilters.category);
+    setSearch(urlFilters.q);
+  }, [urlFilters.severity, urlFilters.category, urlFilters.q]);
+
+  const updateHealthParams = useCallback(
+    (updates: Parameters<typeof applyHealthUrlUpdates>[1]) => {
+      setSearchParams(
+        (prev) => applyHealthUrlUpdates(prev, updates),
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearSlowTimer = useCallback(() => {
+    if (slowTimerRef.current) {
+      clearTimeout(slowTimerRef.current);
+      slowTimerRef.current = null;
+    }
+    setSlowScan(false);
+  }, []);
 
   const runScan = useCallback(async () => {
     setLoading(true);
     setError(null);
+    clearSlowTimer();
+    slowTimerRef.current = setTimeout(() => setSlowScan(true), SLOW_SCAN_MS);
     try {
       const result = await fetchHealthReport();
       setReport(result);
     } catch (err) {
-      const message =
-        err instanceof ApiError
-          ? (err.problem.detail ?? err.problem.title)
-          : err instanceof Error
-            ? err.message
-            : "Health scan failed";
-      setError(message);
-      setReport(null);
+      setError(healthErrorMessage(err));
+    } finally {
+      clearSlowTimer();
+      setLoading(false);
+    }
+  }, [clearSlowTimer]);
+
+  const loadLatest = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setReport(await fetchHealthLatest());
+    } catch (err) {
+      setError(healthErrorMessage(err));
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const summary = report?.summary ?? {
-    error: 0,
-    warning: 0,
-    info: 0,
-    total: 0,
-  };
+  useEffect(() => {
+    if (bootstrapDone.current) return;
+    bootstrapDone.current = true;
+    let cancelled = false;
+
+    void (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const cached = await fetchHealthLatest();
+        if (cancelled) return;
+        setReport(cached);
+      } catch (err) {
+        if (cancelled) return;
+        setError(healthErrorMessage(err));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      clearSlowTimer();
+    };
+  }, [clearSlowTimer]);
+
+  const scopedFindings = useMemo(() => {
+    if (!report) return [];
+    return filterFindingsByEnvironment(report.findings, environmentId);
+  }, [report, environmentId]);
+
+  const summary = useMemo(
+    () =>
+      report
+        ? summarizeFindings(scopedFindings)
+        : { error: 0, warning: 0, info: 0, total: 0 },
+    [report, scopedFindings],
+  );
+
+  const isCatalogHealthy =
+    Boolean(report) && summary.error === 0 && summary.warning === 0;
+
+  const showSkeleton = loading && slowScan;
+  const showReportBody = Boolean(report) && !showSkeleton;
 
   useEffect(() => {
-    if (!report) return;
+    if (!report) {
+      setNavHealthCounts(null);
+      return;
+    }
     setNavHealthCounts({
-      error: report.summary.error,
-      warning: report.summary.warning,
+      error: summary.error,
+      warning: summary.warning,
     });
-  }, [report, setNavHealthCounts]);
+  }, [report, summary.error, summary.warning, setNavHealthCounts]);
+
+  const showInfoSummary = shouldShowInfoSummaryCard(summary.info);
+
+  useEffect(() => {
+    if (!report || severityFilter !== "info" || summary.info > 0) return;
+    setSeverityFilter("");
+    updateHealthParams({ severity: "" });
+  }, [report, severityFilter, summary.info, updateHealthParams]);
 
   const categories = useMemo(
-    () => (report ? distinctCategories(report.findings) : []),
-    [report],
+    () => distinctCategories(scopedFindings),
+    [scopedFindings],
   );
 
   const visibleFindings = useMemo(() => {
-    if (!report) return [];
     return sortFindings(
       filterFindingsWithSearch(
-        report.findings,
+        scopedFindings,
         severityFilter,
         categoryFilter,
         search,
       ),
     );
-  }, [report, severityFilter, categoryFilter, search]);
+  }, [scopedFindings, severityFilter, categoryFilter, search]);
 
   const byCategory = useMemo(
     () => aggregateByCategory(visibleFindings),
@@ -86,8 +216,12 @@ export function HealthPage() {
   );
 
   const toggleSeverity = (severity: HealthSeverity | "") => {
-    setSeverityFilter((current) => (current === severity ? "" : severity));
+    const next = severityFilter === severity ? "" : severity;
+    setSeverityFilter(next);
+    updateHealthParams({ severity: next });
   };
+
+  const stalenessHint = report ? healthStalenessMessage(report.scannedAt) : null;
 
   return (
     <div className="sl-health">
@@ -98,10 +232,10 @@ export function HealthPage() {
         right={
           <div className="sl-page-header-actions">
             {report && (
-              <span className="sl-scan-meta">
-                Scanned {relativeScannedAt(report.scannedAt)} · {report.durationMs}
-                ms
-              </span>
+              <ScannedAtMeta
+                scannedAt={report.scannedAt}
+                durationMs={report.durationMs}
+              />
             )}
             <button
               type="button"
@@ -126,13 +260,58 @@ export function HealthPage() {
 
       {error && (
         <div className="sl-health-error" role="alert">
-          {error}
+          <p>{error}</p>
+          <button
+            type="button"
+            className="sl-btn sl-btn-ghost"
+            onClick={() => void (report ? runScan() : loadLatest())}
+            disabled={loading}
+          >
+            Try again
+          </button>
         </div>
       )}
 
-      {report && (
+      {stalenessHint && !error && (
+        <p className="sl-health-stale-hint" role="status">
+          {stalenessHint}
+        </p>
+      )}
+
+      {isCatalogHealthy && report && (
+        <div className="sl-health-healthy" role="status">
+          <span className="sl-health-healthy-icon" aria-hidden>
+            <ShellIcon name="check" size={20} />
+          </span>
+          <div className="sl-health-healthy-text">
+            <strong>Catalog healthy</strong>
+            <p>
+              No errors or warnings in the latest scan.{" "}
+              <ScannedAtMeta
+                scannedAt={report.scannedAt}
+                durationMs={report.durationMs}
+                inline
+              />
+            </p>
+          </div>
+          <button
+            type="button"
+            className="sl-btn sl-btn-ghost"
+            onClick={() => void runScan()}
+            disabled={loading}
+          >
+            Rescan
+          </button>
+        </div>
+      )}
+
+      {showSkeleton && <HealthScanSkeleton />}
+
+      {showReportBody && report && (
         <>
-          <div className="sl-health-summary">
+          <div
+            className={`sl-health-summary ${showInfoSummary ? "" : "sl-health-summary-no-info"}`}
+          >
             <SummaryCard
               tone="error"
               label="Errors"
@@ -149,14 +328,16 @@ export function HealthPage() {
               active={severityFilter === "warning"}
               onClick={() => toggleSeverity("warning")}
             />
-            <SummaryCard
-              tone="info"
-              label="Suggestions"
-              count={summary.info}
-              note="Polish & metadata"
-              active={severityFilter === "info"}
-              onClick={() => toggleSeverity("info")}
-            />
+            {showInfoSummary ? (
+              <SummaryCard
+                tone="info"
+                label={INFO_TIER_LABEL}
+                count={summary.info}
+                note={INFO_TIER_SUMMARY_NOTE}
+                active={severityFilter === "info"}
+                onClick={() => toggleSeverity("info")}
+              />
+            ) : null}
             <SummaryCard
               tone="ok"
               label="Total"
@@ -166,6 +347,11 @@ export function HealthPage() {
               onClick={() => toggleSeverity("")}
             />
           </div>
+          {!showInfoSummary ? (
+            <p className="sl-health-info-hint" role="status">
+              {INFO_TIER_EMPTY_HINT}
+            </p>
+          ) : null}
 
           <div className="sl-health-cols">
             <section className="sl-health-main">
@@ -176,22 +362,11 @@ export function HealthPage() {
                     type="search"
                     placeholder="Search findings…"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      updateHealthParams({ q: e.target.value });
+                    }}
                   />
-                </div>
-                <div className="sl-filter-chips">
-                  {(["error", "warning", "info"] as const).map((sev) => (
-                    <button
-                      key={sev}
-                      type="button"
-                      className={`sl-chip sl-chip-${sev} ${severityFilter === sev ? "is-active" : ""}`}
-                      onClick={() => toggleSeverity(sev)}
-                    >
-                      <StatusDot status={sev === "info" ? "ok" : sev} />
-                      {sev}
-                      <span className="sl-chip-count">{summary[sev]}</span>
-                    </button>
-                  ))}
                 </div>
                 <span className="sl-result-count">
                   {visibleFindings.length} of {summary.total}
@@ -200,8 +375,16 @@ export function HealthPage() {
 
               {visibleFindings.length === 0 ? (
                 <EmptyState
-                  title="No findings match the current filters."
-                  body="Adjust filters or search to inspect a specific category."
+                  title={
+                    severityFilter === "info" && summary.info === 0
+                      ? INFO_TIER_EMPTY_HINT
+                      : "No findings match the current filters."
+                  }
+                  body={
+                    severityFilter === "info" && summary.info === 0
+                      ? "The catalog scanner has not reported info-tier findings for this environment. Errors and warnings remain in the summary strip above."
+                      : "Adjust category, search, or severity in the summary strip to inspect findings."
+                  }
                 />
               ) : (
                 <ul className="sl-findings">
@@ -210,6 +393,17 @@ export function HealthPage() {
                       key={finding.id}
                       finding={finding}
                       expanded={expandedId === finding.id}
+                      environmentId={environmentId}
+                      sessionBusy={sessionBusy}
+                      onStartAgent={(kind, skillName, envId) =>
+                        void startSession({
+                          kind,
+                          environmentId: envId,
+                          skillName,
+                          navigateOnComplete: true,
+                          returnOrigin: { kind: "health" },
+                        })
+                      }
                       onToggle={() =>
                         setExpandedId((id) =>
                           id === finding.id ? null : finding.id,
@@ -225,16 +419,28 @@ export function HealthPage() {
               <h3 className="sl-side-title">By category</h3>
               <p className="sl-muted">Click to filter</p>
               <ul className="sl-category-list">
-                {byCategory.map(([cat, counts]) => (
+                {byCategory.map(([cat, counts]) => {
+                  const meta = getHealthCategoryMeta(cat);
+                  return (
                   <li key={cat}>
                     <button
                       type="button"
                       className={`sl-category-row ${categoryFilter === cat ? "is-active" : ""}`}
-                      onClick={() =>
-                        setCategoryFilter((c) => (c === cat ? "" : cat))
-                      }
+                      aria-pressed={categoryFilter === cat}
+                      aria-label={`${meta.label}: ${formatCategorySeveritySummary(counts)}`}
+                      onClick={() => {
+                        const next = categoryFilter === cat ? "" : cat;
+                        setCategoryFilter(next);
+                        updateHealthParams({ category: next });
+                      }}
                     >
-                      <code className="sl-category-name">{cat}</code>
+                      <div className="sl-category-text">
+                        <span className="sl-category-label">{meta.label}</span>
+                        {meta.description ? (
+                          <span className="sl-category-desc">{meta.description}</span>
+                        ) : null}
+                        <code className="sl-category-code">{cat}</code>
+                      </div>
                       <div className="sl-category-bars" aria-hidden>
                         {counts.error > 0 && (
                           <span
@@ -261,10 +467,13 @@ export function HealthPage() {
                           />
                         )}
                       </div>
-                      <span className="sl-category-count">{counts.total}</span>
+                      <span className="sl-category-count" aria-hidden>
+                        {counts.total}
+                      </span>
                     </button>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </aside>
           </div>
@@ -272,10 +481,80 @@ export function HealthPage() {
       )}
 
       {!report && !loading && !error && (
-        <p className="sl-muted">
-          Click &quot;Run scan&quot; to load catalog health findings.
-        </p>
+        <EmptyState
+          title="No health scan yet"
+          body="Run a catalog scan to list index, path, reference, and relationship findings."
+          action={
+            <button
+              type="button"
+              className="sl-btn sl-btn-primary"
+              onClick={() => void runScan()}
+            >
+              <ShellIcon name="refresh" size={14} />
+              Run scan
+            </button>
+          }
+        />
       )}
+    </div>
+  );
+}
+
+function ScannedAtMeta({
+  scannedAt,
+  durationMs,
+  inline = false,
+}: {
+  scannedAt: string;
+  durationMs: number;
+  inline?: boolean;
+}) {
+  const absolute = formatScannedAt(scannedAt);
+  const relative = relativeScannedAt(scannedAt);
+  return (
+    <span
+      className={inline ? "sl-scan-meta-inline" : "sl-scan-meta"}
+      title={absolute}
+    >
+      Scanned {relative}
+      {!inline && (
+        <>
+          {" "}
+          · {durationMs}ms
+        </>
+      )}
+    </span>
+  );
+}
+
+function HealthScanSkeleton() {
+  return (
+    <div
+      className="sl-health-skeleton"
+      aria-busy="true"
+      aria-label="Scanning catalog health"
+    >
+      <div className="sl-health-summary">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="sl-skel-card sl-skel-pulse" />
+        ))}
+      </div>
+      <div className="sl-health-cols">
+        <div className="sl-health-main">
+          <div className="sl-skel-toolbar sl-skel-pulse" />
+          <ul className="sl-skel-findings">
+            {Array.from({ length: 6 }, (_, i) => (
+              <li key={i} className="sl-skel-row sl-skel-pulse" />
+            ))}
+          </ul>
+        </div>
+        <aside className="sl-health-side">
+          <div className="sl-skel-side-title sl-skel-pulse" />
+          {Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="sl-skel-side-row sl-skel-pulse" />
+          ))}
+        </aside>
+      </div>
     </div>
   );
 }
@@ -319,35 +598,123 @@ function SummaryCard({
 function FindingRow({
   finding,
   expanded,
+  environmentId,
+  sessionBusy,
+  onStartAgent,
   onToggle,
 }: {
   finding: HealthFinding;
   expanded: boolean;
+  environmentId: string;
+  sessionBusy: boolean;
+  onStartAgent: (
+    kind: AgentSessionKind,
+    skillName: string,
+    environmentId: string,
+  ) => void;
   onToggle: () => void;
 }) {
+  const [pathCopyHint, setPathCopyHint] = useState<string | null>(null);
+  const [fixCopyHint, setFixCopyHint] = useState<string | null>(null);
+  const panelId = `finding-panel-${finding.id}`;
+  const headId = `finding-head-${finding.id}`;
+  const skillName =
+    finding.skillName ?? skillNameFromSourcePath(finding.sourcePath) ?? undefined;
+  const envId = finding.environmentId ?? environmentId;
+  const remediation = resolveHealthRemediation(
+    { ...finding, skillName, environmentId: envId },
+    environmentId,
+  );
+  const agentHintId = `${finding.id}-agent-hint`;
+  const severityLabel =
+    finding.severity === "info" ? "Info" : finding.severity;
+
+  const copySourcePath = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(finding.sourcePath);
+      setPathCopyHint("Path copied");
+    } catch {
+      setPathCopyHint("Copy failed");
+    }
+  }, [finding.sourcePath]);
+
+  const copyFixSteps = useCallback(async () => {
+    const text =
+      finding.recommendation?.trim() ||
+      finding.message ||
+      "No fix steps available for this finding.";
+    try {
+      await navigator.clipboard.writeText(text);
+      setFixCopyHint("Fix steps copied");
+    } catch {
+      setFixCopyHint("Copy failed");
+    }
+  }, [finding.message, finding.recommendation]);
+
+  useEffect(() => {
+    if (!pathCopyHint) return;
+    const t = window.setTimeout(() => setPathCopyHint(null), 2000);
+    return () => window.clearTimeout(t);
+  }, [pathCopyHint]);
+
+  useEffect(() => {
+    if (!fixCopyHint) return;
+    const t = window.setTimeout(() => setFixCopyHint(null), 2000);
+    return () => window.clearTimeout(t);
+  }, [fixCopyHint]);
+
   return (
     <li
       className={`sl-finding sl-finding-${finding.severity} ${expanded ? "is-expanded" : ""}`}
     >
-      <button type="button" className="sl-finding-head" onClick={onToggle}>
+      <button
+        type="button"
+        className="sl-finding-head"
+        id={headId}
+        aria-expanded={expanded}
+        aria-controls={panelId}
+        onClick={onToggle}
+      >
         <span className={`sl-finding-sev sl-finding-sev-${finding.severity}`}>
           <StatusDot
             status={finding.severity === "info" ? "ok" : finding.severity}
           />
-          {finding.severity}
+          {severityLabel}
         </span>
         <code className="sl-finding-cat">{finding.category}</code>
+        {finding.skillName ? (
+          <span className="sl-finding-skill">{finding.skillName}</span>
+        ) : null}
         <span className="sl-finding-msg">{finding.message}</span>
-        <ShellIcon name={expanded ? "chevronDown" : "chevron"} size={12} />
+        <span className="sl-finding-chevron" aria-hidden>
+          <ShellIcon name={expanded ? "chevronDown" : "chevron"} size={12} />
+        </span>
       </button>
       {expanded && (
-        <div className="sl-finding-body">
+        <div
+          id={panelId}
+          className="sl-finding-body"
+          role="region"
+          aria-labelledby={headId}
+        >
           <div className="sl-finding-grid">
             <div className="sl-kv">
               <div className="sl-kv-label">Source</div>
-              <div className="sl-kv-value">
-                <MonoPath path={finding.sourcePath} maxLen={64} />
-                <SourceLink sourcePath={finding.sourcePath} />
+              <div className="sl-kv-value sl-finding-source">
+                <SourceLink sourcePath={finding.sourcePath} showFullPath />
+                <button
+                  type="button"
+                  className="sl-btn sl-btn-ghost sl-btn-sm"
+                  onClick={() => void copySourcePath()}
+                >
+                  <ShellIcon name="copy" size={14} />
+                  Copy path
+                </button>
+                {pathCopyHint ? (
+                  <span className="sl-finding-copy-hint" role="status">
+                    {pathCopyHint}
+                  </span>
+                ) : null}
               </div>
             </div>
             <div className="sl-kv">
@@ -355,14 +722,92 @@ function FindingRow({
               <div className="sl-kv-value">{finding.recommendation ?? "—"}</div>
             </div>
           </div>
-          <div className="sl-finding-actions">
-            <SourceLink sourcePath={finding.sourcePath} />
-            <button type="button" className="sl-btn sl-btn-ghost" disabled>
-              Suggest fix (R0.4)
-            </button>
-          </div>
+          <FindingRemediationActions
+            remediation={remediation}
+            sessionBusy={sessionBusy}
+            agentHintId={agentHintId}
+            onCopyFixSteps={() => void copyFixSteps()}
+            onStartAgent={(kind) => {
+              if (skillName && envId) onStartAgent(kind, skillName, envId);
+            }}
+          />
+          {fixCopyHint ? (
+            <p className="sl-finding-copy-hint sl-finding-action-hint" role="status">
+              {fixCopyHint}
+            </p>
+          ) : null}
         </div>
       )}
     </li>
+  );
+}
+
+function FindingRemediationActions({
+  remediation,
+  sessionBusy,
+  agentHintId,
+  onCopyFixSteps,
+  onStartAgent,
+}: {
+  remediation: ReturnType<typeof resolveHealthRemediation>;
+  sessionBusy: boolean;
+  agentHintId: string;
+  onCopyFixSteps: () => void;
+  onStartAgent: (kind: AgentSessionKind) => void;
+}) {
+  const { primary, agentDisabledReason } = remediation;
+
+  if (primary.mode === "none") {
+    return null;
+  }
+
+  if (primary.mode === "manual") {
+    return (
+      <div className="sl-finding-actions">
+        <button
+          type="button"
+          className="sl-btn sl-btn-ghost"
+          onClick={onCopyFixSteps}
+        >
+          <ShellIcon name="copy" size={14} />
+          {primary.label}
+        </button>
+      </div>
+    );
+  }
+
+  const agentDisabled = Boolean(agentDisabledReason) || sessionBusy;
+
+  return (
+    <div className="sl-finding-actions">
+      <button
+        type="button"
+        className="sl-btn sl-btn-ghost"
+        disabled={agentDisabled}
+        aria-busy={sessionBusy}
+        aria-describedby={agentDisabledReason ? agentHintId : undefined}
+        onClick={() => onStartAgent(primary.kind)}
+      >
+        <ShellIcon name="sparkle" size={14} />
+        {sessionBusy ? "Starting…" : primary.label}
+      </button>
+      {agentDisabledReason ? (
+        <p
+          id={agentHintId}
+          className="sl-finding-action-hint"
+          role="note"
+        >
+          {agentDisabledReason}
+        </p>
+      ) : null}
+      <button
+        type="button"
+        className="sl-btn sl-btn-ghost sl-btn-sm"
+        onClick={onCopyFixSteps}
+      >
+        <ShellIcon name="copy" size={14} />
+        Copy fix steps
+      </button>
+    </div>
   );
 }

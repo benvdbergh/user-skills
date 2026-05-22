@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useLocation } from "react-router-dom";
 
 export interface NavHealthCounts {
   error: number;
@@ -14,23 +15,54 @@ export interface NavHealthCounts {
 
 const defaultCounts: NavHealthCounts = { error: 0, warning: 0 };
 
+/**
+ * Sidebar health pip precedence:
+ * 1. On `/health` with a loaded scan report → scan summary (error/warning from POST /api/health).
+ * 2. Otherwise → catalog per-row index health aggregates (updated when Catalog loads).
+ *
+ * Catalog and Health each publish to separate slots; effective `counts` picks the winner above.
+ */
 const NavHealthContext = createContext<{
   counts: NavHealthCounts;
-  setCounts: (counts: NavHealthCounts) => void;
+  setCatalogCounts: (counts: NavHealthCounts) => void;
+  setScanCounts: (counts: NavHealthCounts | null) => void;
 } | null>(null);
 
 export function NavHealthProvider({ children }: { children: ReactNode }) {
-  const [counts, setCountsState] = useState<NavHealthCounts>(defaultCounts);
+  const location = useLocation();
+  const [catalogCounts, setCatalogCountsState] =
+    useState<NavHealthCounts>(defaultCounts);
+  const [scanCounts, setScanCountsState] = useState<NavHealthCounts | null>(
+    null,
+  );
 
-  const setCounts = useCallback((next: NavHealthCounts) => {
-    setCountsState((prev) =>
+  const setCatalogCounts = useCallback((next: NavHealthCounts) => {
+    setCatalogCountsState((prev) =>
       prev.error === next.error && prev.warning === next.warning ? prev : next,
     );
   }, []);
 
+  const setScanCounts = useCallback((next: NavHealthCounts | null) => {
+    setScanCountsState((prev) => {
+      if (next === null) return null;
+      if (
+        prev &&
+        prev.error === next.error &&
+        prev.warning === next.warning
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }, []);
+
+  const onHealthRoute = location.pathname.startsWith("/health");
+  const counts =
+    onHealthRoute && scanCounts !== null ? scanCounts : catalogCounts;
+
   const value = useMemo(
-    () => ({ counts, setCounts }),
-    [counts, setCounts],
+    () => ({ counts, setCatalogCounts, setScanCounts }),
+    [counts, setCatalogCounts, setScanCounts],
   );
 
   return (
@@ -40,7 +72,8 @@ export function NavHealthProvider({ children }: { children: ReactNode }) {
 
 export function useNavHealth(): {
   counts: NavHealthCounts;
-  setCounts: (counts: NavHealthCounts) => void;
+  setCatalogCounts: (counts: NavHealthCounts) => void;
+  setScanCounts: (counts: NavHealthCounts | null) => void;
 } {
   const ctx = useContext(NavHealthContext);
   if (!ctx) {

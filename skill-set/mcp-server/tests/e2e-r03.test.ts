@@ -107,8 +107,8 @@ describe("R0.3 milestone E2E", () => {
   });
 
   it("HTTP API remains available for dashboard consumers (FR-040)", async () => {
-    const { catalog, graph, health } = services();
-    const app = createApi({ catalog, graph, health });
+    const { config, catalog, graph, health } = services();
+    const app = createApi({ config, catalog, graph, health });
 
     const envRes = await app.request("/api/environments");
     expect(envRes.status).toBe(200);

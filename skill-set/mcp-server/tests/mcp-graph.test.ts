@@ -52,6 +52,7 @@ describe("MCP graph and health adapters (STORY-2-3)", () => {
       "skill-lab://relationships",
       "skill-lab://graph",
       "skill-lab://health/latest",
+      "skill-lab://validation/{environmentId}/{skillName}/latest",
     ]);
   });
 

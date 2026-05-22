@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/relationship-proposal.json",
+  "title": "RelationshipProposal",
+  "type": "object",
+  "required": [
+    "patchToken",
+    "kind",
+    "environmentId",
+    "edges",
+    "createdAt"
+  ],
+  "properties": {
+    "patchToken": { "type": "string" },
+    "kind": { "const": "relationship-suggestion" },
+    "sessionId": { "type": "string" },
+    "environmentId": { "type": "string" },
+    "skillName": { "type": "string" },
+    "edges": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/suggestedEdge" }
+    },
+    "rejectedEdges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["edge", "reason"],
+        "properties": {
+          "edge": { "$ref": "#/$defs/suggestedEdgeInput" },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "evidenceQuote": {
+      "type": "object",
+      "required": ["sourceFile", "quote"],
+      "properties": {
+        "sourceFile": { "type": "string", "minLength": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "suggestedEdge": {
+      "type": "object",
+      "required": [
+        "fromSkill",
+        "toSkill",
+        "relationshipType",
+        "confidence",
+        "evidence"
+      ],
+      "properties": {
+        "fromSkill": { "type": "string" },
+        "toSkill": { "type": "string" },
+        "relationshipType": { "type": "string" },
+        "candidateAgentGraphEdgeType": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "mappingIsApproximate": { "type": "boolean" },
+        "rationale": { "type": "string" },
+        "evidence": { "$ref": "#/$defs/evidenceQuote" }
+      },
+      "additionalProperties": false
+    },
+    "suggestedEdgeInput": {
+      "type": "object",
+      "required": [
+        "fromSkill",
+        "toSkill",
+        "relationshipType",
+        "confidence"
+      ],
+      "properties": {
+        "fromSkill": { "type": "string" },
+        "toSkill": { "type": "string" },
+        "relationshipType": { "type": "string" },
+        "candidateAgentGraphEdgeType": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "mappingIsApproximate": { "type": "boolean" },
+        "rationale": { "type": "string" },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "sourceFile": { "type": "string" },
+            "quote": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "triggerConflictReport": {
+      "type": "object",
+      "required": [
+        "patchToken",
+        "kind",
+        "conflicts",
+        "scannedSkillCount",
+        "createdAt"
+      ],
+      "properties": {
+        "patchToken": { "type": "string" },
+        "kind": { "const": "trigger-conflict-report" },
+        "sessionId": { "type": "string" },
+        "environmentId": { "type": "string" },
+        "conflicts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/triggerConflict" }
+        },
+        "scannedSkillCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "triggerConflict": {
+      "type": "object",
+      "required": ["triggerPhrase", "skillNames", "rationale", "severity"],
+      "properties": {
+        "triggerPhrase": { "type": "string" },
+        "skillNames": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rationale": { "type": "string" },
+        "severity": { "enum": ["warning", "error"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

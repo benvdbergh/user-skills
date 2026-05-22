@@ -2,10 +2,22 @@ import fs from "node:fs";
 import path from "node:path";
 import { Hono } from "hono";
 import { z } from "zod";
+import type { SkillLabConfig } from "../config/loadConfig.js";
 import { PathAccessError } from "../config/pathGuard.js";
+import type { AgentSessionRunner } from "../ai/AgentSessionRunner.js";
 import type { SkillCatalogService } from "../domain/SkillCatalogService.js";
 import type { SkillGraphService } from "../domain/SkillGraphService.js";
 import type { SkillHealthService } from "../domain/SkillHealthService.js";
+import type { SkillValidationService } from "../domain/SkillValidationService.js";
+import type { PromptSourceService } from "../prompts/PromptSourceService.js";
+import type { RelationshipMapRepository } from "../repositories/RelationshipMapRepository.js";
+import { registerAgentSessionRoutes } from "./routes/agentSessions.js";
+import { registerPromptRoutes } from "./routes/prompts.js";
+import {
+  registerProposalRoutes,
+  type ProposalRouteDeps,
+} from "./routes/proposals.js";
+import { registerValidationRoutes } from "./routes/validation.js";
 import {
   EnvironmentSchema,
   GraphFilterSchema,
@@ -14,6 +26,7 @@ import {
   SkillSummarySchema,
 } from "../domain/types.js";
 import {
+  buildCatalogHealthLatestPayload,
   buildCatalogHealthPayload,
   buildGraphNeighborsPayload,
   buildSkillGraphPayload,
@@ -32,9 +45,15 @@ import {
 } from "./problemDetails.js";
 
 export interface ApiServices {
+  config: SkillLabConfig;
   catalog: SkillCatalogService;
   graph: SkillGraphService;
   health: SkillHealthService;
+  validation?: SkillValidationService;
+  agent?: AgentSessionRunner;
+  prompts?: PromptSourceService;
+  relationshipMap?: RelationshipMapRepository;
+  proposals?: ProposalRouteDeps;
 }
 
 export interface CreateApiOptions {
@@ -142,7 +161,17 @@ export function createApi(
   services: ApiServices,
   options?: CreateApiOptions,
 ): Hono {
-  const { catalog, graph, health } = services;
+  const {
+    config,
+    catalog,
+    graph,
+    health,
+    validation,
+    agent,
+    prompts,
+    relationshipMap,
+    proposals: proposalDeps,
+  } = services;
   const app = new Hono();
 
   app.onError((err, c) => {
@@ -223,10 +252,38 @@ export function createApi(
     }
   });
 
+  app.get("/api/health/latest", (c) => {
+    const report = buildCatalogHealthLatestPayload(health);
+    if (!report) {
+      return notFoundProblem(
+        c,
+        "No catalog health scan has been run yet",
+        c.req.path,
+      );
+    }
+    return c.json({ report });
+  });
+
   app.post("/api/health", async (c) => {
     const report = buildCatalogHealthPayload(health);
     return c.json({ report });
   });
+
+  if (validation) {
+    registerValidationRoutes(app, validation);
+  }
+
+  if (agent) {
+    registerAgentSessionRoutes(app, agent);
+  }
+
+  if (prompts && relationshipMap) {
+    registerPromptRoutes(app, { config, catalog, prompts, relationshipMap });
+  }
+
+  if (proposalDeps) {
+    registerProposalRoutes(app, proposalDeps);
+  }
 
   if (options?.staticDir) {
     registerDashboardStatic(app, options.staticDir);

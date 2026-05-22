@@ -13,7 +13,7 @@ Status: **STORY-3-6** (BEN-30). Governs the Skill Lab dashboard (`web/`) and sha
 ## Client rules
 
 1. **Ignore unknown fields** — UI and agents must tolerate extra JSON properties on all DTOs (forwards-compatible reads).
-2. **No write verbs in R0.3** — Except `POST /api/health` (read-only scan). Do not call undocumented mutations.
+2. **No write verbs in R0.3** — Except `POST /api/health` (read-only scan that refreshes cache). `GET /api/health/latest` is read-only. Do not call undocumented mutations.
 3. **Query names** — Use camelCase query parameters exactly as documented in `graph-query-contract.md`.
 4. **Errors** — Expect RFC 9457 `application/problem+json`; surface `title` / `detail` only (no stack traces).
 
@@ -75,7 +75,8 @@ Until then, keep `web/` colocated under `skill-set/mcp-server/web/` per architec
 | `/api/graph` | GET | Graph (global) |
 | `/api/graph/skill-relationship-counts` | GET | Catalog relationship column |
 | `/api/graph/neighbors` | GET | Graph (local), Skill detail |
-| `/api/health` | POST | Health |
+| `/api/health/latest` | GET | Health (cached last scan; 404 if none — does not rescan) |
+| `/api/health` | POST | Health (run scan; updates cache served by `/latest`) |
 | non-`/api` GET | GET | SPA static (`web/dist`) when `serve` / `staticDir` |
 
 ## Dashboard routing (skill names)

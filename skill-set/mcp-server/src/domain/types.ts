@@ -48,6 +48,8 @@ export const HealthFindingSchema = z.object({
   message: z.string(),
   sourcePath: z.string(),
   recommendation: z.string().optional(),
+  environmentId: z.string().optional(),
+  skillName: z.string().optional(),
 });
 export type HealthFinding = z.infer<typeof HealthFindingSchema>;
 
@@ -207,3 +209,337 @@ export const RelationshipMapFileSchema = z.object({
     .optional(),
 });
 export type RelationshipMapFile = z.infer<typeof RelationshipMapFileSchema>;
+
+export const PromptSourceRefSchema = z.object({
+  relativePath: z.string(),
+  sectionHeading: z.string().optional(),
+});
+export type PromptSourceRef = z.infer<typeof PromptSourceRefSchema>;
+
+export const LoadedPromptSectionSchema = z.object({
+  ref: PromptSourceRefSchema,
+  content: z.string(),
+  heading: z.string().optional(),
+});
+export type LoadedPromptSection = z.infer<typeof LoadedPromptSectionSchema>;
+
+export const SourceCitationSchema = z.object({
+  sourcePath: z.string(),
+  heading: z.string().optional(),
+  quote: z.string().optional(),
+});
+export type SourceCitation = z.infer<typeof SourceCitationSchema>;
+
+export const PromptBundleSchema = z.object({
+  templateId: z.string(),
+  sections: z.array(LoadedPromptSectionSchema),
+  sourceRefs: z.array(PromptSourceRefSchema),
+  assembledPrompt: z.string(),
+});
+export type PromptBundle = z.infer<typeof PromptBundleSchema>;
+
+export const PromptBundleContextSchema = z.object({
+  environmentId: z.string().optional(),
+  skillName: z.string().optional(),
+  /** SKILL.md path relative to environment skills root (e.g. demo-skill/SKILL.md). */
+  skillMdRelativePath: z.string().optional(),
+  /** Injected catalog trigger lines for analyze-trigger-conflicts. */
+  triggerCatalogText: z.string().optional(),
+  /** Optional relationship map excerpt for suggest-relationships. */
+  relationshipMapText: z.string().optional(),
+});
+export type PromptBundleContext = z.infer<typeof PromptBundleContextSchema>;
+
+export const AgentRuntimeSchema = z.enum([
+  "claude-headless",
+  "claude-background",
+  "stub",
+]);
+export type AgentRuntime = z.infer<typeof AgentRuntimeSchema>;
+
+export const AgentSessionKindSchema = z.enum([
+  "improve-skill",
+  "create-escalation",
+  "validate-skill",
+  "suggest-relationships",
+  "analyze-trigger-conflicts",
+  "skill-patch",
+]);
+export type AgentSessionKind = z.infer<typeof AgentSessionKindSchema>;
+
+export const AgentAuthStatusSchema = z.object({
+  authenticated: z.boolean(),
+  provider: z.enum(["claude", "none"]),
+  message: z.string().optional(),
+});
+export type AgentAuthStatus = z.infer<typeof AgentAuthStatusSchema>;
+
+export const AgentTaskRequestSchema = z.object({
+  runtime: AgentRuntimeSchema.optional(),
+  kind: AgentSessionKindSchema,
+  environmentId: z.string(),
+  skillName: z.string(),
+  promptTemplateId: z.string().optional(),
+});
+export type AgentTaskRequest = z.infer<typeof AgentTaskRequestSchema>;
+
+export const AgentSessionStatusValueSchema = z.enum([
+  "pending",
+  "running",
+  "completed",
+  "failed",
+  "cancelled",
+]);
+export type AgentSessionStatusValue = z.infer<
+  typeof AgentSessionStatusValueSchema
+>;
+
+export const AgentSessionSchema = z.object({
+  id: z.string(),
+  status: AgentSessionStatusValueSchema,
+  runtime: AgentRuntimeSchema,
+  kind: AgentSessionKindSchema,
+  environmentId: z.string(),
+  skillName: z.string(),
+  promptTemplateId: z.string().optional(),
+  startedAt: z.string(),
+  completedAt: z.string().optional(),
+  proposalIds: z.array(z.string()).optional(),
+  error: z.string().optional(),
+});
+export type AgentSession = z.infer<typeof AgentSessionSchema>;
+
+export const AgentSessionStatusSchema = AgentSessionSchema.extend({
+  logTail: z.string().optional(),
+  artifactDir: z.string().optional(),
+  resumeShellCommand: z.string().optional(),
+});
+export type AgentSessionStatus = z.infer<typeof AgentSessionStatusSchema>;
+
+export const ProposedFileChangeSchema = z.object({
+  relativePath: z.string(),
+  unifiedDiff: z.string().optional(),
+  suggestedContent: z.string().optional(),
+});
+export type ProposedFileChange = z.infer<typeof ProposedFileChangeSchema>;
+
+export const PatchProposalSchema = z.object({
+  patchToken: z.string(),
+  kind: z.string(),
+  sessionId: z.string().optional(),
+  environmentId: z.string(),
+  skillName: z.string(),
+  rationale: z.string(),
+  fileChanges: z.array(ProposedFileChangeSchema),
+  citations: z.array(SourceCitationSchema),
+  createdAt: z.string(),
+});
+export type PatchProposal = z.infer<typeof PatchProposalSchema>;
+
+export const ProposeSkillPatchInputSchema = z.object({
+  environmentId: z.string(),
+  skillName: z.string(),
+  kind: z.string().optional(),
+  sessionId: z.string().optional(),
+  rationale: z.string().min(1),
+  fileChanges: z.array(ProposedFileChangeSchema),
+  citations: z.array(SourceCitationSchema).min(1),
+  patchToken: z.string().optional(),
+});
+export type ProposeSkillPatchInput = z.infer<
+  typeof ProposeSkillPatchInputSchema
+>;
+
+export const EvidenceQuoteSchema = z.object({
+  sourceFile: z.string().min(1),
+  quote: z.string().min(1),
+});
+export type EvidenceQuote = z.infer<typeof EvidenceQuoteSchema>;
+
+export const SuggestedEdgeInputSchema = z.object({
+  fromSkill: z.string().min(1),
+  toSkill: z.string().min(1),
+  relationshipType: z.string().min(1),
+  candidateAgentGraphEdgeType: z.string().optional(),
+  confidence: z.number().min(0).max(1),
+  mappingIsApproximate: z.boolean().optional(),
+  rationale: z.string().optional(),
+  evidence: z
+    .object({
+      sourceFile: z.string().optional(),
+      quote: z.string().optional(),
+    })
+    .optional(),
+});
+export type SuggestedEdgeInput = z.infer<typeof SuggestedEdgeInputSchema>;
+
+export const SuggestedEdgeSchema = z.object({
+  fromSkill: z.string().min(1),
+  toSkill: z.string().min(1),
+  relationshipType: z.string().min(1),
+  candidateAgentGraphEdgeType: z.string().optional(),
+  confidence: z.number().min(0).max(1),
+  mappingIsApproximate: z.boolean().optional(),
+  rationale: z.string().optional(),
+  evidence: EvidenceQuoteSchema,
+});
+export type SuggestedEdge = z.infer<typeof SuggestedEdgeSchema>;
+
+export const RelationshipProposalSchema = z.object({
+  patchToken: z.string(),
+  kind: z.literal("relationship-suggestion"),
+  sessionId: z.string().optional(),
+  environmentId: z.string(),
+  skillName: z.string().optional(),
+  edges: z.array(SuggestedEdgeSchema),
+  rejectedEdges: z
+    .array(
+      z.object({
+        edge: SuggestedEdgeInputSchema,
+        reason: z.string(),
+      }),
+    )
+    .optional(),
+  createdAt: z.string(),
+});
+export type RelationshipProposal = z.infer<typeof RelationshipProposalSchema>;
+
+export const TriggerConflictSchema = z.object({
+  triggerPhrase: z.string(),
+  skillNames: z.array(z.string()),
+  rationale: z.string(),
+  severity: z.enum(["warning", "error"]),
+});
+export type TriggerConflict = z.infer<typeof TriggerConflictSchema>;
+
+export const TriggerConflictReportSchema = z.object({
+  patchToken: z.string(),
+  kind: z.literal("trigger-conflict-report"),
+  sessionId: z.string().optional(),
+  environmentId: z.string().optional(),
+  conflicts: z.array(TriggerConflictSchema),
+  scannedSkillCount: z.number().int().nonnegative(),
+  createdAt: z.string(),
+});
+export type TriggerConflictReport = z.infer<typeof TriggerConflictReportSchema>;
+
+export const StoredProposalSchema = z.discriminatedUnion("proposalKind", [
+  z.object({
+    proposalKind: z.literal("patch"),
+    proposal: PatchProposalSchema,
+  }),
+  z.object({
+    proposalKind: z.literal("relationship"),
+    proposal: RelationshipProposalSchema,
+  }),
+  z.object({
+    proposalKind: z.literal("trigger-conflicts"),
+    proposal: TriggerConflictReportSchema,
+  }),
+]);
+export type StoredProposal = z.infer<typeof StoredProposalSchema>;
+
+export const ValidationSeveritySchema = z.enum([
+  "critical",
+  "error",
+  "warning",
+  "info",
+]);
+export type ValidationSeverity = z.infer<typeof ValidationSeveritySchema>;
+
+export const ValidationFindingSchema = z.object({
+  id: z.string(),
+  severity: ValidationSeveritySchema,
+  category: z.string(),
+  message: z.string(),
+  recommendation: z.string().optional(),
+  ruleId: z.string().optional(),
+});
+export type ValidationFinding = z.infer<typeof ValidationFindingSchema>;
+
+export const LintCategorySummarySchema = z.object({
+  category: z.string(),
+  passed: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+});
+export type LintCategorySummary = z.infer<typeof LintCategorySummarySchema>;
+
+export const LintReportSchema = z.object({
+  reportId: z.string(),
+  environmentId: z.string(),
+  skillName: z.string(),
+  sourcePath: z.string(),
+  scoredAt: z.string(),
+  score: z.number().min(0).max(100),
+  complianceLevel: z.string(),
+  categories: z.array(LintCategorySummarySchema),
+  findings: z.array(ValidationFindingSchema),
+  recommendedFixes: z.array(z.string()),
+  persisted: z.boolean().optional(),
+});
+export type LintReport = z.infer<typeof LintReportSchema>;
+
+export const ValidationDimensionScoreSchema = z.object({
+  dimension: z.string(),
+  label: z.string(),
+  score: z.number().min(0).max(100),
+  weight: z.number(),
+  summary: z.string(),
+});
+export type ValidationDimensionScore = z.infer<
+  typeof ValidationDimensionScoreSchema
+>;
+
+export const ValidationReportSchema = z.object({
+  reportId: z.string(),
+  environmentId: z.string(),
+  skillName: z.string(),
+  sourcePath: z.string(),
+  scoredAt: z.string(),
+  score: z.number().min(0).max(100),
+  effectivenessLevel: z.string(),
+  jobStatement: z.string().optional(),
+  skillNecessity: z.string().optional(),
+  dimensions: z.array(ValidationDimensionScoreSchema),
+  findings: z.array(ValidationFindingSchema),
+  blockingRemediations: z.array(z.string()),
+  recommendations: z.array(z.string()),
+  rubricTemplateId: z.string(),
+  rubricCitations: z.array(SourceCitationSchema),
+  deepValidateSessionId: z.string().optional(),
+  persisted: z.boolean().optional(),
+});
+export type ValidationReport = z.infer<typeof ValidationReportSchema>;
+
+export const ValidationDimensionDeltaSchema = z.object({
+  dimension: z.string(),
+  label: z.string(),
+  before: z.number(),
+  after: z.number(),
+  delta: z.number(),
+});
+export type ValidationDimensionDelta = z.infer<
+  typeof ValidationDimensionDeltaSchema
+>;
+
+export const ValidationCompareResultSchema = z.object({
+  environmentId: z.string(),
+  skillName: z.string(),
+  beforeId: z.string(),
+  afterId: z.string(),
+  dimensionDeltas: z.array(ValidationDimensionDeltaSchema),
+});
+export type ValidationCompareResult = z.infer<
+  typeof ValidationCompareResultSchema
+>;
+
+export const PersistedValidationEnvelopeSchema = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({ kind: z.literal("lint"), report: LintReportSchema }),
+    z.object({ kind: z.literal("validation"), report: ValidationReportSchema }),
+  ],
+);
+export type PersistedValidationEnvelope = z.infer<
+  typeof PersistedValidationEnvelopeSchema
+>;

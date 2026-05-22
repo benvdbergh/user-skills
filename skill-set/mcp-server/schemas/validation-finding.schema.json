@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/validation-finding.json",
+  "title": "ValidationFinding",
+  "type": "object",
+  "required": ["id", "severity", "category", "message"],
+  "properties": {
+    "id": { "type": "string" },
+    "severity": {
+      "enum": ["critical", "error", "warning", "info"]
+    },
+    "category": { "type": "string" },
+    "message": { "type": "string" },
+    "recommendation": { "type": "string" },
+    "ruleId": { "type": "string" }
+  },
+  "additionalProperties": false
+}

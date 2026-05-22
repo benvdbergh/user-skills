@@ -39,6 +39,25 @@ describe("SkillHealthService", () => {
     }
   });
 
+  it("getLatest returns null before scan and cached report after (NFR-002)", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "skill-lab-health-cache-"));
+    tempDirs.push(root);
+    copyFixtureTree(root);
+    fs.rmSync(path.join(root, ".generated", "health"), {
+      recursive: true,
+      force: true,
+    });
+    const health = loadHealthFromRoot(root);
+    expect(health.getLatest()).toBeNull();
+
+    const report = health.scan();
+    const latest = health.getLatest();
+    expect(latest).not.toBeNull();
+    expect(latest?.scannedAt).toBe(report.scannedAt);
+    expect(latest?.summary).toEqual(report.summary);
+    expect(health.getLatest()).toBe(latest);
+  });
+
   it("returns CatalogHealthReport with findings and summary (FR-016–020)", () => {
     const health = loadHealthFromRoot(FIXTURE_ROOT);
     const report = health.scan();

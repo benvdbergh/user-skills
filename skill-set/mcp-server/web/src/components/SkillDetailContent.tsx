@@ -10,6 +10,9 @@ import { fetchGraphNeighbors, type SkillGraphResult } from "../api/graph";
 import { ApiError } from "../api/client";
 import { Badge } from "./ShellPrimitives";
 import { StatusDot } from "./ShellIcon";
+import { AgentSkillActions } from "./AgentSkillActions";
+import { PromptActions } from "./PromptActions";
+import { ValidationScorecard } from "./ValidationScorecard";
 import { SourceLink } from "./SourceLink";
 import {
   neighborLabel,
@@ -132,6 +135,21 @@ export function SkillDetailContent({
           {JSON.stringify(skill.metadata, null, 2)}
         </pre>
       )}
+
+      <AgentSkillActions
+        environmentId={environmentId}
+        skillName={skillName}
+      />
+
+      <ValidationScorecard
+        environmentId={environmentId}
+        skillName={skillName}
+      />
+
+      <PromptActions
+        environmentId={environmentId}
+        skillName={skillName}
+      />
 
       <DetailSection title="Triggers" count={skill.triggers.length}>
         {skill.triggers.length === 0 ? (

@@ -91,6 +91,30 @@
   gap: 20px;
 }
 
+.sl-prompt-actions .sl-prompt-action-grid,
+.sl-agent-actions .sl-prompt-action-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sl-prompt-action-btn {
+  font-size: 12px;
+}
+
+.sl-prompt-status {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.sl-prompt-status-ok {
+  color: var(--ok);
+}
+
+.sl-prompt-status-error {
+  color: var(--error);
+}
+
 .sl-detail-loading,
 .sl-muted {
   margin: 0;

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { catalogHealthLatestPath } from "../ai/generatedPaths.js";
 import type { SkillLabConfig } from "../config/loadConfig.js";
 import { resolvePathInfo, toPosixPath } from "../config/pathModel.js";
 import { RelationshipMapRepository } from "../repositories/RelationshipMapRepository.js";
@@ -16,6 +17,18 @@ import type {
 import { CatalogHealthReportSchema } from "./types.js";
 
 const STALE_SKEW_MS = 1_000;
+
+/** Stable finding category codes emitted by scan() — mirrored in web healthView metadata. */
+export const HEALTH_FINDING_CATEGORIES = [
+  "environment",
+  "index",
+  "staleness",
+  "relationships",
+  "escalation",
+  "references",
+] as const;
+
+export type HealthFindingCategory = (typeof HEALTH_FINDING_CATEGORIES)[number];
 
 const DEFAULT_EXTERNAL_ENDPOINT_PATTERNS = [
   /^[a-z0-9][a-z0-9-]*-mcp(-server)?$/i,
@@ -50,6 +63,7 @@ function summarize(findings: HealthFinding[]) {
 export class SkillHealthService {
   private readonly mapRepo: RelationshipMapRepository;
   private readonly indexRepo: SkillIndexRepository;
+  private latest: CatalogHealthReport | null = null;
 
   constructor(
     private readonly config: SkillLabConfig,
@@ -59,6 +73,12 @@ export class SkillHealthService {
   ) {
     this.mapRepo = mapRepo ?? new RelationshipMapRepository(config);
     this.indexRepo = indexRepo ?? new SkillIndexRepository(config);
+    this.latest = this.loadPersistedLatest();
+  }
+
+  /** Last scan result without re-running checks (NFR-002). */
+  getLatest(): CatalogHealthReport | null {
+    return this.latest;
   }
 
   scan(): CatalogHealthReport {
@@ -89,7 +109,26 @@ export class SkillHealthService {
       durationMs: Date.now() - started,
       summary: summarize(findings),
     });
+    this.latest = report;
+    this.persistLatest(report);
     return report;
+  }
+
+  private loadPersistedLatest(): CatalogHealthReport | null {
+    const filePath = catalogHealthLatestPath(this.config.skillsRoot);
+    if (!fs.existsSync(filePath)) return null;
+    try {
+      const raw = JSON.parse(fs.readFileSync(filePath, "utf8")) as unknown;
+      return CatalogHealthReportSchema.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  private persistLatest(report: CatalogHealthReport): void {
+    const filePath = catalogHealthLatestPath(this.config.skillsRoot);
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify(report, null, 2), "utf8");
   }
 
   private collectKnownSkillNames(
@@ -168,6 +207,7 @@ export class SkillHealthService {
         category: "index",
         message: mismatches.join("; ") + ".",
         sourcePath,
+        environmentId,
         recommendation:
           "Regenerate skill-index.json with skill-set/scripts/update_skill_index.py.",
       });
@@ -246,6 +286,8 @@ export class SkillHealthService {
         category: "escalation",
         message: `Skill "${skill.name}" is missing references/skill-escalation.md.`,
         sourcePath,
+        environmentId: skill.environmentId,
+        skillName: skill.name,
         recommendation:
           "Add references/skill-escalation.md per skill-set boundary standard.",
       });
@@ -258,6 +300,8 @@ export class SkillHealthService {
         category: "references",
         message: `Skill "${skill.name}" references missing file ${missing}.`,
         sourcePath,
+        environmentId: skill.environmentId,
+        skillName: skill.name,
         recommendation: `Create ${missing} or remove the reference from SKILL.md.`,
       });
     }

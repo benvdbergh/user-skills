@@ -82,8 +82,8 @@ describe("R0.2 milestone E2E", () => {
   });
 
   it("NFR-011: HTTP graph and health match MCP adapter payloads", async () => {
-    const { catalog, graph, health } = services();
-    const app = createApi({ catalog, graph, health });
+    const { config, catalog, graph, health } = services();
+    const app = createApi({ config, catalog, graph, health });
 
     const graphExpected = buildSkillGraphPayload(graph, { limit: 50 });
     const graphRes = await app.request("/api/graph?limit=50");

@@ -10,7 +10,9 @@
     "category": { "type": "string" },
     "message": { "type": "string" },
     "sourcePath": { "type": "string" },
-    "recommendation": { "type": "string" }
+    "recommendation": { "type": "string" },
+    "environmentId": { "type": "string" },
+    "skillName": { "type": "string" }
   },
   "additionalProperties": false
 }

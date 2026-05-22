@@ -77,6 +77,11 @@
   box-shadow: inset 0 2px 0 var(--error);
 }
 
+a.sl-stat-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .sl-table-wrap {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);

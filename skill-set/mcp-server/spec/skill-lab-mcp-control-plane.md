@@ -6,7 +6,7 @@ project: user-skills-repository
 version: 0.1.0
 status: draft
 created: 2026-05-18
-updated: 2026-05-18
+updated: 2026-05-22
 owner: skill-set
 scale_profile: growth
 ---
@@ -259,6 +259,28 @@ Needs project-specific skill inventory, wrappers, and impact analysis without ed
 - **US-018**: As the repository owner, I can ask AI to detect overlapping skills and propose scope changes so that duplication is managed.
 - **US-019**: As the repository owner, I can review AI-generated patches as Git diffs before accepting them so that the repository remains controlled.
 
+### Remediation, advisor sessions, and proposals (dashboard UX)
+
+These stories describe the end-to-end journey from **health findings** → **advisor action** → **agent session** → **proposal workbench**. They complement **US-015–US-019** with explicit UX and wiring requirements. Terminology is normative:
+
+| Term | Meaning | Not the same as |
+|------|---------|-----------------|
+| **Info** (severity) | Optional polish tier in health scan (`severity: info`) | AI “suggestions” in Proposals |
+| **Recommendation** | Deterministic text on a `HealthFinding` (e.g. run a script) | AI rationale on a `PatchProposal` |
+| **Suggest fix** | Start an **agent session** from a finding or skill context | Apply patch (gated **R1.0**) |
+| **Proposal** | Stored `PatchProposal`, `RelationshipProposal`, or `TriggerConflictReport` token | Health finding row |
+
+- **US-025**: As the repository owner, I can tell **errors**, **warnings**, and **info** findings apart on the Health page so that I triage blockers before optional polish.
+- **US-026**: As the repository owner, when the health scanner emits no **info** findings, I see that the Info tier is unused (hidden or explained) so that I do not hunt for a non-existent “Suggestions” bucket.
+- **US-027**: As the repository owner, each health finding exposes the right **next step**: deterministic recommendation (script/regenerate), **Suggest fix** (agent), or **open source** only—so I am not offered “improve description” for index or relationship-map issues.
+- **US-028**: As the repository owner, **Suggest fix** starts an agent session whose **kind** matches the finding (e.g. `create-escalation` for missing escalation, `suggest-relationships` for relationship endpoints when scoped to a skill, `improve-skill` only for skill-content issues) so that the resulting proposal is relevant.
+- **US-029**: As the repository owner, I see **one** agent session progress surface across Health, skill detail, and Proposals so that navigation does not lose session state, toasts, or completion handling.
+- **US-030**: As the repository owner, when an agent session completes with proposal token(s), I land on **Proposals** with the new item selected, a clear success message, and a way to return to the originating skill or health finding so that the loop feels finished.
+- **US-031**: As the repository owner, I can **cancel** a running session, **dismiss** the session strip without cancelling, and still find completed proposals in the workbench so that long-running Claude jobs do not trap the UI.
+- **US-032**: As the repository owner, the Proposals workbench lists proposals from **server storage and this browser session**, loads detail and diff reliably, and separates **Patches** vs **Relationships** (and trigger-conflict reports) so that I can review the right artifact type.
+- **US-033**: As the repository owner, before starting an advisor action I see **agent auth and runtime** status (sidebar) and get a clear error if the CLI is not ready so that failed sessions are not mysterious.
+- **US-034**: As the repository owner, on skill detail I can start **Improve description** or **Draft escalation** with the same session → proposal → workbench flow as Health **Suggest fix** so that advisor entry points behave consistently.
+
 ### MCP agent access
 
 - **US-020**: As an agent, I can call `list_skills` to retrieve skill summaries without parsing the repository manually.
@@ -337,6 +359,12 @@ Needs project-specific skill inventory, wrappers, and impact analysis without ed
 - **FR-040**: The dashboard shall call the shared backend API rather than parsing files directly in the browser.
 - **FR-041**: The dashboard shall allow switching between user-level and project-level environments.
 - **FR-042**: The dashboard shall show source file links for every displayed catalog or graph fact.
+- **FR-043**: The dashboard shall map health finding **category** (and optional `skillName`) to a documented remediation action: deterministic (recommendation only), agent session kind, or neither.
+- **FR-044**: Agent session UI state (active `sessionId`, terminal handler, user-visible status/toast) shall be shared across dashboard routes that start sessions—not reinstantiated per page without sync.
+- **FR-045**: Completing an agent session with `proposalIds` shall register tokens server-side and in the workbench list, select the primary token in the URL (`/proposals?patch=`), and surface errors when proposal fetch fails.
+- **FR-046**: Dismissing the session strip shall not imply session cancellation; **Cancel** shall call `DELETE /api/agent-sessions/:id`.
+- **FR-047**: The health scanner may emit `info` severity findings; until it does, the dashboard shall not imply an “AI suggestions” queue on the Health page Info filter.
+- **FR-048**: **Suggest fix** actions shall be disabled with an inline reason when `skillName` and/or `environmentId` are missing for the chosen agent kind.
 
 ## Non-Functional Requirements
 
@@ -455,6 +483,10 @@ The API should return stable domain DTOs shared with MCP response schemas where 
 - Missing escalation files.
 - Broken file references.
 - Script contract issues where detectable.
+- Severity filters: **error**, **warning**, **info** (see **US-025**, **US-026**); category sidebar with human labels.
+- Bootstrap: show `GET /api/health/latest` when present; **Run scan** / **Rescan** runs `POST /api/health`.
+- Expanded finding: source link, recommendation, **Suggest fix** when remediation map allows ( **US-027**, **US-028** ).
+- Staleness hint when cached scan is older than threshold (catalog may have changed).
 
 ### Proposal workbench
 
@@ -463,6 +495,50 @@ The API should return stable domain DTOs shared with MCP response schemas where 
 - Proposed file changes.
 - Diff preview.
 - Apply/ignore/export options.
+- Tabs: **Patches** | **Relationships** (plus trigger-conflict reports in list filtering).
+- Token list: merge `GET /api/proposals` with browser `sessionStorage` registry (**US-032**).
+- Deep link: `/proposals?patch={token}`.
+- **Apply** disabled until gated writes (**NFR-007**, **R1.0**); **Export JSON** and **Ignore** available.
+- Active agent session strip when a session was started from this page (**US-029**); completion navigates to selected proposal (**US-030**).
+
+### Advisor journey (normative flow)
+
+```text
+Health finding | Skill detail advisor
+        │
+        ▼
+  [Suggest fix | Improve description | Draft escalation | …]
+        │  POST /api/agent-sessions { kind, environmentId, skillName, runtime }
+        ▼
+  AgentSessionStrip (poll GET …/status until terminal)
+        │  completed + proposalIds[]
+        ▼
+  Proposals workbench (?patch=token) → diff preview → export | ignore | (apply later)
+        │
+        └── optional: return to skill detail or health finding context
+```
+
+**Remediation map (initial — extend in `healthRemediation.ts` or domain doc):**
+
+| Health category | Typical severity | Primary next step | Agent kind (if any) |
+|-----------------|------------------|-------------------|---------------------|
+| `environment` | error | Fix paths / config per recommendation | — |
+| `index` | warning | Run `update_skill_index.py` per recommendation | — |
+| `staleness` | warning | Regenerate artifact per recommendation | — |
+| `relationships` | warning | Fix map / patterns per recommendation | `suggest-relationships` when centered on a skill |
+| `escalation` | warning | Add escalation file | `create-escalation` |
+| `references` | warning | Create missing file or edit SKILL.md | `improve-skill` or `skill-patch` (TBD) |
+
+**Backlog (Linear, EPIC-4):** STORY-4-13 (BEN-56) → STORY-4-16/4-17; STORY-4-14 (BEN-57), STORY-4-15 (BEN-58) in parallel. See `tracker-index.md`.
+
+**Current implementation gaps (planning truth — update as fixed):**
+
+- Health **Suggest fix** always uses `improve-skill` regardless of category (**US-028** not met).
+- `SkillHealthService` does not emit `severity: info` today; Info filter is usually empty (**US-026**).
+- `useStartAgentSession` is local to each route/component; session strip and toasts do not survive route changes (**US-029**).
+- **Dismiss** on `AgentSessionStrip` clears UI only; server session may still run (**US-031**).
+- Proposals list loads every token in parallel with no global loading/error aggregate (**US-032** polish).
+- **Apply** correctly disabled; users may expect “Suggest fix” to apply changes immediately (**US-030** copy gap).
 
 ## Data Model
 
@@ -603,6 +679,13 @@ This is an explicit exception to the "one runtime per skill scripts" guidance be
 - **AC-008**: No write operation runs without explicit confirmation.
 - **AC-009**: Existing `skill-set/scripts/update_skill_index.py` and `update_relationship_map.py` remain usable.
 - **AC-010**: The implementation does not require moving or rewriting existing skills.
+- **AC-011**: Health finding expansion shows recommendation text and disables **Suggest fix** with an inline reason when agent context is missing (**US-034**, **FR-048**).
+- **AC-012**: Starting **Suggest fix** from an escalation finding uses `create-escalation` (or documented map), not `improve-skill`, when **US-028** is implemented.
+- **AC-013**: After a completed agent session, the user reaches `/proposals?patch=` with the new token visible in the list without manual refresh (**US-030**, **FR-045**).
+- **AC-014**: Navigating Health → Proposals during a session does not orphan progress: strip or toast remains until terminal or dismiss (**US-029**).
+- **AC-015**: Cancelling a session from the strip updates status to `cancelled` and does not navigate to Proposals (**US-031**).
+- **AC-016**: Proposals workbench shows patch diff via `GET /api/git/diff?patchToken=` for patch proposals (**US-019**).
+- **AC-017**: Agent auth strip shows unauthenticated state before user starts Improve description / Suggest fix (**US-033**).
 
 ## Quality Gates
 

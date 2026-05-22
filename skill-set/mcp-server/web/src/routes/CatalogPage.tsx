@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useDetailPanelSlot } from "../context/DetailPanelSlotContext";
 import { useNavHealth } from "../context/NavHealthContext";
 import { parseSkillQuery } from "../lib/skillQuery";
@@ -27,6 +27,7 @@ import {
   type CatalogFilters,
   type CatalogRow,
 } from "../lib/catalogView";
+import { buildHealthPath } from "../lib/healthUrlParams";
 
 type SortKey =
   | "name"
@@ -54,7 +55,7 @@ function catalogSearchWithoutSkill(params: URLSearchParams): string {
 export function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { setConfig, registerClosePanel } = useDetailPanelSlot();
-  const { setCounts: setNavHealthCounts } = useNavHealth();
+  const { setCatalogCounts: setNavHealthCounts } = useNavHealth();
   const { environmentId } = useEnvironment();
   const lastOpenedRowKey = useRef<string | null>(null);
   const [skills, setSkills] = useState<SkillSummary[]>([]);
@@ -337,6 +338,7 @@ export function CatalogPage() {
         healthCounts={healthCounts}
         healthFilter={filters.health}
         onHealthFilter={setHealthFilter}
+        environmentId={environmentId}
         totalRelations={totalRelations}
         alwaysOnCount={alwaysOnCount}
       />
@@ -433,6 +435,7 @@ function CatalogStats({
   healthCounts,
   healthFilter,
   onHealthFilter,
+  environmentId,
   totalRelations,
   alwaysOnCount,
 }: {
@@ -440,9 +443,11 @@ function CatalogStats({
   healthCounts: { ok: number; warning: number; error: number };
   healthFilter: string;
   onHealthFilter: (health: string) => void;
+  environmentId: string;
   totalRelations: number;
   alwaysOnCount: number;
 }) {
+  const envOpt = environmentId ? { environmentId } : {};
   return (
     <div className="sl-catalog-stats">
       <button
@@ -464,28 +469,28 @@ function CatalogStats({
         </div>
         <div className="sl-stat-label">Healthy</div>
       </button>
-      <button
-        type="button"
-        className={`sl-stat sl-stat-warn ${healthFilter === "warning" ? "is-active" : ""}`}
-        onClick={() => onHealthFilter("warning")}
+      <Link
+        to={buildHealthPath({ severity: "warning", ...envOpt })}
+        className="sl-stat sl-stat-warn sl-stat-link"
+        title="View warnings in Health"
       >
         <div className="sl-stat-value">
           <StatusDot status="warning" />
           {healthCounts.warning}
         </div>
         <div className="sl-stat-label">Warnings</div>
-      </button>
-      <button
-        type="button"
-        className={`sl-stat sl-stat-err ${healthFilter === "error" ? "is-active" : ""}`}
-        onClick={() => onHealthFilter("error")}
+      </Link>
+      <Link
+        to={buildHealthPath({ severity: "error", ...envOpt })}
+        className="sl-stat sl-stat-err sl-stat-link"
+        title="View errors in Health"
       >
         <div className="sl-stat-value">
           <StatusDot status="error" />
           {healthCounts.error}
         </div>
         <div className="sl-stat-label">Errors</div>
-      </button>
+      </Link>
       <div className="sl-stat-spacer" aria-hidden />
       <div className="sl-stat sl-stat-readonly">
         <div className="sl-stat-value">{totalRelations}</div>

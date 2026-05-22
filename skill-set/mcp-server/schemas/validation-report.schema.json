@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/validation-report.json",
+  "title": "ValidationReport",
+  "type": "object",
+  "required": [
+    "reportId",
+    "environmentId",
+    "skillName",
+    "sourcePath",
+    "scoredAt",
+    "score",
+    "effectivenessLevel",
+    "dimensions",
+    "findings",
+    "blockingRemediations",
+    "recommendations",
+    "rubricTemplateId",
+    "rubricCitations"
+  ],
+  "properties": {
+    "reportId": { "type": "string" },
+    "environmentId": { "type": "string" },
+    "skillName": { "type": "string" },
+    "sourcePath": { "type": "string" },
+    "scoredAt": { "type": "string" },
+    "score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "effectivenessLevel": { "type": "string" },
+    "jobStatement": { "type": "string" },
+    "skillNecessity": { "type": "string" },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["dimension", "label", "score", "weight", "summary"],
+        "properties": {
+          "dimension": { "type": "string" },
+          "label": { "type": "string" },
+          "score": { "type": "number", "minimum": 0, "maximum": 100 },
+          "weight": { "type": "number" },
+          "summary": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "validation-finding.schema.json" }
+    },
+    "blockingRemediations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rubricTemplateId": { "type": "string" },
+    "rubricCitations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sourcePath"],
+        "properties": {
+          "sourcePath": { "type": "string" },
+          "heading": { "type": "string" },
+          "quote": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "deepValidateSessionId": { "type": "string" },
+    "persisted": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}

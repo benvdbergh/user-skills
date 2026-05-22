@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentSession",
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "runtime",
+    "kind",
+    "environmentId",
+    "skillName",
+    "startedAt"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "status": {
+      "enum": ["pending", "running", "completed", "failed", "cancelled"]
+    },
+    "runtime": {
+      "enum": ["claude-headless", "claude-background", "stub"]
+    },
+    "kind": {
+      "enum": [
+        "improve-skill",
+        "create-escalation",
+        "validate-skill",
+        "suggest-relationships",
+        "analyze-trigger-conflicts",
+        "skill-patch"
+      ]
+    },
+    "environmentId": { "type": "string" },
+    "skillName": { "type": "string" },
+    "promptTemplateId": { "type": "string" },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "proposalIds": { "type": "array", "items": { "type": "string" } },
+    "error": { "type": "string" }
+  },
+  "additionalProperties": false
+}

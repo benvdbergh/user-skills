@@ -1,18 +1,9 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useEnvironment } from "../context/EnvironmentContext";
+import { buildHealthPath } from "../lib/healthUrlParams";
 import { EnvironmentSwitcher } from "./EnvironmentSwitcher";
+import { SettingsAiStrip } from "./SettingsAiStrip";
 import { ShellIcon, StatusDot } from "./ShellIcon";
-
-const navItems = [
-  { to: "/", label: "Catalog", icon: "catalog" as const, end: true },
-  { to: "/graph", label: "Graph", icon: "graph" as const },
-  { to: "/health", label: "Health", icon: "health" as const, showHealthPip: true },
-  {
-    to: "/proposals",
-    label: "Proposals",
-    icon: "proposals" as const,
-    badge: "R0.4",
-  },
-];
 
 export interface HealthNavCounts {
   error: number;
@@ -25,6 +16,22 @@ export function Sidebar({
   healthCounts?: HealthNavCounts;
 }) {
   const location = useLocation();
+  const { environmentId } = useEnvironment();
+  const healthNavTo = buildHealthPath(
+    environmentId ? { environmentId } : {},
+  );
+
+  const navItems = [
+    { to: "/", label: "Catalog", icon: "catalog" as const, end: true },
+    { to: "/graph", label: "Graph", icon: "graph" as const },
+    {
+      to: healthNavTo,
+      label: "Health",
+      icon: "health" as const,
+      showHealthPip: true,
+    },
+    { to: "/proposals", label: "Proposals", icon: "proposals" as const },
+  ];
 
   const isCatalogActive =
     location.pathname === "/" ||
@@ -38,7 +45,7 @@ export function Sidebar({
         </div>
         <div className="sl-brand-text">
           <div className="sl-brand-name">Skill Lab</div>
-          <div className="sl-brand-sub">Control plane · v0.3</div>
+          <div className="sl-brand-sub">Control plane · v0.4</div>
         </div>
       </div>
 
@@ -46,23 +53,6 @@ export function Sidebar({
 
       <nav className="sl-nav" aria-label="Main">
         {navItems.map((item) => {
-          if (item.disabled) {
-            return (
-              <span
-                key={item.to}
-                className="sl-nav-item is-disabled"
-                aria-disabled="true"
-                title="Planned for R0.4"
-              >
-                <ShellIcon name={item.icon} size={15} />
-                <span className="sl-nav-label">{item.label}</span>
-                {item.badge && (
-                  <span className="sl-nav-badge">{item.badge}</span>
-                )}
-              </span>
-            );
-          }
-
           const active =
             item.to === "/"
               ? isCatalogActive
@@ -77,9 +67,6 @@ export function Sidebar({
             >
               <ShellIcon name={item.icon} size={15} />
               <span className="sl-nav-label">{item.label}</span>
-              {item.badge && (
-                <span className="sl-nav-badge">{item.badge}</span>
-              )}
               {item.showHealthPip && healthCounts.error > 0 && (
                 <span className="sl-nav-pip">
                   <StatusDot status="error" />
@@ -98,6 +85,7 @@ export function Sidebar({
       </nav>
 
       <div className="sl-sidebar-foot">
+        <SettingsAiStrip />
         <div className="sl-sidebar-meta">
           <span>Indexed</span>
           <span aria-hidden>—</span>

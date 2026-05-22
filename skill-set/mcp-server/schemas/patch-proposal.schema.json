@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-lab.local/schemas/patch-proposal.json",
+  "title": "PatchProposal",
+  "type": "object",
+  "required": [
+    "patchToken",
+    "kind",
+    "environmentId",
+    "skillName",
+    "rationale",
+    "fileChanges",
+    "citations",
+    "createdAt"
+  ],
+  "properties": {
+    "patchToken": { "type": "string" },
+    "kind": { "type": "string" },
+    "sessionId": { "type": "string" },
+    "environmentId": { "type": "string" },
+    "skillName": { "type": "string" },
+    "rationale": { "type": "string" },
+    "fileChanges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["relativePath"],
+        "properties": {
+          "relativePath": { "type": "string" },
+          "unifiedDiff": { "type": "string" },
+          "suggestedContent": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["sourcePath"],
+        "properties": {
+          "sourcePath": { "type": "string" },
+          "heading": { "type": "string" },
+          "quote": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
