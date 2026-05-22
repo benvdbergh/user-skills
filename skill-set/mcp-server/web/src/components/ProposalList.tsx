@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   fetchStoredProposal,
   proposalListLabel,
@@ -25,6 +25,7 @@ function entryLoadError(err: unknown): string {
 
 export function ProposalList({
   tokens,
+  sessionId,
   selectedToken,
   tab,
   listLoading,
@@ -33,6 +34,8 @@ export function ProposalList({
   onRefresh,
 }: {
   tokens: string[];
+  /** When set, server list sync uses `GET /api/proposals?sessionId=`. */
+  sessionId?: string | null;
   selectedToken: string | null;
   tab: "patches" | "relationships";
   listLoading?: boolean;
@@ -41,13 +44,18 @@ export function ProposalList({
   onRefresh: () => void;
 }) {
   const [entries, setEntries] = useState<ProposalListEntry[]>([]);
+  const loadGenerationRef = useRef(0);
 
-  const loadEntries = useCallback(async (tokenList: string[]) => {
+  const loadEntries = useCallback(async (tokenList: string[], generation: number) => {
     if (tokenList.length === 0) {
-      setEntries([]);
+      if (loadGenerationRef.current === generation) {
+        setEntries([]);
+      }
       return;
     }
-    setEntries(tokenList.map((patchToken) => ({ patchToken, loading: true })));
+    if (loadGenerationRef.current === generation) {
+      setEntries(tokenList.map((patchToken) => ({ patchToken, loading: true })));
+    }
     const results = await Promise.all(
       tokenList.map(async (patchToken) => {
         try {
@@ -58,17 +66,13 @@ export function ProposalList({
         }
       }),
     );
+    if (loadGenerationRef.current !== generation) return;
     setEntries(results);
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    void loadEntries(tokens).then(() => {
-      if (cancelled) return;
-    });
-    return () => {
-      cancelled = true;
-    };
+    const generation = ++loadGenerationRef.current;
+    void loadEntries(tokens, generation);
   }, [tokens, loadEntries]);
 
   const retryRow = (patchToken: string) => {
@@ -106,8 +110,9 @@ export function ProposalList({
   if (tokens.length === 0 && !listLoading) {
     return (
       <p className="sl-muted sl-proposal-list-empty">
-        No proposals in this session. Run an advisor action from skill detail
-        or health.
+        {sessionId
+          ? "No proposals in this session. Run an advisor action from skill detail or health."
+          : "No proposals yet. Run an advisor action from skill detail or health."}
       </p>
     );
   }

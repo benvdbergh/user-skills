@@ -119,6 +119,9 @@ export function registerValidationRoutes(
       if (err instanceof Error && err.message.includes("Compare requires")) {
         return validationProblem(c, err.message, c.req.path);
       }
+      if (err instanceof Error && err.message.startsWith("Invalid report id")) {
+        return validationProblem(c, err.message, c.req.path);
+      }
       throw err;
     }
   });

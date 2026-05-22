@@ -68,8 +68,20 @@ export type StoredProposal =
   | { proposalKind: "relationship"; proposal: RelationshipProposal }
   | { proposalKind: "trigger-conflicts"; proposal: TriggerConflictReport };
 
-export async function fetchProposalTokens(): Promise<string[]> {
-  const body = await apiFetch<{ tokens: string[] }>("/api/proposals");
+export interface FetchProposalTokensOptions {
+  sessionId?: string;
+  limit?: number;
+}
+
+export async function fetchProposalTokens(
+  options?: FetchProposalTokensOptions,
+): Promise<string[]> {
+  const params = new URLSearchParams();
+  if (options?.sessionId) params.set("sessionId", options.sessionId);
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  const path = qs ? `/api/proposals?${qs}` : "/api/proposals";
+  const body = await apiFetch<{ tokens: string[] }>(path);
   return body.tokens;
 }
 

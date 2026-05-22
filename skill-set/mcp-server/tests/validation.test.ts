@@ -94,15 +94,66 @@ describe("SkillValidationService (BEN-32)", () => {
 
     const dir = validationReportDir(config.skillsRoot, "user", "demo-skill");
     expect(fs.existsSync(path.join(dir, `${lint.reportId}.json`))).toBe(true);
-    expect(fs.existsSync(path.join(dir, "latest.json"))).toBe(true);
+    expect(fs.existsSync(path.join(dir, "latest-lint.json"))).toBe(true);
 
     const validationReport = await validation.validate("user", "demo-skill", {
       persist: true,
     });
     expect(validationReport.persisted).toBe(true);
+    expect(fs.existsSync(path.join(dir, "latest-validation.json"))).toBe(true);
 
     const latest = validation.getLatest("user", "demo-skill");
+    expect(latest.lint?.reportId).toBe(lint.reportId);
     expect(latest.validation?.reportId).toBe(validationReport.reportId);
+  });
+
+  it("getLatest returns lint and validation after dual persist (BUG-R0.4-02)", async () => {
+    const { validation } = loadFixtureValidation(true);
+    const lint = validation.lint("user", "demo-skill", { persist: true });
+    const validationReport = await validation.validate("user", "demo-skill", {
+      persist: true,
+    });
+
+    const latest = validation.getLatest("user", "demo-skill");
+    expect(latest.lint?.reportId).toBe(lint.reportId);
+    expect(latest.validation?.reportId).toBe(validationReport.reportId);
+  });
+
+  it("compare rejects path traversal in report ids (NFR-009)", async () => {
+    const { validation } = loadFixtureValidation(true);
+    const second = await validation.validate("user", "demo-skill", {
+      persist: true,
+    });
+    expect(() =>
+      validation.compare(
+        "user",
+        "demo-skill",
+        "../../../etc/passwd",
+        second.reportId,
+      ),
+    ).toThrow(/Invalid report id/);
+    expect(() =>
+      validation.compare(
+        "user",
+        "demo-skill",
+        second.reportId,
+        "..\\..\\latest",
+      ),
+    ).toThrow(/Invalid report id/);
+  });
+
+  it("getLatest skips non-uuid report filenames", async () => {
+    const { validation, config } = loadFixtureValidation(true);
+    await validation.validate("user", "demo-skill", { persist: true });
+    const dir = validationReportDir(config.skillsRoot, "user", "demo-skill");
+    fs.writeFileSync(
+      path.join(dir, "../../../escape.json"),
+      JSON.stringify({ kind: "lint", report: { reportId: "evil" } }),
+      "utf8",
+    );
+    const latest = validation.getLatest("user", "demo-skill");
+    expect(latest.validation?.environmentId).toBe("user");
+    expect(latest.validation?.skillName).toBe("demo-skill");
   });
 
   it("compare returns dimension deltas between validation reports", async () => {
@@ -153,6 +204,45 @@ describe("HTTP validation routes", () => {
 
     const res = await app.request("/api/validation/user/demo-skill/latest");
     expect(res.status).toBe(404);
+  });
+
+  it("GET latest returns lint and validation when both persisted (BUG-R0.4-02)", async () => {
+    const { validation, catalog, config } = loadFixtureValidation(true);
+    const graph = new SkillGraphService(config, catalog);
+    const health = new SkillHealthService(config, catalog);
+    const app = createApi({ config, catalog, graph, health, validation });
+
+    const lint = validation.lint("user", "demo-skill", { persist: true });
+    const validationReport = await validation.validate("user", "demo-skill", {
+      persist: true,
+    });
+
+    const res = await app.request("/api/validation/user/demo-skill/latest");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      lint: { reportId: string };
+      validation: { reportId: string };
+    };
+    expect(body.lint.reportId).toBe(lint.reportId);
+    expect(body.validation.reportId).toBe(validationReport.reportId);
+  });
+
+  it("GET compare rejects path traversal in beforeId/afterId", async () => {
+    const { validation, catalog, config } = loadFixtureValidation(true);
+    const graph = new SkillGraphService(config, catalog);
+    const health = new SkillHealthService(config, catalog);
+    const app = createApi({ config, catalog, graph, health, validation });
+
+    const second = await validation.validate("user", "demo-skill", {
+      persist: true,
+    });
+
+    const res = await app.request(
+      `/api/validation/user/demo-skill/compare?beforeId=${encodeURIComponent("../../../etc/passwd")}&afterId=${second.reportId}`,
+    );
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { title?: string; detail?: string };
+    expect(body.detail).toMatch(/Invalid report id/);
   });
 
   it("GET compare requires validation report ids", async () => {

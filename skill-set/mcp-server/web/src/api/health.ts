@@ -2,6 +2,8 @@ import { ApiError, apiFetch } from "./client";
 
 export type HealthSeverity = "info" | "warning" | "error";
 
+export type HealthPrimaryAction = "manual" | "agent" | "none";
+
 export interface HealthFinding {
   id: string;
   severity: HealthSeverity;
@@ -11,6 +13,8 @@ export interface HealthFinding {
   recommendation?: string;
   environmentId?: string;
   skillName?: string;
+  primaryAction?: HealthPrimaryAction;
+  agentKind?: import("./agent").AgentSessionKind;
 }
 
 export interface CatalogHealthSummary {

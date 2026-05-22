@@ -23,7 +23,20 @@
     "assets": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
     "hasSkillEscalation": { "type": "boolean" },
     "missingReferences": { "type": "array", "items": { "type": "string" } },
-    "sourcePath": { "type": "string" }
+    "sourcePath": { "type": "string" },
+    "advisorAgentKinds": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "improve-skill",
+          "create-escalation",
+          "validate-skill",
+          "suggest-relationships",
+          "analyze-trigger-conflicts",
+          "skill-patch"
+        ]
+      }
+    }
   },
   "$defs": {
     "fileRef": {

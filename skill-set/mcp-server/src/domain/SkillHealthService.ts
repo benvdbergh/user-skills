@@ -14,21 +14,15 @@ import type {
   RelationshipMapFile,
   SkillSummary,
 } from "./types.js";
+import { enrichHealthFindings } from "./healthRemediationPolicy.js";
 import { CatalogHealthReportSchema } from "./types.js";
 
+export {
+  HEALTH_FINDING_CATEGORIES,
+  type HealthFindingCategory,
+} from "./healthRemediationPolicy.js";
+
 const STALE_SKEW_MS = 1_000;
-
-/** Stable finding category codes emitted by scan() — mirrored in web healthView metadata. */
-export const HEALTH_FINDING_CATEGORIES = [
-  "environment",
-  "index",
-  "staleness",
-  "relationships",
-  "escalation",
-  "references",
-] as const;
-
-export type HealthFindingCategory = (typeof HEALTH_FINDING_CATEGORIES)[number];
 
 const DEFAULT_EXTERNAL_ENDPOINT_PATTERNS = [
   /^[a-z0-9][a-z0-9-]*-mcp(-server)?$/i,
@@ -104,7 +98,7 @@ export class SkillHealthService {
     }
 
     const report = CatalogHealthReportSchema.parse({
-      findings,
+      findings: enrichHealthFindings(findings),
       scannedAt: new Date().toISOString(),
       durationMs: Date.now() - started,
       summary: summarize(findings),
@@ -119,7 +113,11 @@ export class SkillHealthService {
     if (!fs.existsSync(filePath)) return null;
     try {
       const raw = JSON.parse(fs.readFileSync(filePath, "utf8")) as unknown;
-      return CatalogHealthReportSchema.parse(raw);
+      const parsed = CatalogHealthReportSchema.parse(raw);
+      return {
+        ...parsed,
+        findings: enrichHealthFindings(parsed.findings),
+      };
     } catch {
       return null;
     }

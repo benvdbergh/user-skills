@@ -24,6 +24,8 @@ import {
 
   fetchAgentAuth,
 
+  isTerminalSessionStatus,
+
   startAgentSession,
 
   type AgentAuthStatus,
@@ -56,6 +58,11 @@ import { getPreferredRuntime } from "../lib/agentSettings";
 
 import { addProposalToken } from "../lib/proposalStorage";
 
+import {
+  setSessionReturnOrigin,
+  type SessionReturnOrigin,
+} from "../lib/sessionOrigin";
+
 
 
 export interface AgentSessionStartParams {
@@ -72,6 +79,10 @@ export interface AgentSessionStartParams {
 
   healthFinding?: AgentHealthFindingContext;
 
+  /** Workbench “Return to …” target; defaults to skill from environmentId/skillName. */
+
+  returnOrigin?: SessionReturnOrigin;
+
 }
 
 
@@ -81,6 +92,10 @@ const AgentSessionContext = createContext<{
   sessionId: string | null;
 
   busy: boolean;
+
+  /** True while a session is pending/running (not terminal). */
+
+  sessionInProgress: boolean;
 
   toast: string | null;
 
@@ -97,6 +112,10 @@ const AgentSessionContext = createContext<{
   authError: string | null;
 
   refreshAuth: () => void;
+
+  /** Bumps when proposals are ingested (poll) or session reaches terminal with proposals. */
+
+  proposalListRevision: number;
 
   start: (params: AgentSessionStartParams) => Promise<AgentSession | null>;
 
@@ -145,6 +164,44 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
   const terminalHandledRef = useRef<string | null>(null);
 
   const authRequestRef = useRef(0);
+
+  const seenProposalIdsRef = useRef<Set<string>>(new Set());
+
+  const [proposalListRevision, setProposalListRevision] = useState(0);
+
+  const bumpProposalListRevision = useCallback(() => {
+
+    setProposalListRevision((revision) => revision + 1);
+
+  }, []);
+
+  const ingestProposalIds = useCallback(
+
+    (proposalIds: string[] | undefined) => {
+
+      if (!proposalIds?.length) return;
+
+      let added = false;
+
+      for (const token of proposalIds) {
+
+        if (seenProposalIdsRef.current.has(token)) continue;
+
+        seenProposalIdsRef.current.add(token);
+
+        addProposalToken(token);
+
+        added = true;
+
+      }
+
+      if (added) bumpProposalListRevision();
+
+    },
+
+    [bumpProposalListRevision],
+
+  );
 
 
 
@@ -218,11 +275,7 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
 
       if (status === "completed" && proposalIds?.length) {
 
-        for (const token of proposalIds) {
-
-          addProposalToken(token);
-
-        }
+        ingestProposalIds(proposalIds);
 
         setToast("Proposal ready — opening workbench");
 
@@ -266,13 +319,21 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
 
     },
 
-    [navigate],
+    [navigate, ingestProposalIds],
 
   );
 
 
 
   const navigateOnCompleteRef = useRef(true);
+
+
+
+  useEffect(() => {
+
+    ingestProposalIds(pollStatus?.proposalIds);
+
+  }, [pollStatus?.proposalIds, ingestProposalIds]);
 
 
 
@@ -324,7 +385,17 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
 
       terminalHandledRef.current = null;
 
+      seenProposalIdsRef.current = new Set();
+
       navigateOnCompleteRef.current = params.navigateOnComplete !== false;
+
+      setSessionReturnOrigin(
+        params.returnOrigin ?? {
+          kind: "skill",
+          environmentId: params.environmentId,
+          skillName: params.skillName,
+        },
+      );
 
       try {
 
@@ -443,6 +514,18 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
 
 
 
+  const sessionInProgress = useMemo(() => {
+
+    if (!sessionId) return false;
+
+    if (!pollStatus) return true;
+
+    return !isTerminalSessionStatus(pollStatus.status);
+
+  }, [sessionId, pollStatus]);
+
+
+
   const value = useMemo(
 
     () => ({
@@ -450,6 +533,8 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
       sessionId,
 
       busy,
+
+      sessionInProgress,
 
       toast,
 
@@ -466,6 +551,8 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
       authError,
 
       refreshAuth,
+
+      proposalListRevision,
 
       start,
 
@@ -481,6 +568,8 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
 
       busy,
 
+      sessionInProgress,
+
       toast,
 
       stripVisible,
@@ -496,6 +585,8 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
       authError,
 
       refreshAuth,
+
+      proposalListRevision,
 
       start,
 

@@ -1,96 +1,91 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import {
+  resolveHealthRemediationPolicy,
+  SKILL_DETAIL_ADVISOR_AGENT_KINDS,
+} from "../src/domain/healthRemediationPolicy.js";
 
 const webLib = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   "../web/src/lib/healthRemediation.ts",
 );
 
-const { resolveHealthRemediation, agentDisabledReason } = await import(
+const { viewRemediationFromFinding, agentDisabledReason } = await import(
   webLib
 );
 
-describe("resolveHealthRemediation", () => {
+describe("resolveHealthRemediationPolicy", () => {
   it("maps catalog categories to manual copy only", () => {
     for (const category of ["environment", "index", "staleness"] as const) {
-      const r = resolveHealthRemediation(
-        { category, skillName: undefined, environmentId: undefined },
-        "user",
-      );
-      expect(r.primary).toEqual({ mode: "manual", label: "Copy fix steps" });
-      expect(r.agentDisabledReason).toBeNull();
+      expect(
+        resolveHealthRemediationPolicy({
+          category,
+          skillName: undefined,
+        }),
+      ).toEqual({ primaryAction: "manual" });
     }
   });
 
   it("maps relationships without skill to manual only", () => {
-    const r = resolveHealthRemediation(
-      {
+    expect(
+      resolveHealthRemediationPolicy({
         category: "relationships",
         skillName: undefined,
-        environmentId: "user",
-      },
-      "user",
-    );
-    expect(r.primary.mode).toBe("manual");
-    expect(r.agentDisabledReason).toBeNull();
+      }),
+    ).toEqual({ primaryAction: "manual" });
   });
 
   it("maps relationships with skill to suggest-relationships", () => {
-    const r = resolveHealthRemediation(
-      {
+    expect(
+      resolveHealthRemediationPolicy({
         category: "relationships",
         skillName: "demo-skill",
-        environmentId: "user",
-      },
-      "user",
-    );
-    expect(r.primary).toEqual({
-      mode: "agent",
-      kind: "suggest-relationships",
-      label: "Suggest relationships",
+      }),
+    ).toEqual({
+      primaryAction: "agent",
+      agentKind: "suggest-relationships",
     });
-    expect(r.agentDisabledReason).toBeNull();
   });
 
   it("maps escalation to create-escalation when skill-scoped (AC-012)", () => {
-    const r = resolveHealthRemediation(
-      {
+    expect(
+      resolveHealthRemediationPolicy({
         category: "escalation",
         skillName: "demo-skill",
-        environmentId: "user",
-      },
-      "user",
-    );
-    expect(r.primary).toEqual({
-      mode: "agent",
-      kind: "create-escalation",
-      label: "Draft escalation",
+      }),
+    ).toEqual({
+      primaryAction: "agent",
+      agentKind: "create-escalation",
     });
-    expect(r.agentDisabledReason).toBeNull();
   });
 
   it("maps references to improve-skill when skill-scoped", () => {
-    const r = resolveHealthRemediation(
-      {
+    expect(
+      resolveHealthRemediationPolicy({
         category: "references",
         skillName: "demo-skill",
-        environmentId: "user",
-      },
-      "user",
-    );
-    expect(r.primary).toEqual({
-      mode: "agent",
-      kind: "improve-skill",
-      label: "Improve description",
+      }),
+    ).toEqual({
+      primaryAction: "agent",
+      agentKind: "improve-skill",
     });
-    expect(r.agentDisabledReason).toBeNull();
   });
 
+  it("exposes skill-detail advisor kinds aligned with escalation and references", () => {
+    expect(SKILL_DETAIL_ADVISOR_AGENT_KINDS).toEqual([
+      "improve-skill",
+      "create-escalation",
+    ]);
+  });
+});
+
+describe("viewRemediationFromFinding", () => {
   it("disables escalation agent with inline reason when skill missing (FR-048)", () => {
-    const r = resolveHealthRemediation(
+    const r = viewRemediationFromFinding(
       {
-        category: "escalation",
+        primaryAction: "agent",
+        agentKind: "create-escalation",
         skillName: undefined,
         environmentId: "user",
       },

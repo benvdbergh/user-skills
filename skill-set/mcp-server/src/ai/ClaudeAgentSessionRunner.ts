@@ -30,6 +30,10 @@ import {
   resolveRuntime,
 } from "./agentSessionCore.js";
 import {
+  applyProcessExitStatus,
+  markSessionCancelled,
+} from "./agentSessionLifecycle.js";
+import {
   buildClaudeSpawnArgs,
   buildShortClaudePrompt,
   prependAgentTaskHeader,
@@ -43,6 +47,18 @@ import {
 } from "./claudeCli.js";
 
 const activeChildren = new Map<string, ReturnType<typeof spawn>>();
+
+function killProcessByPid(pid: number): void {
+  try {
+    if (process.platform === "win32") {
+      spawn("taskkill", ["/PID", String(pid), "/F", "/T"], { shell: true });
+    } else {
+      process.kill(pid, "SIGTERM");
+    }
+  } catch {
+    /* process may already have exited */
+  }
+}
 
 /** Spawns `claude` when available; does not require ANTHROPIC_API_KEY. */
 export class ClaudeAgentSessionRunner implements AgentSessionRunner {
@@ -223,36 +239,16 @@ export class ClaudeAgentSessionRunner implements AgentSessionRunner {
   }
 
   async cancel(sessionId: string): Promise<void> {
-    const manifest = loadManifestOrThrow(this.config, sessionId);
-    if (manifest.status === "completed" || manifest.status === "cancelled") {
+    if (markSessionCancelled(this.config, sessionId) === "already_terminal") {
       return;
     }
 
+    const manifest = loadManifestOrThrow(this.config, sessionId);
     const child = activeChildren.get(sessionId);
-    if (child?.pid) {
-      try {
-        if (process.platform === "win32") {
-          spawn("taskkill", ["/PID", String(child.pid), "/F", "/T"], {
-            shell: true,
-          });
-        } else {
-          process.kill(child.pid, "SIGTERM");
-        }
-      } catch {
-        /* process may already have exited */
-      }
-      activeChildren.delete(sessionId);
-    } else if (await claudeAvailable()) {
-      try {
-        await runCommand("claude", ["stop"], { timeoutMs: 10_000 });
-      } catch {
-        /* best-effort */
-      }
-    }
+    const pid = child?.pid ?? manifest.pid;
+    if (child) activeChildren.delete(sessionId);
+    if (pid) killProcessByPid(pid);
 
-    manifest.status = "cancelled";
-    manifest.completedAt = new Date().toISOString();
-    persistManifest(this.config, manifest);
     appendSessionLog(this.config, sessionId, "Session cancelled");
   }
 }

@@ -1,3 +1,4 @@
+import type { AgentSessionKind } from "./agent";
 import { apiFetch } from "./client";
 
 export type HealthStatus = "ok" | "warning" | "error";
@@ -35,6 +36,7 @@ export interface SkillDetail extends SkillSummary {
   hasSkillEscalation: boolean;
   missingReferences: string[];
   sourcePath: string;
+  advisorAgentKinds?: AgentSessionKind[];
 }
 
 export interface Environment {

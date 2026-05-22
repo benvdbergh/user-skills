@@ -46,3 +46,8 @@ export const PROMPT_TEMPLATE_SOURCES: Record<string, PromptTemplateSourcePlan> =
   };
 
 export const PROMPT_TEMPLATE_IDS = Object.keys(PROMPT_TEMPLATE_SOURCES);
+
+/** True when buildPromptBundle needs context.skillMdRelativePath (target SKILL.md). */
+export function promptTemplateRequiresSkillTarget(templateId: string): boolean {
+  return Boolean(PROMPT_TEMPLATE_SOURCES[templateId]?.targetSkillRefs?.length);
+}

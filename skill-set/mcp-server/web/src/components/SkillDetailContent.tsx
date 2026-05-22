@@ -51,7 +51,8 @@ export function SkillDetailContent({
           const neighbors = await fetchGraphNeighbors({ nodeId, depth: 1 });
           if (!cancelled) setGraph(neighbors);
         } catch {
-          if (!cancelled) setGraph({ nodes: [], edges: [] });
+          if (!cancelled)
+            setGraph({ nodes: [], edges: [], highRiskRefactorSequences: [] });
         }
       })
       .catch((err) => {
@@ -139,6 +140,7 @@ export function SkillDetailContent({
       <AgentSkillActions
         environmentId={environmentId}
         skillName={skillName}
+        agentKinds={skill.advisorAgentKinds ?? []}
       />
 
       <ValidationScorecard

@@ -2,7 +2,11 @@ import type { Hono } from "hono";
 import { z } from "zod";
 import type { RelationshipSuggestionAdvisor } from "../../ai/RelationshipSuggestionAdvisor.js";
 import type { SkillImprovementAdvisor } from "../../ai/SkillImprovementAdvisor.js";
-import type { ChangeProposalService } from "../../domain/ChangeProposalService.js";
+import {
+  ChangeProposalService,
+  DEFAULT_PROPOSAL_LIST_LIMIT,
+  MAX_PROPOSAL_LIST_LIMIT,
+} from "../../domain/ChangeProposalService.js";
 import type { SkillCatalogService } from "../../domain/SkillCatalogService.js";
 import { ProposalValidationError } from "../../domain/proposalValidation.js";
 import {
@@ -14,8 +18,17 @@ import {
   TriggerConflictReportSchema,
 } from "../../domain/types.js";
 import type { GitDiffService } from "../../git/GitDiffService.js";
-import { formatZodError } from "../queryParams.js";
+import { QueryParamError, formatZodError } from "../queryParams.js";
 import { notFoundProblem, validationProblem } from "../problemDetails.js";
+
+function parseProposalListLimit(raw: string | undefined): number {
+  if (raw == null || raw === "") return DEFAULT_PROPOSAL_LIST_LIMIT;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1) {
+    throw new QueryParamError(`Invalid limit: ${raw}`);
+  }
+  return Math.min(n, MAX_PROPOSAL_LIST_LIMIT);
+}
 
 export interface ProposalRouteDeps {
   catalog: SkillCatalogService;
@@ -178,8 +191,17 @@ export function registerProposalRoutes(
   });
 
   app.get("/api/proposals", (c) => {
-    const tokens = proposals.listProposalTokens();
-    return c.json({ tokens });
+    try {
+      const limit = parseProposalListLimit(c.req.query("limit"));
+      const sessionId = c.req.query("sessionId") || undefined;
+      const tokens = proposals.listProposalTokens({ limit, sessionId });
+      return c.json({ tokens });
+    } catch (err) {
+      if (err instanceof QueryParamError) {
+        return validationProblem(c, err.message, c.req.path);
+      }
+      throw err;
+    }
   });
 
   app.get("/api/proposals/:patchToken", (c) => {

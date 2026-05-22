@@ -77,6 +77,18 @@ describe("SkillHealthService", () => {
         (f) => f.category === "references" && f.message.includes("validate.md"),
       ),
     ).toBe(true);
+
+    const escalation = report.findings.find(
+      (f) => f.id.includes("demo-skill") && f.category === "escalation",
+    );
+    expect(escalation?.primaryAction).toBe("agent");
+    expect(escalation?.agentKind).toBe("create-escalation");
+
+    const references = report.findings.find(
+      (f) => f.category === "references" && f.message.includes("validate.md"),
+    );
+    expect(references?.primaryAction).toBe("agent");
+    expect(references?.agentKind).toBe("improve-skill");
   });
 
   it("detects index count mismatches (FR-016)", () => {

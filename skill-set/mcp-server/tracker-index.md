@@ -73,3 +73,27 @@ Open the project in Linear for milestone detail, exit criteria, and progress.
 | STORY-5-6 | BEN-43 | https://linear.app/ben-van-den-bergh/issue/BEN-43 |
 | STORY-5-7 | BEN-44 | https://linear.app/ben-van-den-bergh/issue/BEN-44 |
 | STORY-5-8 | BEN-45 | https://linear.app/ben-van-den-bergh/issue/BEN-45 |
+
+## R0.4 code-review bugs (EPIC-4)
+
+Created from full review of commits `89a96066`..`HEAD` (2026-05-22). Milestone: **R0.4 — Validation, Source Prompts & AI Proposals**.
+
+| Planning ID | Issue | Priority | URL |
+|-------------|-------|----------|-----|
+| BUG-R0.4-01 | BEN-62 | Urgent | https://linear.app/ben-van-den-bergh/issue/BEN-62 |
+| BUG-R0.4-02 | BEN-63 | High | https://linear.app/ben-van-den-bergh/issue/BEN-63 |
+| BUG-R0.4-03 | BEN-64 | High | https://linear.app/ben-van-den-bergh/issue/BEN-64 |
+| BUG-R0.4-04 | BEN-65 | Urgent | https://linear.app/ben-van-den-bergh/issue/BEN-65 |
+| BUG-R0.4-05 | BEN-66 | High | https://linear.app/ben-van-den-bergh/issue/BEN-66 |
+| BUG-R0.4-06 | BEN-67 | High | https://linear.app/ben-van-den-bergh/issue/BEN-67 |
+| BUG-R0.4-07 | BEN-68 | Medium | https://linear.app/ben-van-den-bergh/issue/BEN-68 |
+| BUG-R0.4-08 | BEN-69 | High | https://linear.app/ben-van-den-bergh/issue/BEN-69 |
+| BUG-R0.4-09 | BEN-70 | Medium | https://linear.app/ben-van-den-bergh/issue/BEN-70 |
+| BUG-R0.4-10 | BEN-71 | Medium | https://linear.app/ben-van-den-bergh/issue/BEN-71 |
+| BUG-R0.4-11 | BEN-72 | Medium | https://linear.app/ben-van-den-bergh/issue/BEN-72 |
+| BUG-R0.4-12 | BEN-73 | Low | https://linear.app/ben-van-den-bergh/issue/BEN-73 |
+| BUG-R0.4-13 | BEN-74 | Low | https://linear.app/ben-van-den-bergh/issue/BEN-74 |
+| BUG-R0.4-14 | BEN-75 | High | https://linear.app/ben-van-den-bergh/issue/BEN-75 |
+| BUG-R0.4-15 | BEN-76 | Medium | https://linear.app/ben-van-den-bergh/issue/BEN-76 |
+
+**Suggested fix order:** BEN-62 → BEN-63, BEN-64, BEN-65 → BEN-66, BEN-67 → BEN-69 (after BEN-64) → BEN-75 (after BEN-62, BEN-66, BEN-71) → remainder.

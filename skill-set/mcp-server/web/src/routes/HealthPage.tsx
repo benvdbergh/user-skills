@@ -4,7 +4,7 @@ import { useEnvironment } from "../context/EnvironmentContext";
 import { useNavHealth } from "../context/NavHealthContext";
 import type { AgentSessionKind } from "../api/agent";
 import { useAgentSession } from "../context/AgentSessionContext";
-import { resolveHealthRemediation } from "../lib/healthRemediation";
+import { viewRemediationFromFinding } from "../lib/healthRemediation";
 import { skillNameFromSourcePath } from "../lib/skillFromPath";
 import {
   applyHealthUrlUpdates,
@@ -54,13 +54,13 @@ export function HealthPage() {
   const { environmentId } = useEnvironment();
   const { setScanCounts: setNavHealthCounts } = useNavHealth();
   const {
-    sessionId,
     busy: sessionStarting,
     authLoading,
+    sessionInProgress,
     start: startSession,
   } = useAgentSession();
   const sessionBusy =
-    sessionStarting || authLoading || Boolean(sessionId);
+    sessionStarting || authLoading || sessionInProgress;
   const [report, setReport] = useState<CatalogHealthReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [slowScan, setSlowScan] = useState(false);
@@ -628,7 +628,7 @@ function FindingRow({
   const skillName =
     finding.skillName ?? skillNameFromSourcePath(finding.sourcePath) ?? undefined;
   const envId = finding.environmentId ?? environmentId;
-  const remediation = resolveHealthRemediation(
+  const remediation = viewRemediationFromFinding(
     { ...finding, skillName, environmentId: envId },
     environmentId,
   );
@@ -764,7 +764,7 @@ function FindingRemediationActions({
   onCopyFixSteps,
   onStartAgent,
 }: {
-  remediation: ReturnType<typeof resolveHealthRemediation>;
+  remediation: ReturnType<typeof viewRemediationFromFinding>;
   sessionBusy: boolean;
   agentHintId: string;
   onCopyFixSteps: () => void;

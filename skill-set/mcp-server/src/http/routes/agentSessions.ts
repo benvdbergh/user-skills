@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 import type { AgentSessionRunner } from "../../ai/AgentSessionRunner.js";
+import { isClaudeRuntime, resolveRuntime } from "../../ai/agentSessionCore.js";
 import {
   AgentAuthStatusSchema,
   AgentSessionSchema,
@@ -7,7 +8,11 @@ import {
   AgentTaskRequestSchema,
 } from "../../domain/types.js";
 import { formatZodError } from "../queryParams.js";
-import { notFoundProblem, validationProblem } from "../problemDetails.js";
+import {
+  forbiddenProblem,
+  notFoundProblem,
+  validationProblem,
+} from "../problemDetails.js";
 
 function isNotFoundError(err: unknown): boolean {
   return (
@@ -36,6 +41,17 @@ export function registerAgentSessionRoutes(
     const parsed = AgentTaskRequestSchema.safeParse(body);
     if (!parsed.success) {
       return validationProblem(c, formatZodError(parsed.error), c.req.path);
+    }
+    const runtime = resolveRuntime(parsed.data);
+    if (isClaudeRuntime(runtime)) {
+      const auth = AgentAuthStatusSchema.parse(await agent.checkAuth());
+      if (!auth.authenticated) {
+        return forbiddenProblem(
+          c,
+          auth.message ?? "Claude CLI is not authenticated",
+          c.req.path,
+        );
+      }
     }
     try {
       const session = AgentSessionSchema.parse(

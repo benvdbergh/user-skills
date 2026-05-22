@@ -3,7 +3,6 @@ import path from "node:path";
 import { Hono } from "hono";
 import { z } from "zod";
 import type { SkillLabConfig } from "../config/loadConfig.js";
-import { PathAccessError } from "../config/pathGuard.js";
 import type { AgentSessionRunner } from "../ai/AgentSessionRunner.js";
 import type { SkillCatalogService } from "../domain/SkillCatalogService.js";
 import type { SkillGraphService } from "../domain/SkillGraphService.js";
@@ -35,14 +34,8 @@ import {
   formatZodError,
   graphFilterFromSearchParams,
   graphNeighborsFromSearchParams,
-  QueryParamError,
 } from "./queryParams.js";
-import {
-  forbiddenProblem,
-  internalProblem,
-  notFoundProblem,
-  validationProblem,
-} from "./problemDetails.js";
+import { handleApiError, notFoundProblem, validationProblem } from "./problemDetails.js";
 
 export interface ApiServices {
   config: SkillLabConfig;
@@ -174,19 +167,7 @@ export function createApi(
   } = services;
   const app = new Hono();
 
-  app.onError((err, c) => {
-    if (err instanceof PathAccessError) {
-      return forbiddenProblem(c, err.message, c.req.path);
-    }
-    if (err instanceof QueryParamError) {
-      return validationProblem(c, err.message, c.req.path);
-    }
-    return internalProblem(
-      c,
-      err instanceof Error ? err.message : "Unknown error",
-      c.req.path,
-    );
-  });
+  app.onError((err, c) => handleApiError(c, err));
 
   app.get("/api/environments", (c) => {
     const environments = z

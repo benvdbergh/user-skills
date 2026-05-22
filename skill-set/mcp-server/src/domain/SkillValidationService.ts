@@ -25,6 +25,16 @@ import {
 
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
+/** Report filenames use `randomUUID()` — reject traversal via reportId (NFR-009). */
+const REPORT_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function assertValidReportId(reportId: string): void {
+  if (!REPORT_ID.test(reportId)) {
+    throw new Error(`Invalid report id: ${reportId}`);
+  }
+}
+
 const LINT_DEDUCTIONS: Record<ValidationFinding["severity"], number> = {
   critical: 20,
   error: 10,
@@ -92,6 +102,16 @@ const STANDARD_SKILL_DIRS = new Set([
   "scripts",
   "references",
   "assets",
+]);
+
+const LATEST_LINT_POINTER = "latest-lint.json";
+const LATEST_VALIDATION_POINTER = "latest-validation.json";
+const LEGACY_LATEST_POINTER = "latest.json";
+
+const REPORT_POINTER_FILES = new Set([
+  LATEST_LINT_POINTER,
+  LATEST_VALIDATION_POINTER,
+  LEGACY_LATEST_POINTER,
 ]);
 
 export interface LintOptions {
@@ -243,30 +263,61 @@ export class SkillValidationService {
       skillName,
     );
     if (!fs.existsSync(dir)) return {};
+    assertPathUnderRoots(dir, this.config.allowedRoots);
 
-    const latestPointer = path.join(dir, "latest.json");
-    if (fs.existsSync(latestPointer)) {
-      const envelope = PersistedValidationEnvelopeSchema.parse(
-        JSON.parse(fs.readFileSync(latestPointer, "utf8")) as unknown,
+    let lint = readLatestEnvelope(
+      dir,
+      LATEST_LINT_POINTER,
+      this.config.allowedRoots,
+      "lint",
+    )?.report;
+    let validation = readLatestEnvelope(
+      dir,
+      LATEST_VALIDATION_POINTER,
+      this.config.allowedRoots,
+      "validation",
+    )?.report;
+
+    if (!lint || !validation) {
+      const legacy = readLatestEnvelope(
+        dir,
+        LEGACY_LATEST_POINTER,
+        this.config.allowedRoots,
       );
-      if (envelope.kind === "lint") return { lint: envelope.report };
-      return { validation: envelope.report };
+      if (legacy) {
+        if (legacy.kind === "lint" && !lint) lint = legacy.report;
+        if (legacy.kind === "validation" && !validation) {
+          validation = legacy.report;
+        }
+      }
+    }
+
+    if (lint || validation) {
+      const out: { lint?: LintReport; validation?: ValidationReport } = {};
+      if (lint) out.lint = LintReportSchema.parse(lint);
+      if (validation) out.validation = ValidationReportSchema.parse(validation);
+      return out;
     }
 
     const files = fs
       .readdirSync(dir)
-      .filter((f) => f.endsWith(".json") && f !== "latest.json")
-      .map((f) => ({
-        name: f,
-        mtime: fs.statSync(path.join(dir, f)).mtimeMs,
-      }))
+      .filter((f) => f.endsWith(".json") && !REPORT_POINTER_FILES.has(f))
+      .filter((f) => REPORT_ID.test(f.slice(0, -".json".length)))
+      .map((f) => {
+        const filePath = path.join(dir, f);
+        assertPathUnderRoots(filePath, this.config.allowedRoots);
+        return {
+          name: f,
+          mtime: fs.statSync(filePath).mtimeMs,
+        };
+      })
       .sort((a, b) => b.mtime - a.mtime);
 
-    let lint: LintReport | undefined;
-    let validation: ValidationReport | undefined;
     for (const { name } of files) {
+      const filePath = path.join(dir, name);
+      assertPathUnderRoots(filePath, this.config.allowedRoots);
       const raw = JSON.parse(
-        fs.readFileSync(path.join(dir, name), "utf8"),
+        fs.readFileSync(filePath, "utf8"),
       ) as unknown;
       const envelope = PersistedValidationEnvelopeSchema.parse(raw);
       if (envelope.kind === "lint" && !lint) lint = envelope.report;
@@ -342,7 +393,10 @@ export class SkillValidationService {
     frontmatter: Record<string, unknown>;
     parsed: ReturnType<typeof parseSkillMd>;
   } {
-    const skillMdPath = this.skillMdAbsolutePath(detail);
+    const skillMdPath = assertPathUnderRoots(
+      this.skillMdAbsolutePath(detail),
+      this.config.allowedRoots,
+    );
     const skillDir = path.dirname(skillMdPath);
     const text = fs.readFileSync(skillMdPath, "utf8");
     const { data, content } = matter(text);
@@ -752,7 +806,9 @@ export class SkillValidationService {
     const filePath = path.join(dir, `${envelope.report.reportId}.json`);
     assertPathUnderRoots(filePath, this.config.allowedRoots);
     fs.writeFileSync(filePath, JSON.stringify(envelope, null, 2), "utf8");
-    const latestPath = path.join(dir, "latest.json");
+    const pointerName =
+      envelope.kind === "lint" ? LATEST_LINT_POINTER : LATEST_VALIDATION_POINTER;
+    const latestPath = path.join(dir, pointerName);
     fs.writeFileSync(latestPath, JSON.stringify(envelope, null, 2), "utf8");
     return true;
   }
@@ -762,13 +818,16 @@ export class SkillValidationService {
     skillName: string,
     reportId: string,
   ) {
-    const filePath = path.join(
-      validationReportDir(
-        this.config.skillsRoot,
-        environmentId,
-        skillName,
-      ),
-      `${reportId}.json`,
+    assertValidReportId(reportId);
+    const dir = validationReportDir(
+      this.config.skillsRoot,
+      environmentId,
+      skillName,
+    );
+    assertPathUnderRoots(dir, this.config.allowedRoots);
+    const filePath = assertPathUnderRoots(
+      path.join(dir, `${reportId}.json`),
+      this.config.allowedRoots,
     );
     if (!fs.existsSync(filePath)) {
       throw new Error(`Validation report not found: ${reportId}`);
@@ -776,6 +835,27 @@ export class SkillValidationService {
     const raw = JSON.parse(fs.readFileSync(filePath, "utf8")) as unknown;
     return PersistedValidationEnvelopeSchema.parse(raw);
   }
+}
+
+function readLatestEnvelope(
+  dir: string,
+  pointerFile: string,
+  allowedRoots: string[],
+  expectedKind?: "lint" | "validation",
+):
+  | { kind: "lint"; report: LintReport }
+  | { kind: "validation"; report: ValidationReport }
+  | undefined {
+  const pointerPath = assertPathUnderRoots(
+    path.join(dir, pointerFile),
+    allowedRoots,
+  );
+  if (!fs.existsSync(pointerPath)) return undefined;
+  const envelope = PersistedValidationEnvelopeSchema.parse(
+    JSON.parse(fs.readFileSync(pointerPath, "utf8")) as unknown,
+  );
+  if (expectedKind && envelope.kind !== expectedKind) return undefined;
+  return envelope;
 }
 
 function lintFinding(

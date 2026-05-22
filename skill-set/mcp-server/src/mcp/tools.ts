@@ -19,11 +19,11 @@ import {
 import {
   GraphNodeTypeSchema,
   HealthStatusSchema,
-  LintReportSchema,
   SkillDetailSchema,
   SkillSummarySchema,
   ValidationReportSchema,
 } from "../domain/types.js";
+import { executeLintSkill } from "./toolExecutors.js";
 
 export {
   buildCatalogHealthPayload,
@@ -267,27 +267,7 @@ export function registerValidationTools(
           .describe("Persist report under .generated/reports when writesEnabled"),
       },
     },
-    async ({ environmentId, skillName, persist }) => {
-      try {
-        const report = validation.lint(environmentId, skillName, { persist });
-        const parsed = LintReportSchema.parse(report);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({ lint: parsed }, null, 2),
-            },
-          ],
-          structuredContent: { lint: parsed },
-        };
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Lint failed";
-        return {
-          isError: true,
-          content: [{ type: "text" as const, text: JSON.stringify({ error: message }) }],
-        };
-      }
-    },
+    async (input) => executeLintSkill(validation, input),
   );
 
   server.registerTool(

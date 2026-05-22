@@ -2,6 +2,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import type { AgentSessionRunner } from "../src/ai/AgentSessionRunner.js";
+import {
+  applyProcessExitStatus,
+  markSessionCancelled,
+} from "../src/ai/agentSessionLifecycle.js";
 import { agentSessionDir } from "../src/ai/generatedPaths.js";
 import { redactSecrets } from "../src/ai/logRedaction.js";
 import { RelationshipSuggestionAdvisor } from "../src/ai/RelationshipSuggestionAdvisor.js";
@@ -74,6 +79,80 @@ describe("agent session (BEN-36)", () => {
     };
     expect(body.auth.provider).toBe("none");
     expect(body.auth.authenticated).toBe(true);
+  });
+
+  it("POST /api/agent-sessions rejects Claude runtime when unauthenticated (BEN-70)", async () => {
+    const { pkg, config, catalog } = loadFixtureAgentApi();
+    tempDirs.push(pkg);
+    const graph = new SkillGraphService(config, catalog);
+    const health = new SkillHealthService(config, catalog);
+    let startCalled = false;
+    const unauthAgent: AgentSessionRunner = {
+      checkAuth: async () => ({
+        authenticated: false,
+        provider: "claude",
+        message: "Not logged in",
+      }),
+      start: async () => {
+        startCalled = true;
+        throw new Error("start must not run when unauthenticated");
+      },
+      getStatus: async () => {
+        throw new Error("not used");
+      },
+      cancel: async () => {
+        throw new Error("not used");
+      },
+    };
+    const app = createApi({
+      config,
+      catalog,
+      graph,
+      health,
+      agent: unauthAgent,
+    });
+    const task = {
+      kind: "improve-skill" as const,
+      environmentId: "user",
+      skillName: "demo-skill",
+    };
+    for (const runtime of ["claude-headless", "claude-background"] as const) {
+      startCalled = false;
+      const res = await app.request("/api/agent-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...task, runtime }),
+      });
+      expect(res.status).toBe(403);
+      expect(res.headers.get("content-type")).toContain(
+        "application/problem+json",
+      );
+      const problem = (await res.json()) as {
+        status: number;
+        detail?: string;
+        auth?: unknown;
+      };
+      expect(problem.status).toBe(403);
+      expect(problem.detail).toContain("Not logged in");
+      expect(problem.auth).toBeUndefined();
+      expect(startCalled).toBe(false);
+    }
+    startCalled = false;
+    const defaultRes = await app.request("/api/agent-sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(task),
+    });
+    expect(defaultRes.status).toBe(403);
+    expect(startCalled).toBe(false);
+
+    const { app: stubApp } = loadFixtureAgentApi();
+    const stubRes = await stubApp.request("/api/agent-sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...task, runtime: "stub" }),
+    });
+    expect(stubRes.status).toBe(201);
   });
 
   it("POST /api/agent-sessions starts stub session with artifacts and proposal", async () => {
@@ -187,6 +266,104 @@ describe("agent session (BEN-36)", () => {
     await runner.cancel(session.id);
     const status = await runner.getStatus(session.id);
     expect(status.status).toBe("cancelled");
+  });
+
+  it("cancelled status wins over process exit (BUG-R0.4-04)", () => {
+    const { pkg, config } = loadFixtureAgentApi();
+    tempDirs.push(pkg);
+    const sessionId = "00000000-0000-4000-8000-000000000099";
+    const dir = agentSessionDir(config.skillsRoot, sessionId);
+    fs.mkdirSync(dir, { recursive: true });
+    const running = {
+      id: sessionId,
+      status: "running" as const,
+      runtime: "claude-headless" as const,
+      kind: "improve-skill" as const,
+      environmentId: "user",
+      skillName: "demo-skill",
+      promptTemplateId: "improve-skill-description",
+      startedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      pid: 4242,
+    };
+    fs.writeFileSync(
+      path.join(dir, "manifest.json"),
+      JSON.stringify(running, null, 2),
+    );
+
+    expect(markSessionCancelled(config, sessionId)).toBe("applied");
+    applyProcessExitStatus(config, sessionId, 0);
+
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(dir, "manifest.json"), "utf8"),
+    ) as { status: string };
+    expect(manifest.status).toBe("cancelled");
+  });
+
+  it("process exit does not overwrite already-cancelled session", () => {
+    const { pkg, config } = loadFixtureAgentApi();
+    tempDirs.push(pkg);
+    const sessionId = "00000000-0000-4000-8000-000000000098";
+    const dir = agentSessionDir(config.skillsRoot, sessionId);
+    fs.mkdirSync(dir, { recursive: true });
+    const cancelled = {
+      id: sessionId,
+      status: "cancelled" as const,
+      runtime: "claude-headless" as const,
+      kind: "improve-skill" as const,
+      environmentId: "user",
+      skillName: "demo-skill",
+      promptTemplateId: "improve-skill-description",
+      startedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+    };
+    fs.writeFileSync(
+      path.join(dir, "manifest.json"),
+      JSON.stringify(cancelled, null, 2),
+    );
+
+    applyProcessExitStatus(config, sessionId, 0);
+
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(dir, "manifest.json"), "utf8"),
+    ) as { status: string; error?: string };
+    expect(manifest.status).toBe("cancelled");
+    expect(manifest.error).toBeUndefined();
+  });
+
+  it("markSessionCancelled before exit matches cancel-then-close ordering", () => {
+    const { pkg, config } = loadFixtureAgentApi();
+    tempDirs.push(pkg);
+    const sessionId = "00000000-0000-4000-8000-000000000097";
+    const dir = agentSessionDir(config.skillsRoot, sessionId);
+    fs.mkdirSync(dir, { recursive: true });
+    const running = {
+      id: sessionId,
+      status: "running" as const,
+      runtime: "claude-headless" as const,
+      kind: "improve-skill" as const,
+      environmentId: "user",
+      skillName: "demo-skill",
+      promptTemplateId: "improve-skill-description",
+      startedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      pid: 9999,
+    };
+    fs.writeFileSync(
+      path.join(dir, "manifest.json"),
+      JSON.stringify(running, null, 2),
+    );
+
+    markSessionCancelled(config, sessionId);
+    applyProcessExitStatus(config, sessionId, 0);
+    applyProcessExitStatus(config, sessionId, 1);
+
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(dir, "manifest.json"), "utf8"),
+    ) as { status: string };
+    expect(manifest.status).toBe("cancelled");
+    expect(markSessionCancelled(config, sessionId)).toBe("already_terminal");
   });
 
   it("StubAgentSessionRunner ingests patch via ChangeProposalService", async () => {

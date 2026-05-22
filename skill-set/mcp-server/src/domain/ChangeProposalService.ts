@@ -45,6 +45,15 @@ export interface IngestTriggerConflictInput {
   patchToken?: string;
 }
 
+export const DEFAULT_PROPOSAL_LIST_LIMIT = 50;
+export const MAX_PROPOSAL_LIST_LIMIT = 200;
+
+export interface ListProposalTokensOptions {
+  /** Max tokens returned; omit for no cap (internal session lookups). */
+  limit?: number;
+  sessionId?: string;
+}
+
 export class ChangeProposalService {
   private readonly byToken = new Map<string, StoredProposal>();
 
@@ -154,40 +163,58 @@ export class ChangeProposalService {
   }
 
   listTokensForSession(sessionId: string): string[] {
-    const tokens = new Set<string>();
-    for (const stored of this.byToken.values()) {
-      const p = stored.proposal;
-      if ("sessionId" in p && p.sessionId === sessionId) {
-        tokens.add(p.patchToken);
-      }
-    }
-    for (const patchToken of this.listProposalTokens()) {
-      const stored = this.getStored(patchToken);
-      const p = stored?.proposal;
-      if (p && "sessionId" in p && p.sessionId === sessionId) {
-        tokens.add(patchToken);
-      }
-    }
-    return [...tokens];
+    return this.listProposalTokens({ sessionId });
   }
 
   /** In-memory tokens plus persisted `.generated/proposals/*.json` (newest first). */
-  listProposalTokens(): string[] {
-    const tokens = new Set<string>(this.byToken.keys());
+  listProposalTokens(options?: ListProposalTokensOptions): string[] {
+    const sessionId = options?.sessionId;
+    const limit = options?.limit;
+
+    const entries: { patchToken: string; sortKey: string }[] = [];
+
+    for (const [patchToken, stored] of this.byToken) {
+      const proposal = stored.proposal;
+      const proposalSessionId =
+        "sessionId" in proposal ? proposal.sessionId : undefined;
+      if (sessionId && proposalSessionId !== sessionId) continue;
+      entries.push({ patchToken, sortKey: proposal.createdAt });
+    }
+
     const dir = path.join(generatedRoot(this.config.skillsRoot), "proposals");
     if (fs.existsSync(dir)) {
       for (const file of fs.readdirSync(dir)) {
         if (!file.endsWith(".json")) continue;
-        tokens.add(file.slice(0, -".json".length));
+        const patchToken = file.slice(0, -".json".length);
+        if (this.byToken.has(patchToken)) continue;
+
+        if (sessionId) {
+          const stored = this.loadPersisted(patchToken);
+          const proposal = stored?.proposal;
+          const proposalSessionId =
+            proposal && "sessionId" in proposal
+              ? proposal.sessionId
+              : undefined;
+          if (proposalSessionId !== sessionId) continue;
+          entries.push({
+            patchToken,
+            sortKey: proposal?.createdAt ?? "",
+          });
+          continue;
+        }
+
+        const filePath = path.join(dir, file);
+        entries.push({
+          patchToken,
+          sortKey: fs.statSync(filePath).mtime.toISOString(),
+        });
       }
     }
-    const withTime = [...tokens].map((patchToken) => {
-      const stored = this.getStored(patchToken);
-      const createdAt = stored?.proposal.createdAt ?? "";
-      return { patchToken, createdAt };
-    });
-    withTime.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    return withTime.map((e) => e.patchToken);
+
+    entries.sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+    const ordered = entries.map((e) => e.patchToken);
+    if (limit === undefined) return ordered;
+    return ordered.slice(0, limit);
   }
 
   private store(stored: StoredProposal): void {

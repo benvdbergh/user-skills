@@ -9,6 +9,7 @@ import { SkillReferenceSource, extractSection } from "../src/prompts/SkillRefere
 import { PROMPT_TEMPLATE_IDS } from "../src/prompts/templateSources.js";
 
 const FIXTURE_ROOT = path.resolve("tests/fixtures/minimal-skill");
+const DEMO_SKILL_CTX = { skillMdRelativePath: "demo-skill/SKILL.md" };
 const tempDirs: string[] = [];
 
 afterEach(() => {
@@ -88,17 +89,29 @@ describe("PromptSourceService", () => {
     expect(target.content).toContain("Demo");
   });
 
-  it("builds improve-skill-description bundle from references", () => {
+  it("builds improve-skill-description bundle from references and target SKILL.md", () => {
     const prompts = loadFixturePromptService();
-    const bundle = prompts.buildPromptBundle("improve-skill-description");
+    const bundle = prompts.buildPromptBundle(
+      "improve-skill-description",
+      DEMO_SKILL_CTX,
+    );
     expect(bundle.templateId).toBe("improve-skill-description");
-    expect(bundle.sections.length).toBe(2);
+    expect(bundle.sections.length).toBe(3);
     expect(bundle.assembledPrompt).toContain("Optimize (fixture)");
     expect(bundle.assembledPrompt).toContain("Authoring guide");
+    expect(bundle.assembledPrompt).toContain("Demo");
     expect(bundle.sourceRefs.map((r) => r.relativePath)).toEqual([
       "skill-set/references/optimize.md",
       "skill-set/references/authoring-guide.md",
+      "demo-skill/SKILL.md",
     ]);
+  });
+
+  it("requires skillMdRelativePath for templates with targetSkillRefs", () => {
+    const prompts = loadFixturePromptService();
+    expect(() =>
+      prompts.buildPromptBundle("improve-skill-description"),
+    ).toThrow(/requires skillMdRelativePath/);
   });
 
   it("builds create-skill-escalation with target SKILL.md", () => {
@@ -130,8 +143,8 @@ describe("PromptSourceService", () => {
     const prompts = loadFixturePromptService();
     for (const id of PROMPT_TEMPLATE_IDS) {
       const ctx =
-        id === "create-skill-escalation"
-          ? { skillMdRelativePath: "demo-skill/SKILL.md" }
+        id === "create-skill-escalation" || id === "improve-skill-description"
+          ? DEMO_SKILL_CTX
           : id === "analyze-trigger-conflicts"
             ? { triggerCatalogText: "demo-skill: testing catalog ingestion" }
             : {};

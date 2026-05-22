@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -24,6 +23,7 @@ const FIXTURE_ROOT = path.resolve("tests/fixtures/minimal-skill");
 
 /**
  * R0.4 milestone E2E — Validation, Source Prompts & AI Proposals (EPIC-4).
+ * Layout manifest: `e2e-r04-layout.test.ts`. CI runway: `e2e-r04-gates.md`.
  */
 describe("R0.4 milestone E2E", () => {
   const packageRoot = path.resolve(".");
@@ -76,48 +76,6 @@ describe("R0.4 milestone E2E", () => {
     });
     return { config, catalog, app, prompts, proposals };
   }
-
-  it("R0.4 layout: prompts, validation, proposals, agent, git, schemas, web workbench", () => {
-    const required = [
-      "src/prompts/PromptSourceService.ts",
-      "src/prompts/SkillReferenceSource.ts",
-      "src/prompts/templateSources.ts",
-      "src/domain/SkillValidationService.ts",
-      "src/domain/ChangeProposalService.ts",
-      "src/ai/AgentSessionRunner.ts",
-      "src/ai/StubAgentSessionRunner.ts",
-      "src/ai/SkillImprovementAdvisor.ts",
-      "src/ai/RelationshipSuggestionAdvisor.ts",
-      "src/git/GitDiffService.ts",
-      "src/http/routes/validation.ts",
-      "src/http/routes/proposals.ts",
-      "src/http/routes/agentSessions.ts",
-      "src/mcp/prompts.ts",
-      "schemas/lint-report.schema.json",
-      "schemas/validation-report.schema.json",
-      "schemas/patch-proposal.schema.json",
-      "schemas/relationship-proposal.schema.json",
-      "schemas/agent-session.schema.json",
-      "web/src/api/validation.ts",
-      "web/src/api/proposals.ts",
-      "web/src/api/agent.ts",
-      "web/src/components/ValidationScorecard.tsx",
-      "web/src/components/PromptActions.tsx",
-      "web/src/components/ProposalList.tsx",
-      "web/src/components/ProposalWorkbenchBanner.tsx",
-      "web/src/lib/proposalRegistry.ts",
-      "web/src/lib/sessionOrigin.ts",
-      "web/src/components/ProposalDetail.tsx",
-      "web/src/components/ProposalDiffViewer.tsx",
-      "web/src/components/AgentSessionStrip.tsx",
-      "web/src/components/CitationChip.tsx",
-      "web/src/components/SettingsAiStrip.tsx",
-      "tests/e2e-r04.test.ts",
-    ];
-    for (const rel of required) {
-      expect(fs.existsSync(path.join(packageRoot, rel))).toBe(true);
-    }
-  });
 
   it("AC-003: lifecycle prompts load from skill-set files (NFR-012)", () => {
     const prompts = new PromptSourceService(fixtureConfig());
@@ -381,18 +339,4 @@ describe("R0.4 milestone E2E", () => {
     expect(sidebar).toMatch(/to:\s*["']\/proposals["']/);
   });
 
-  it(
-    "web production build succeeds (R0.4 smoke)",
-    () => {
-      execSync("npm run web:build", {
-        cwd: packageRoot,
-        stdio: "pipe",
-        env: process.env,
-      });
-      expect(
-        fs.existsSync(path.join(packageRoot, "web/dist/index.html")),
-      ).toBe(true);
-    },
-    120_000,
-  );
 });

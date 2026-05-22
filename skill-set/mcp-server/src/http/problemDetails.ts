@@ -1,5 +1,14 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { PathAccessError } from "../config/pathGuard.js";
+import { ProposalValidationError } from "../domain/proposalValidation.js";
+import { QueryParamError } from "./queryParams.js";
+
+/** Client-safe `detail` strings — never include host filesystem paths (FR-040). */
+export const SAFE_CLIENT_DETAILS = {
+  internal: "An unexpected error occurred",
+  pathForbidden: "Path is outside configured skills roots",
+} as const;
 
 export interface ProblemDetail {
   type: string;
@@ -64,16 +73,39 @@ export function forbiddenProblem(
   });
 }
 
-export function internalProblem(
-  c: Context,
-  detail: string,
-  instance?: string,
-) {
+export function internalProblem(c: Context, instance?: string) {
   return problemResponse(c, {
     type: PROBLEM_TYPES.internal,
     title: "Internal server error",
     status: 500,
-    detail,
+    detail: SAFE_CLIENT_DETAILS.internal,
     instance,
   });
+}
+
+export function logApiError(err: unknown, instance?: string): void {
+  const label = instance ? `[skill-lab ${instance}]` : "[skill-lab]";
+  if (err instanceof Error) {
+    console.error(label, err);
+  } else {
+    console.error(label, err);
+  }
+}
+
+export function handleApiError(c: Context, err: unknown) {
+  const instance = c.req.path;
+
+  if (err instanceof PathAccessError) {
+    logApiError(err, instance);
+    return forbiddenProblem(c, SAFE_CLIENT_DETAILS.pathForbidden, instance);
+  }
+  if (err instanceof QueryParamError) {
+    return validationProblem(c, err.message, instance);
+  }
+  if (err instanceof ProposalValidationError) {
+    return validationProblem(c, err.message, instance);
+  }
+
+  logApiError(err, instance);
+  return internalProblem(c, instance);
 }

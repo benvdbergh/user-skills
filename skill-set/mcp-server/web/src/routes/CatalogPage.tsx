@@ -114,15 +114,17 @@ export function CatalogPage() {
     const list = filterCatalogRows(rows, search, filters);
     const k = sort.key;
     return [...list].sort((a, b) => {
-      let av: string | number = a[k];
-      let bv: string | number = b[k];
+      let av: string | number;
+      let bv: string | number;
       if (k === "health") {
         av = a.health.status;
         bv = b.health.status;
-      }
-      if (k === "relationshipCount") {
+      } else if (k === "relationshipCount") {
         av = a.relationshipCount ?? -1;
         bv = b.relationshipCount ?? -1;
+      } else {
+        av = a[k] as string | number;
+        bv = b[k] as string | number;
       }
       if (typeof av === "number" && typeof bv === "number") {
         return sort.dir === "asc" ? av - bv : bv - av;

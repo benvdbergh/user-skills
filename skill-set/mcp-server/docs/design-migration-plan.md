@@ -4,7 +4,7 @@
 **Source mockup:** `skill-set/mcp-server/web-js/` (`Skill Lab.html`, `styles-1..5.css`, `*.jsx`)  
 **Target:** `skill-set/mcp-server/web/src/` (Vite + React 19 + TypeScript)  
 **Requirements SSOT:** `spec/skill-lab-mcp-control-plane.md` (FR-039–042, US-001–011)  
-**Architecture:** `docs/architecture.md` § Dashboard architecture (R0.3)
+**Architecture:** [`docs/architecture.md`](architecture.md) — dashboard shell and R0.4 routes (proposals workbench)
 
 ## Executive summary
 
@@ -55,7 +55,7 @@ routes/*  →  api/*  →  HTTP /api/*  →  domain/
 | **CSS** | Per-component `skill-lab-*` / page CSS | Global `sl-*` + CSS variables | Merge `styles-1..5.css` into `src/styles/` or phased imports |
 | **Catalog detail** | Navigate to `/skills/...` | Side panel + `?skill=` | **ADR below** — dual pattern |
 | **Graph canvas** | `@xyflow/react` | Hand-rolled SVG | **Restyle Flow** — do not swap layout engine in R0.3 |
-| **Proposals** | Disabled nav + placeholder | Sketched R0.4 UI | Port **static sketch only**; keep non-functional until R0.4 |
+| **Proposals** | R0.4 functional workbench (`/proposals`, agent strip, diff preview) | Richer visual polish in mockup | **Restyle in place** — do not remove API-backed flows; Apply stays disabled until R1.0 |
 | **Tweaks panel** | — | Theme/accent/density toggles | **Drop** — ship `data-theme="dark"` + sage accent default |
 
 ### Key decision: catalog skill detail (ADR)
@@ -189,7 +189,7 @@ flowchart LR
 | **STORY-3-8** | Sidebar, TopBar, env switcher in rail, health pip stub | Layout-only; routes unchanged |
 | **STORY-3-9** | Catalog stats strip, `sl-table`, dashed filter chips | Same hooks; markup/CSS |
 | **STORY-3-10** | `SkillDetailContent` + panel + `?skill=` | Biggest behavioral change |
-| **STORY-3-11** | Flow node styling, health expandable UI, proposals sketch | Can split into 2 PRs if needed |
+| **STORY-3-11** | Flow node styling, health expandable UI, proposals workbench polish | Can split into 2 PRs if needed |
 
 ## Reference mapping (prototype → production)
 

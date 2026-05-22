@@ -7,12 +7,19 @@ const webLib = path.join(
   "../web/src/lib/agentSessionLabels.ts",
 );
 
-const { ADVISOR_SKILL_ACTIONS, agentSessionKindLabel, isClaudeRuntime } =
-  await import(webLib);
+const { agentSessionKindLabel, isClaudeRuntime } = await import(webLib);
 
 describe("agentSessionLabels", () => {
-  it("exposes advisor action labels aligned with Health CTAs", () => {
-    expect(ADVISOR_SKILL_ACTIONS).toEqual([
+  it("labels skill-detail advisor kinds aligned with Health CTAs", async () => {
+    const { SKILL_DETAIL_ADVISOR_AGENT_KINDS } = await import(
+      "../src/domain/healthRemediationPolicy.js",
+    );
+    expect(
+      SKILL_DETAIL_ADVISOR_AGENT_KINDS.map((kind) => ({
+        kind,
+        label: agentSessionKindLabel(kind),
+      })),
+    ).toEqual([
       { kind: "improve-skill", label: "Improve description" },
       { kind: "create-escalation", label: "Draft escalation" },
     ]);

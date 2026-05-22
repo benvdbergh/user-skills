@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { SkillLabConfig } from "../config/loadConfig.js";
+import { SKILL_DETAIL_ADVISOR_AGENT_KINDS } from "./healthRemediationPolicy.js";
 import type { Environment, SkillDetail, SkillSummary } from "./types.js";
 import { FileSystemSkillRepository } from "../repositories/FileSystemSkillRepository.js";
 import { SkillIndexRepository } from "../repositories/SkillIndexRepository.js";
@@ -123,6 +124,7 @@ export class SkillCatalogService {
       hasSkillEscalation: parsed.hasSkillEscalation,
       missingReferences: parsed.missingReferences,
       sourcePath: posixPath,
+      advisorAgentKinds: [...SKILL_DETAIL_ADVISOR_AGENT_KINDS],
     };
   }
 

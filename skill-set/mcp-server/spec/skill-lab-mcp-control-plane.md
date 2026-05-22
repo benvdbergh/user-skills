@@ -708,7 +708,7 @@ Required before implementation starts:
 - Define local configuration file format for skills roots and environment path overrides.
 - Define write-confirmation mechanism for MCP and HTTP calls.
 
-Status: **Pending architecture decisions**.
+Status: **Pass** — recorded in `docs/architecture.md` (Node 20+, Hono, Zod, colocated `web/`, `skill-lab.config.json`, `writesEnabled` default false).
 
 ### Gate 3: Release Ready
 
@@ -720,7 +720,7 @@ Required before daily use:
 - Add safety tests proving write tools reject unconfirmed mutations.
 - Add Git dirty-worktree overlap detection.
 
-Status: **Not started**.
+Status: **Partial — R0.4 milestone** (`tests/e2e-r01.test.ts` … `tests/e2e-r04.test.ts`, `npm test` including `web:typecheck` + `web:build`). README covers MCP/dashboard startup; fixture coverage for catalog, graph, health, validation, proposals, and agent sessions; `writesEnabled` / no-apply guards in R0.4 (NFR-007). **Deferred to R1.0:** write-confirmation UX, `apply_approved_patch`, Git dirty-worktree overlap on apply (see `docs/architecture.md` out-of-scope). HTTP/UI contract SSOT: `docs/ui-api-compatibility.md`.
 
 ## Open Questions
 

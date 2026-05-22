@@ -61,9 +61,12 @@ describe("MCP prompts (BEN-33)", () => {
     });
     expect(bundle.assembledPrompt).toContain("Optimize (fixture)");
     expect(bundle.assembledPrompt).toContain("Authoring guide");
-    expect(bundle.sourceRefs.every((r) => r.relativePath.includes("skill-set/"))).toBe(
-      true,
-    );
+    expect(bundle.assembledPrompt).toContain("Demo");
+    expect(bundle.sourceRefs.map((r) => r.relativePath)).toEqual([
+      "skill-set/references/optimize.md",
+      "skill-set/references/authoring-guide.md",
+      "demo-skill/SKILL.md",
+    ]);
   });
 
   it("normalizes sourceRefs under skillSetRoot in GetPromptResult _meta", () => {

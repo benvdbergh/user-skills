@@ -9,7 +9,7 @@ import { SkillHealthService } from "./domain/SkillHealthService.js";
 import { createApi } from "./http/api.js";
 import { createAgentServices } from "./http/createAgentServices.js";
 import { createProposalServices } from "./http/createProposalServices.js";
-import { createValidationService } from "./http/createValidationServices.js";
+import { createValidationServices } from "./http/createValidationServices.js";
 import { PromptSourceService } from "./prompts/PromptSourceService.js";
 import { RelationshipMapRepository } from "./repositories/RelationshipMapRepository.js";
 import { startMcpServer } from "./mcp/server.js";
@@ -29,7 +29,7 @@ async function startHttpServer(options?: {
   const health = new SkillHealthService(config, catalog);
   const { agent, proposals, prompts } = createAgentServices(config, catalog);
   const proposalRoutes = createProposalServices(config, catalog, proposals);
-  const validation = createValidationService(config, catalog, agent);
+  const { validation } = createValidationServices(config, catalog, agent);
   const relationshipMap = new RelationshipMapRepository(config);
   const staticDir = options?.staticDir;
   const app = createApi(

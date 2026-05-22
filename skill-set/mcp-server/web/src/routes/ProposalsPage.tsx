@@ -32,7 +32,7 @@ export function ProposalsPage() {
   const patchFromUrl = searchParams.get("patch");
   const skillFromUrl = searchParams.get("skill");
   const readyFromUrl = searchParams.get("ready") === "1";
-  const { proposalListRevision } = useAgentSession();
+  const { proposalListRevision, sessionId: activeSessionId } = useAgentSession();
   const [tab, setTab] = useState<WorkbenchTab>("patches");
   const [tokens, setTokens] = useState<string[]>(() => listProposalTokens());
   const [listLoading, setListLoading] = useState(false);
@@ -51,7 +51,9 @@ export function ProposalsPage() {
     setListLoading(true);
     setListError(null);
     const local = listProposalTokens();
-    void fetchProposalTokens()
+    void fetchProposalTokens(
+      activeSessionId ? { sessionId: activeSessionId } : undefined,
+    )
       .then((serverTokens) => {
         for (const token of serverTokens) {
           addProposalToken(token);
@@ -65,7 +67,7 @@ export function ProposalsPage() {
       .finally(() => {
         setListLoading(false);
       });
-  }, []);
+  }, [activeSessionId]);
 
   useEffect(() => {
     refreshTokens();
@@ -204,6 +206,7 @@ export function ProposalsPage() {
         <aside className="sl-workbench-list" aria-label="Proposal list">
           <ProposalList
             tokens={tokens}
+            sessionId={activeSessionId}
             selectedToken={selectedToken}
             tab={tab}
             listLoading={listLoading}

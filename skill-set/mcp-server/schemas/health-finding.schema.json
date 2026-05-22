@@ -12,7 +12,18 @@
     "sourcePath": { "type": "string" },
     "recommendation": { "type": "string" },
     "environmentId": { "type": "string" },
-    "skillName": { "type": "string" }
+    "skillName": { "type": "string" },
+    "primaryAction": { "enum": ["manual", "agent", "none"] },
+    "agentKind": {
+      "enum": [
+        "improve-skill",
+        "create-escalation",
+        "validate-skill",
+        "suggest-relationships",
+        "analyze-trigger-conflicts",
+        "skill-patch"
+      ]
+    }
   },
   "additionalProperties": false
 }

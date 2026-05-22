@@ -64,7 +64,7 @@ export class PromptSourceService {
     if (plan.targetSkillRefs?.length) {
       if (!targetSkillRoot) {
         throw new Error(
-          `Template ${templateId} requires skillMdRelativePath in context`,
+          `Template ${templateId} requires skillMdRelativePath in context. Pass skillMdRelativePath, or environmentId and skillName via buildPromptBundleContext.`,
         );
       }
       for (const ref of plan.targetSkillRefs) {

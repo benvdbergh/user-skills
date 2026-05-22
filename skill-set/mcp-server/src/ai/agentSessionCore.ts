@@ -26,6 +26,10 @@ export function resolveRuntime(request: AgentTaskRequest): AgentRuntime {
   return request.runtime ?? "claude-headless";
 }
 
+export function isClaudeRuntime(runtime: AgentRuntime): boolean {
+  return runtime === "claude-headless" || runtime === "claude-background";
+}
+
 export function manifestToSession(m: SessionManifest): AgentSession {
   return AgentSessionSchema.parse({
     id: m.id,

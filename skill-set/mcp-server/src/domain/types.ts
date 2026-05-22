@@ -26,6 +26,16 @@ export const SkillFileRefSchema = z.object({
 });
 export type SkillFileRef = z.infer<typeof SkillFileRefSchema>;
 
+export const AgentSessionKindSchema = z.enum([
+  "improve-skill",
+  "create-escalation",
+  "validate-skill",
+  "suggest-relationships",
+  "analyze-trigger-conflicts",
+  "skill-patch",
+]);
+export type AgentSessionKind = z.infer<typeof AgentSessionKindSchema>;
+
 export const SkillDetailSchema = SkillSummarySchema.extend({
   license: z.string().optional(),
   compatibility: z.string().optional(),
@@ -38,8 +48,13 @@ export const SkillDetailSchema = SkillSummarySchema.extend({
   hasSkillEscalation: z.boolean(),
   missingReferences: z.array(z.string()),
   sourcePath: z.string(),
+  /** Advisor session kinds for skill detail (FR-043 / US-034). */
+  advisorAgentKinds: z.array(AgentSessionKindSchema).optional(),
 });
 export type SkillDetail = z.infer<typeof SkillDetailSchema>;
+
+export const HealthPrimaryActionSchema = z.enum(["manual", "agent", "none"]);
+export type HealthPrimaryAction = z.infer<typeof HealthPrimaryActionSchema>;
 
 export const HealthFindingSchema = z.object({
   id: z.string(),
@@ -50,6 +65,8 @@ export const HealthFindingSchema = z.object({
   recommendation: z.string().optional(),
   environmentId: z.string().optional(),
   skillName: z.string().optional(),
+  primaryAction: HealthPrimaryActionSchema.optional(),
+  agentKind: AgentSessionKindSchema.optional(),
 });
 export type HealthFinding = z.infer<typeof HealthFindingSchema>;
 
@@ -270,16 +287,6 @@ export const AgentRuntimeSchema = z.enum([
 ]);
 export type AgentRuntime = z.infer<typeof AgentRuntimeSchema>;
 
-export const AgentSessionKindSchema = z.enum([
-  "improve-skill",
-  "create-escalation",
-  "validate-skill",
-  "suggest-relationships",
-  "analyze-trigger-conflicts",
-  "skill-patch",
-]);
-export type AgentSessionKind = z.infer<typeof AgentSessionKindSchema>;
-
 export const AgentAuthStatusSchema = z.object({
   authenticated: z.boolean(),
   provider: z.enum(["claude", "none"]),
@@ -364,6 +371,10 @@ export const ProposeSkillPatchInputSchema = z.object({
 export type ProposeSkillPatchInput = z.infer<
   typeof ProposeSkillPatchInputSchema
 >;
+
+/** MCP `propose_skill_patch` inputSchema — derived from {@link ProposeSkillPatchInputSchema} (Contract SSOT). */
+export const ProposeSkillPatchMcpInputSchema =
+  ProposeSkillPatchInputSchema.shape;
 
 export const EvidenceQuoteSchema = z.object({
   sourceFile: z.string().min(1),
