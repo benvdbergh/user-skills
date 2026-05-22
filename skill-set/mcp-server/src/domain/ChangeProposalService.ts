@@ -154,12 +154,21 @@ export class ChangeProposalService {
   }
 
   listTokensForSession(sessionId: string): string[] {
-    return [...this.byToken.values()]
-      .filter((stored) => {
-        const p = stored.proposal;
-        return "sessionId" in p && p.sessionId === sessionId;
-      })
-      .map((stored) => stored.proposal.patchToken);
+    const tokens = new Set<string>();
+    for (const stored of this.byToken.values()) {
+      const p = stored.proposal;
+      if ("sessionId" in p && p.sessionId === sessionId) {
+        tokens.add(p.patchToken);
+      }
+    }
+    for (const patchToken of this.listProposalTokens()) {
+      const stored = this.getStored(patchToken);
+      const p = stored?.proposal;
+      if (p && "sessionId" in p && p.sessionId === sessionId) {
+        tokens.add(patchToken);
+      }
+    }
+    return [...tokens];
   }
 
   /** In-memory tokens plus persisted `.generated/proposals/*.json` (newest first). */
@@ -183,9 +192,8 @@ export class ChangeProposalService {
 
   private store(stored: StoredProposal): void {
     this.byToken.set(stored.proposal.patchToken, stored);
-    if (this.config.writesEnabled) {
-      this.persist(stored.proposal);
-    }
+    // Review artifacts under .generated/proposals — not gated by writesEnabled (skill apply is).
+    this.persist(stored.proposal);
   }
 
   private persist(proposal: StoredProposal["proposal"]): void {

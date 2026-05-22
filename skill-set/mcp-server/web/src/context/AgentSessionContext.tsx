@@ -28,6 +28,8 @@ import {
 
   type AgentAuthStatus,
 
+  type AgentHealthFindingContext,
+
   type AgentSession,
 
   type AgentSessionKind,
@@ -65,6 +67,10 @@ export interface AgentSessionStartParams {
   skillName: string;
 
   navigateOnComplete?: boolean;
+
+  /** Passed when starting from a health finding (e.g. missing escalation). */
+
+  healthFinding?: AgentHealthFindingContext;
 
 }
 
@@ -347,6 +353,8 @@ export function AgentSessionProvider({ children }: { children: ReactNode }) {
           skillName: params.skillName,
 
           runtime,
+
+          healthFinding: params.healthFinding,
 
         });
 

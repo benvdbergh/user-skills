@@ -170,8 +170,8 @@ describe("patch proposals (BEN-35)", () => {
     expect(body.proposal.patchToken).toBe(proposal.patchToken);
   });
 
-  it("persists proposal JSON under .generated/proposals when writesEnabled", async () => {
-    const { pkg, config, app } = loadFixtureProposalsApi(true);
+  it("persists proposal JSON under .generated/proposals (independent of writesEnabled)", async () => {
+    const { pkg, config, app } = loadFixtureProposalsApi(false);
     tempDirs.push(pkg);
     const created = await app.request("/api/proposals/skill-patch", {
       method: "POST",

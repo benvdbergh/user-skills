@@ -31,7 +31,6 @@ export function AgentSkillActions({
       environmentId,
       skillName,
       navigateOnComplete: true,
-      returnOrigin: { kind: "skill", environmentId, skillName },
     });
 
   };

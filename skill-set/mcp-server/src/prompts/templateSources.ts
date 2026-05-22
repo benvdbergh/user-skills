@@ -18,7 +18,7 @@ export const PROMPT_TEMPLATE_SOURCES: Record<string, PromptTemplateSourcePlan> =
     },
     "create-skill-escalation": {
       skillSetRefs: [
-        { relativePath: "skill-set/references/authoring-guide.md" },
+        { relativePath: "skill-set/references/create-escalation.md" },
       ],
       targetSkillRefs: [{ relativePath: "SKILL.md" }],
     },

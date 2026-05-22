@@ -118,6 +118,7 @@ export function buildPromptContext(
   environmentId: string;
   skillName: string;
   skillMdRelativePath: string;
+  healthFindingText?: string;
 } {
   const detail = catalog.getSkillDetail(
     request.environmentId,
@@ -130,7 +131,24 @@ export function buildPromptContext(
     environmentId: request.environmentId,
     skillName: request.skillName,
     skillMdRelativePath: detail.path,
+    healthFindingText: formatHealthFindingText(request.healthFinding),
   };
+}
+
+export function formatHealthFindingText(
+  finding: AgentTaskRequest["healthFinding"],
+): string | undefined {
+  if (!finding) return undefined;
+  const lines = [
+    finding.id ? `Finding ID: ${finding.id}` : null,
+    `Category: ${finding.category}`,
+    `Message: ${finding.message}`,
+    finding.recommendation
+      ? `Recommendation: ${finding.recommendation}`
+      : null,
+    finding.sourcePath ? `Source path: ${finding.sourcePath}` : null,
+  ].filter((line): line is string => Boolean(line));
+  return lines.length ? lines.join("\n") : undefined;
 }
 
 export function buildTaskPrompt(

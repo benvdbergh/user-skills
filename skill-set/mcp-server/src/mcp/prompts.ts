@@ -40,7 +40,7 @@ const MCP_PROMPT_META: Record<
     templateId: "create-skill-escalation",
     title: "Create skill escalation",
     description:
-      "Draft or refine a skill escalation reference using authoring guidance and the target SKILL.md.",
+      "Draft references/skill-escalation.md from the narrow create-escalation rubric and target SKILL.md (not full lint/validate).",
     requiresSkill: true,
   },
   "skill-lab/validate-skill-effectiveness": {

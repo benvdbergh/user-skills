@@ -112,6 +112,18 @@ export class PromptSourceService {
       sourceRefs.push(syntheticRef);
     }
 
+    if (templateId === "create-skill-escalation" && context.healthFindingText) {
+      const syntheticRef: PromptSourceRef = {
+        relativePath: "skill-lab://health-finding",
+      };
+      sections.unshift({
+        ref: syntheticRef,
+        content: context.healthFindingText.trim(),
+        heading: "Health scan finding",
+      });
+      sourceRefs.unshift(syntheticRef);
+    }
+
     const assembledPrompt = assemblePromptSections(templateId, sections);
     return PromptBundleSchema.parse({
       templateId,

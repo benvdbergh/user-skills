@@ -57,10 +57,26 @@ describe("agent session Claude launch", () => {
       "claude-headless",
     );
     expect(cmd).toContain("claude --resume 00000000-0000-4000-8000-000000000001");
+    expect(cmd).toContain("--mcp-config");
+    expect(cmd).toContain("skill-lab.mcp.json");
+    expect(cmd).toContain("--strict-mcp-config");
+    expect(cmd).toContain("--add-dir");
     expect(cmd).toContain("task.md");
     expect(cmd).not.toContain("--continue");
     expect(cmd).toContain("agent-sessions");
     expect(buildResumeShellCommand("C:\\skills", manifest.id, "stub")).toBeUndefined();
+  });
+
+  it("buildShortClaudePrompt for create-escalation avoids improve-skill wording", () => {
+    const escalationManifest = {
+      ...manifest,
+      kind: "create-escalation" as const,
+      promptTemplateId: "create-skill-escalation",
+    };
+    const prompt = buildShortClaudePrompt(escalationManifest, detail);
+    expect(prompt).toContain("skill-escalation.md");
+    expect(prompt).toContain("Do not run lint or validate");
+    expect(prompt.startsWith("Draft references")).toBe(true);
   });
 
   it("buildClaudeSpawnArgs omits prompt text (stdin only)", () => {

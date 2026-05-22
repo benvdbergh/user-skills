@@ -107,9 +107,23 @@ describe("PromptSourceService", () => {
       skillMdRelativePath: "demo-skill/SKILL.md",
     });
     expect(bundle.sections.some((s) => s.content.includes("Demo"))).toBe(true);
-    expect(bundle.sections.some((s) => s.content.includes("Authoring guide"))).toBe(
+    expect(bundle.sections.some((s) => s.content.includes("Draft skill-escalation"))).toBe(
       true,
     );
+    expect(bundle.sourceRefs.map((r) => r.relativePath)).toContain(
+      "skill-set/references/create-escalation.md",
+    );
+  });
+
+  it("prepends health finding for create-skill-escalation", () => {
+    const prompts = loadFixturePromptService();
+    const bundle = prompts.buildPromptBundle("create-skill-escalation", {
+      skillMdRelativePath: "demo-skill/SKILL.md",
+      healthFindingText:
+        "Category: escalation\nMessage: missing references/skill-escalation.md",
+    });
+    expect(bundle.sections[0]?.heading).toBe("Health scan finding");
+    expect(bundle.assembledPrompt).toContain("Category: escalation");
   });
 
   it("supports all lifecycle template IDs", () => {

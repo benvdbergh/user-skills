@@ -23,12 +23,21 @@ export interface AgentAuthStatus {
   message?: string;
 }
 
+export interface AgentHealthFindingContext {
+  id?: string;
+  category: string;
+  message: string;
+  recommendation?: string;
+  sourcePath?: string;
+}
+
 export interface AgentTaskRequest {
   runtime?: AgentRuntime;
   kind: AgentSessionKind;
   environmentId: string;
   skillName: string;
   promptTemplateId?: string;
+  healthFinding?: AgentHealthFindingContext;
 }
 
 export interface AgentSession {

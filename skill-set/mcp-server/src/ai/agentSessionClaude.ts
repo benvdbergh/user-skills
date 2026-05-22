@@ -6,18 +6,23 @@ import { agentSessionDir } from "./generatedPaths.js";
 import { ensureAgentSessionDir } from "./agentSessionArtifacts.js";
 import type { SessionManifest } from "./agentSessionArtifacts.js";
 
+function mcpDeliverableTool(kind: SessionManifest["kind"]): string {
+  if (kind === "suggest-relationships") return "suggest_relationship_edges";
+  if (kind === "analyze-trigger-conflicts") return "detect_trigger_conflicts";
+  return "propose_skill_patch";
+}
+
 /** Prepended to task.md so the fixed target is visible before the rubric. */
 export function prependAgentTaskHeader(
   manifest: SessionManifest,
   detail: SkillDetail,
   assembledPrompt: string,
 ): string {
-  const toolHint =
-    manifest.kind === "suggest-relationships"
-      ? "suggest_relationship_edges"
-      : manifest.kind === "analyze-trigger-conflicts"
-        ? "detect_trigger_conflicts"
-        : "propose_skill_patch";
+  const toolHint = mcpDeliverableTool(manifest.kind);
+  const scopeNote =
+    manifest.kind === "create-escalation"
+      ? "Draft `references/skill-escalation.md` only. Do **not** run lint, validate, or full-catalog health scans — use the Health scan finding (if present) and the rubric below."
+      : "Work only on the named skill. Read the rubric sections below, then read the target SKILL.md under the skills root.";
   const header = [
     "# Skill Lab agent task (fixed target — do not ask which skill to run)",
     "",
@@ -28,7 +33,7 @@ export function prependAgentTaskHeader(
     `- **SKILL.md path (from skills root):** ${detail.path}`,
     `- **MCP deliverable:** \`${toolHint}\` with the sessionId above`,
     "",
-    "Work only on the named skill. Read the rubric sections below, then read the target SKILL.md under the skills root.",
+    scopeNote,
     "",
     "---",
     "",
@@ -44,12 +49,18 @@ export function buildShortClaudePrompt(
   manifest: SessionManifest,
   detail: SkillDetail,
 ): string {
-  const toolHint =
-    manifest.kind === "suggest-relationships"
-      ? "suggest_relationship_edges"
-      : manifest.kind === "analyze-trigger-conflicts"
-        ? "detect_trigger_conflicts"
-        : "propose_skill_patch";
+  const toolHint = mcpDeliverableTool(manifest.kind);
+  if (manifest.kind === "create-escalation") {
+    return [
+      `Draft references/skill-escalation.md for skill "${manifest.skillName}" in environment "${manifest.environmentId}".`,
+      `This is a Skill Lab create-escalation session; the target is already chosen — do not ask which skill to use.`,
+      `Open task.md first (health finding if any, then the narrow escalation rubric).`,
+      `Do not run lint or validate workflows — fix the missing escalation artifact only.`,
+      `Target SKILL.md: ${detail.path} (under the added skills root directory).`,
+      `When done, call skill-lab MCP ${toolHint} with sessionId "${manifest.id}", environmentId "${manifest.environmentId}", skillName "${manifest.skillName}", citations, and fileChanges for references/skill-escalation.md (and SKILL.md only if you add a routing row).`,
+      `Do not edit skill files directly except via the MCP proposal.`,
+    ].join(" ");
+  }
   return [
     `Improve the agent skill "${manifest.skillName}" in environment "${manifest.environmentId}".`,
     `This is a Skill Lab ${manifest.kind} session; the target is already chosen — do not ask which skill to use.`,
@@ -76,9 +87,18 @@ export function buildResumeShellCommand(
 ): string | undefined {
   if (runtime === "stub") return undefined;
   const dir = agentSessionDir(skillsRoot, sessionId);
+  const mcpConfigPath = path.join(dir, "skill-lab.mcp.json");
   const quotedDir = JSON.stringify(dir);
+  const quotedMcp = JSON.stringify(mcpConfigPath);
+  const quotedSkillsRoot = JSON.stringify(skillsRoot);
   const quotedPrompt = JSON.stringify(RESUME_PROMPT);
-  const resume = `claude --resume ${sessionId} ${quotedPrompt}`;
+  const resume = [
+    `claude --resume ${sessionId}`,
+    `--mcp-config ${quotedMcp}`,
+    "--strict-mcp-config",
+    `--add-dir ${quotedSkillsRoot}`,
+    quotedPrompt,
+  ].join(" ");
   if (process.platform === "win32") {
     return `cd ${quotedDir}; ${resume}`;
   }

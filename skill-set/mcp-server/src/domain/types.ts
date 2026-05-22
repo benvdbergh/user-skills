@@ -247,8 +247,21 @@ export const PromptBundleContextSchema = z.object({
   triggerCatalogText: z.string().optional(),
   /** Optional relationship map excerpt for suggest-relationships. */
   relationshipMapText: z.string().optional(),
+  /** Health scan finding for create-escalation (from Suggest fix). */
+  healthFindingText: z.string().optional(),
 });
 export type PromptBundleContext = z.infer<typeof PromptBundleContextSchema>;
+
+export const AgentHealthFindingContextSchema = z.object({
+  id: z.string().optional(),
+  category: z.string(),
+  message: z.string(),
+  recommendation: z.string().optional(),
+  sourcePath: z.string().optional(),
+});
+export type AgentHealthFindingContext = z.infer<
+  typeof AgentHealthFindingContextSchema
+>;
 
 export const AgentRuntimeSchema = z.enum([
   "claude-headless",
@@ -280,6 +293,8 @@ export const AgentTaskRequestSchema = z.object({
   environmentId: z.string(),
   skillName: z.string(),
   promptTemplateId: z.string().optional(),
+  /** When started from a health finding (e.g. missing escalation). */
+  healthFinding: AgentHealthFindingContextSchema.optional(),
 });
 export type AgentTaskRequest = z.infer<typeof AgentTaskRequestSchema>;
 

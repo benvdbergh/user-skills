@@ -459,7 +459,7 @@ Registered in `mcp/prompts.ts`; bodies from `PromptSourceService` only.
 | Prompt name | Source refs (typical) |
 |-------------|----------------------|
 | `skill-lab/improve-skill-description` | `optimize.md`, `authoring-guide.md` |
-| `skill-lab/create-skill-escalation` | `authoring-guide.md`, skill `SKILL.md` |
+| `skill-lab/create-skill-escalation` | `create-escalation.md`, skill `SKILL.md`; optional health finding from Suggest fix |
 | `skill-lab/validate-skill-effectiveness` | `validate.md`, `effectiveness-assessment.md` |
 | `skill-lab/suggest-relationships` | `synthesize.md`, relationship map context |
 | `skill-lab/analyze-trigger-conflicts` | catalog triggers + `lint.md` |

@@ -395,13 +395,13 @@ export function HealthPage() {
                       expanded={expandedId === finding.id}
                       environmentId={environmentId}
                       sessionBusy={sessionBusy}
-                      onStartAgent={(kind, skillName, envId) =>
+                      onStartAgent={(kind, skillName, envId, healthFinding) =>
                         void startSession({
                           kind,
                           environmentId: envId,
                           skillName,
                           navigateOnComplete: true,
-                          returnOrigin: { kind: "health" },
+                          healthFinding,
                         })
                       }
                       onToggle={() =>
@@ -611,6 +611,13 @@ function FindingRow({
     kind: AgentSessionKind,
     skillName: string,
     environmentId: string,
+    healthFinding?: {
+      id?: string;
+      category: string;
+      message: string;
+      recommendation?: string;
+      sourcePath?: string;
+    },
   ) => void;
   onToggle: () => void;
 }) {
@@ -728,7 +735,15 @@ function FindingRow({
             agentHintId={agentHintId}
             onCopyFixSteps={() => void copyFixSteps()}
             onStartAgent={(kind) => {
-              if (skillName && envId) onStartAgent(kind, skillName, envId);
+              if (skillName && envId) {
+                onStartAgent(kind, skillName, envId, {
+                  id: finding.id,
+                  category: finding.category,
+                  message: finding.message,
+                  recommendation: finding.recommendation,
+                  sourcePath: finding.sourcePath,
+                });
+              }
             }}
           />
           {fixCopyHint ? (
