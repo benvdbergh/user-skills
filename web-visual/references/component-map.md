@@ -258,13 +258,47 @@ Implementation options:
 
 ---
 
+### citation-appendix
+
+**Use when**: Deep-research reports, footnoted analysis, any page with numbered `[n]` references
+**Content signals**: Citation appendix, references section, URL list at document end
+
+```html
+<section class="citations" id="references" aria-labelledby="references-heading">
+  <h2 id="references-heading">References</h2>
+  <ol class="citations__list">
+    <li id="ref-1"><a href="{url}" rel="noopener noreferrer">{title}</a> — {publisher}, {date}</li>
+  </ol>
+</section>
+```
+
+**Styling**: Smaller type, break-all URLs, back-to-content links optional. Inline `[n]` in prose link to `#ref-n`.
+
+---
+
+### reading-progress
+
+**Use when**: Long reports (12+ sections) where orientation helps
+**Content signals**: Activated by `long-report` workflow
+
+```html
+<div class="reading-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+  <div class="reading-progress__bar"></div>
+</div>
+```
+
+**Styling**: Fixed top, 2–3px height, accent color; update width from scroll %. Disable animation when `prefers-reduced-motion: reduce`.
+
+---
+
 ## Component Composition
 
 Most pages use 3-6 components in combination. Typical compositions:
 
 | Page Type | Component Stack |
 |---|---|
-| Research report | hero → metric-cards → narrative-section → data-chart → comparison-grid → narrative-section |
+| Research report | hero → metric-cards → narrative-section → data-chart → comparison-grid → narrative-section → citation-appendix |
+| Long / deep-research dossier | hero → metric-cards → narrative (exec) → [batched sections + TOC] → accordion (appendix) → citation-appendix |
 | Product roadmap | hero → timeline → tabbed-content (per phase) → flow-diagram |
 | Dashboard | metric-cards → data-chart (×2-3) → comparison-grid → accordion (details) |
 | Process documentation | hero → flow-diagram → tabbed-content → accordion (FAQ) |

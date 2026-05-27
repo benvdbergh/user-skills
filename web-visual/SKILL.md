@@ -1,195 +1,132 @@
 ---
 name: web-visual
 description: >-
-  Transform text content, research reports, and structured data into polished,
-  interactive single-file HTML5 visualizations. USE WHEN generate HTML page,
-  create visualization, interactive report, web visual, visual report, data
-  dashboard, content to HTML, generative UI, interactive page, visual summary,
-  HTML export, web presentation, data visualization.
+  Transform text content, research reports (including deep-research outputs), and
+  structured data into polished, interactive single-file HTML5 visualizations.
+  USE WHEN generate HTML page, create visualization, interactive report, web visual,
+  visual report, long report HTML, research dossier page, data dashboard, content to
+  HTML, generative UI, interactive page, visual summary, HTML export, web presentation,
+  data visualization.
 license: MIT
 metadata:
   author: PAI
-  version: 1.1.0
+  version: 1.3.0
 ---
 
 # web-visual
 
-Generative UI skill that transforms textual content into polished, self-contained HTML5 + CSS3 + JavaScript visualizations. Inspired by the Gemini Generative UI pipeline: the agent stops acting like a writer and starts acting like a full-stack developer and UI designer.
+Generative UI skill: turn textual or research content into polished, self-contained HTML5 pages. Pipeline summary: **ingest → design → compose → critique** — full steps in `references/compose.md`.
 
-## Core Pipeline
+## Mandatory Behaviors
 
-Every visualization follows a four-stage transformation:
+1. **Resolve output path** per Output Convention before writing any file.
+2. **Classify input**: short page | long report | deep-research | CSV/dashboard — route per table below.
+3. **Long-report triggers** → require **blueprint** with Report Spec; never single-pass wall-of-text HTML.
+4. **deep-research input** → read `references/deep-research-handoff.md` before compose.
+5. **Promote prose semantically** using `references/markdown-patterns.md` (analyzer, not 1:1 markdown mirror).
+6. **End compose** with Stage 4 checklist; run `audit` workflow when the user asks for quality validation.
+7. **Escalate** decks, diagrams, research, or product UI per `references/skill-escalation.md`.
 
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│  INGEST     │ →  │  DESIGN     │ →  │  CODE       │ →  │  CRITIQUE   │
-│             │    │             │    │             │    │             │
-│ Parse       │    │ Select UI   │    │ Generate    │    │ Validate    │
-│ structure,  │    │ metaphors,  │    │ HTML/CSS/JS │    │ a11y, perf, │
-│ verbalize   │    │ map intent  │    │ single-file │    │ responsive  │
-│ data trends │    │ to layout   │    │ output      │    │ layout      │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-```
+## Input Routing
 
-### Stage 1: Structural Analysis & Verbalization (Ingest)
-
-- Parse content hierarchy: headers, sections, data points, conclusions
-- Identify data types: quantitative, categorical, temporal, relational, geographic
-- **Verbalize** complex data: annotate trends, comparisons, and key takeaways
-  so the design stage understands what to highlight
-- Build an internal "content graph" of entities and their relationships
-
-### Stage 2: Intent-to-Interface Mapping (Design)
-
-Select visual components based on content semantics, not generic templates:
-
-| Content Pattern | Visual Metaphor | Component |
-|----------------|-----------------|-----------|
-| Comparison data | Side-by-side cards, filterable table | `comparison-grid` |
-| Process / workflow | Interactive flowchart, stepper | `flow-diagram` |
-| Timeline / history | Horizontal timeline, scroll-reveal | `timeline` |
-| Hierarchical data | Tree diagram, nested accordions | `hierarchy-tree` |
-| Quantitative data | Bar/line/pie charts | `data-chart` |
-| Key metrics | KPI cards with sparklines | `metric-cards` |
-| Narrative text | Typography-first sections, pull quotes | `narrative-section` |
-| Relationships | Network graph, connection diagram | `relationship-map` |
-| Geographic data | Styled map with markers | `geo-visual` |
-
-Full mapping reference: `references/component-map.md`
-
-### Stage 3: Code Generation (Code)
-
-Generate a **single self-contained HTML file** with:
-
-- **HTML5** semantic markup (`<article>`, `<section>`, `<nav>`, `<figure>`)
-- **CSS3** using custom properties, Grid/Flexbox, `@media` queries for responsive design
-- **JavaScript** for animations, interactivity, and data-driven rendering
-- **No external dependencies by default** — inline everything for portability
-- When charts are needed: embed Chart.js or D3.js via CDN `<script>` tag
-- Design tokens from `assets/design-tokens.md` for consistent styling
-
-### Stage 4: Refinement & Self-Critique (Critique)
-
-Automated quality pass before delivering output:
-
-- Accessibility: semantic HTML, ARIA labels, color contrast, keyboard navigation
-- Responsiveness: test layout at 320px, 768px, 1024px, 1440px breakpoints
-- Performance: minimize DOM nodes, defer non-critical JS, optimize animations
-- Code quality: no console errors, clean structure, commented non-obvious logic
-- Visual polish: consistent spacing, typography scale, color harmony
+| Input signal | Workflow |
+|--------------|----------|
+| User wants a plan first, or complex mixed content | `blueprint` → `compose` |
+| Long report / dossier / 12+ sections / deep-research output | `long-report` (blueprint required) → batched `compose` |
+| Direct “generate HTML” on short content | `compose` (internal ingest if no blueprint) |
+| Change existing `.html` | `refine` → `audit` |
+| Quality check only | `audit` |
 
 ## Workflow Routing
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **blueprint** | "analyze content for visualization", "what visuals would work", "design plan", "visual blueprint" | `references/blueprint.md` |
-| **compose** | "create visualization", "generate HTML", "build interactive page", "visualize this" | `references/compose.md` |
-| **audit** | "validate visualization", "check accessibility", "audit HTML", "quality check" | `references/audit.md` |
-| **refine** | "update visualization", "improve layout", "change style", "add section", "modify chart" | `references/refine.md` |
+| **blueprint** | "visual blueprint", "what visuals would work", "design plan" | `references/blueprint.md` |
+| **compose** | "generate HTML", "visualize", "build interactive page" | `references/compose.md` |
+| **audit** | "audit HTML", "check accessibility", "quality check" | `references/audit.md` |
+| **refine** | "update visualization", "change layout", "add section" | `references/refine.md` |
+| **long-report** | "research dossier", "long report HTML", "deep-research HTML" | `references/long-report.md` |
 
-### Lifecycle Flow
+### Lifecycle
 
 ```
 blueprint → compose → audit → refine → audit
-    ↑                           │
-    └───── (new content) ───────┘
 ```
 
-- **blueprint** can be skipped if the user wants direct generation (compose runs its own internal analysis)
-- **audit** is automatically invoked at the end of compose and refine
-- **refine** can loop back through audit as many times as needed
+- **blueprint** may be skipped for **short** pages only (compose runs ingest internally).
+- **long reports**: blueprint is **required** (`references/long-report.md`).
+- **audit** runs at end of compose/refine unless the user opts out.
 
 ## Output Convention
 
-**Do not** use a single fixed output folder (for example a hard-coded `web-visuals/` at the workspace root). Resolve where to write files from context:
+**Do not** hard-code a fixed folder (e.g. `web-visuals/` at repo root).
 
-1. **Explicit path** — If the user names a folder or full path, use it. Create parent directories as needed.
-2. **Source-adjacent** — When the visualization is built from an existing file, default to the **same directory** as that file: `{source-dir}/{slug}.html` (and `{slug}.blueprint.md` / `{slug}.audit.md` alongside, unless the user wants them elsewhere).
-3. **Task context** — When there is no single source file, place outputs next to the primary note, spec, or folder the user is working in; if that is unclear, ask once for the target directory.
+1. **Explicit path** — user-named folder or file path.
+2. **Source-adjacent** — `{source-dir}/{slug}.html` plus optional `{slug}.blueprint.md` / `{slug}.audit.md`.
+3. **Task context** — next to the primary note or spec; ask once if unclear.
 
-Naming:
-
-- `{name}` / `{slug}` defaults to a slugified version of the content title
-- The HTML file can be opened directly in any browser or hosted on GitHub Pages
-- Preview in Cursor's built-in browser using `cursor-ide-browser` tools
+Preview: open `.html` in a browser or IDE preview; no IDE-specific tools required.
 
 ## Design Principles
 
-1. **Content-First**: The visualization serves the content, never the other way around
-2. **Progressive Enhancement**: Start with readable HTML, layer on CSS, then JS interactivity
-3. **Single-File Portability**: One `.html` file that works anywhere, no build step
-4. **Modern Aesthetic**: Clean typography, generous whitespace, subtle animations
-5. **Responsive by Default**: Every layout adapts from mobile to widescreen
-6. **Accessible**: WCAG 2.1 AA compliance as a baseline, not an afterthought
+1. Content-first — visualization serves the story.
+2. Progressive enhancement — readable HTML, then CSS, then JS.
+3. Single-file portability — one `.html`, no build step.
+4. Responsive and WCAG 2.1 AA baseline.
 
 ## Examples
 
-**Example 1: Research report to interactive page**
+**Example 1: Research report**
 ```
 User: "Visualize this market analysis report"
-→ Invokes compose workflow
-→ Stage 1: Parses markdown, identifies 4 sections + comparison table + metrics
-→ Stage 2: Maps sections to narrative-section, table to comparison-grid, metrics to metric-cards
-→ Stage 3: Generates single HTML file with nav, smooth scrolling, animated charts
-→ Stage 4: Self-critique passes (a11y OK, responsive OK, no console errors)
-→ Output: e.g. same folder as the source report → `.../market-analysis.html`
+→ compose (or blueprint if 12+ sections)
+→ markdown-patterns + component-map → single HTML beside source
+→ audit checklist before delivery
 ```
 
-**Example 2: Blueprint before generation**
+**Example 2: Long deep-research dossier**
 ```
-User: "What's the best way to visualize this product roadmap?"
-→ Invokes blueprint workflow
-→ Analyzes content: timeline data + feature groups + priority indicators
-→ Proposes: horizontal timeline with grouped swimlanes, filterable by priority
-→ Output: e.g. `.../product-roadmap.blueprint.md` next to the agreed output location
-→ User approves → compose workflow generates the HTML
+User: "Turn this deep-research report into an interactive dossier"
+→ blueprint (Report Spec) + deep-research-handoff
+→ compose from assets/long-report-shell.html in batches
+→ citation-appendix + TOC; audit long-report gates
 ```
 
-**Example 3: Refine existing visualization**
+**Example 3: Blueprint then compose**
 ```
-User: "Add a dark mode toggle and make the charts bigger"
-→ Invokes refine workflow
-→ Reads existing HTML file
-→ Adds CSS custom property theme switcher + JS toggle
-→ Adjusts chart container dimensions
-→ Runs audit: confirms dark mode contrast ratios pass WCAG AA
-→ Output: updated `market-analysis.html` at its existing path
+User: "What would this product roadmap look like as a page?"
+→ blueprint → user approves → compose from assets/base-template.html
 ```
 
-**Example 4: Audit a generated page**
-```
-User: "Check if the dashboard is accessible and mobile-friendly"
-→ Invokes audit workflow
-→ Checks: semantic HTML ✅, ARIA labels ⚠️ (2 missing), color contrast ✅
-→ Checks: 320px layout ⚠️ (table overflow), 768px ✅, 1024px ✅
-→ Output: `dashboard.audit.md` beside the HTML (or path the user specified)
-→ Optionally auto-fixes issues if user confirms
-```
+More scenarios: `references/examples.md`.
 
-**Example 5: Data-heavy content**
-```
-User: "Turn this CSV data into an interactive dashboard"
-→ Invokes compose workflow
-→ Stage 1: Parses CSV, identifies columns, data types, trends
-→ Stage 2: Maps to metric-cards (KPIs) + data-chart (line chart) + comparison-grid (table)
-→ Stage 3: Embeds Chart.js via CDN, generates responsive dashboard layout
-→ Stage 4: Validates chart rendering, tooltip accessibility, filter UX
-→ Output: e.g. user-specified or source-adjacent `data-dashboard.html`
-```
+## Integration
 
-## Integration Points
+| Skill | Role |
+|-------|------|
+| **deep-research** | Upstream cited reports → `deep-research-handoff.md` |
+| **research-analysis** | Upstream topic notes |
+| **enterprise-architecture** | Upstream EA artifacts (present only; do not author models) |
+| **specification** | Upstream PRD/spec markdown |
+| **diagram** | Standalone diagrams when not inline HTML |
+| **slides** | Pitch decks — not scrollable dossiers |
 
-- **research-analysis**: Visualize research outputs and topic comparisons
-- **Architecture**: Generate interactive views of architecture diagrams
-- **Specification**: Visual PRD summaries and feature comparison pages
-- **deep-research**: Transform multi-source research reports into navigable HTML
+Boundaries: `references/skill-escalation.md`.
 
 ## References
 
-- `references/blueprint.md` — Content analysis and visual design planning workflow
-- `references/compose.md` — Full generation pipeline (ingest → design → code → critique)
-- `references/refine.md` — Iterative update and feedback integration workflow
-- `references/audit.md` — Accessibility, responsiveness, and quality validation workflow
-- `references/component-map.md` — Complete content-to-UI component mapping reference
-- `assets/design-tokens.md` — Color, typography, spacing, and animation token system
-- `assets/base-template.html` — Starter HTML scaffold with design tokens pre-applied
+| File | Purpose |
+|------|---------|
+| `references/compose.md` | Full ingest → code → critique pipeline |
+| `references/markdown-patterns.md` | Prose pattern → component (analyzer rules) |
+| `references/component-map.md` | Component catalog and HTML patterns |
+| `references/long-report.md` | Long dossier workflow (SSoT for batching/TOC) |
+| `references/deep-research-handoff.md` | Research report → HTML contract |
+| `references/blueprint.md` | Pre-code design plan |
+| `references/audit.md` | Standalone quality validation |
+| `references/refine.md` | Incremental HTML edits |
+| `references/skill-escalation.md` | Owns / does not own / escalate |
+| `references/examples.md` | Additional use-case walkthroughs |
+| `assets/base-template.html` | Short-page shell |
+| `assets/long-report-shell.html` | Dossier shell (TOC, drawer, progress) |
+| `assets/design-tokens.md` | CSS custom properties |

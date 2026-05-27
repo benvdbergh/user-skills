@@ -39,7 +39,12 @@ These annotations guide component selection — the design stage needs to know t
 
 ### Step 3: Component Mapping
 
-For each content block, consult `references/component-map.md` and propose a visual component:
+For each content block:
+
+1. Match prose patterns in `references/markdown-patterns.md`
+2. Resolve HTML patterns in `references/component-map.md`
+
+Propose a visual component:
 
 ```markdown
 ## Visual Component Map
@@ -53,6 +58,14 @@ For each content block, consult `references/component-map.md` and propose a visu
 | Next Steps | Sequential | `flow-diagram` | Step-by-step process |
 ```
 
+### Step 3b: Long-Report Detection
+
+If triggers in `references/long-report.md` apply:
+
+- Add **Report Spec** (knowledge units table, audience paths, reading time estimate).
+- If input is deep-research output, include metadata block per `references/deep-research-handoff.md`.
+- Set `status: long-report` in blueprint frontmatter.
+
 ### Step 4: Layout Architecture
 
 Propose the overall page structure:
@@ -61,8 +74,9 @@ Propose the overall page structure:
 ## Page Layout
 
 ### Navigation
-- Sticky top nav with section anchors
-- Smooth scroll behavior
+- Sticky sidebar TOC (long reports) or top nav (short pages)
+- Smooth scroll behavior; mobile TOC drawer for long reports
+- Reading progress indicator (optional)
 
 ### Section Order (Information Hierarchy)
 1. Hero / title section — context setting

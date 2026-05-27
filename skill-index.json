@@ -1,8 +1,8 @@
 {
-  "generated": "2026-05-21T19:39:20.203986Z",
-  "totalSkills": 44,
+  "generated": "2026-05-27T10:58:06.041538Z",
+  "totalSkills": 43,
   "alwaysLoadedCount": 0,
-  "deferredCount": 44,
+  "deferredCount": 43,
   "skills": {
     "banner-design": {
       "name": "banner-design",
@@ -80,26 +80,6 @@
         "diagrams",
         "wants to trace features to code artifacts",
         "requests documentation-aware change impact for a branch"
-      ],
-      "workflows": [],
-      "tier": "deferred"
-    },
-    "code-review-skill": {
-      "name": "code-review-excellence",
-      "path": "code-review-skill/SKILL.md",
-      "fullDescription": "Provides comprehensive code review guidance for React 19, Vue 3, Angular 17+, Svelte 5, Rust, TypeScript, Java, Python, Django, Go, C#/.NET, Kotlin, NestJS, C/C++, and more. Helps catch bugs, improve code quality, and give constructive feedback. Use when: reviewing pull requests, conducting PR reviews, code review, reviewing code changes, establishing review standards, mentoring developers, architecture reviews, security audits, checking code quality, finding bugs, giving feedback on code.",
-      "triggers": [
-        "reviewing pull requests",
-        "conducting PR reviews",
-        "code review",
-        "reviewing code changes",
-        "establishing review standards",
-        "mentoring developers",
-        "architecture reviews",
-        "security audits",
-        "checking code quality",
-        "finding bugs",
-        "giving feedback on code"
       ],
       "workflows": [],
       "tier": "deferred"
@@ -876,13 +856,15 @@
     "web-visual": {
       "name": "web-visual",
       "path": "web-visual/SKILL.md",
-      "fullDescription": "Transform text content, research reports, and structured data into polished, interactive single-file HTML5 visualizations. USE WHEN generate HTML page, create visualization, interactive report, web visual, visual report, data dashboard, content to HTML, generative UI, interactive page, visual summary, HTML export, web presentation, data visualization.",
+      "fullDescription": "Transform text content, research reports (including deep-research outputs), and structured data into polished, interactive single-file HTML5 visualizations. USE WHEN generate HTML page, create visualization, interactive report, web visual, visual report, long report HTML, research dossier page, data dashboard, content to HTML, generative UI, interactive page, visual summary, HTML export, web presentation, data visualization.",
       "triggers": [
         "generate HTML page",
         "create visualization",
         "interactive report",
         "web visual",
         "visual report",
+        "long report HTML",
+        "research dossier page",
         "data dashboard",
         "content to HTML",
         "generative UI",
@@ -896,7 +878,8 @@
         "blueprint",
         "compose",
         "audit",
-        "refine"
+        "refine",
+        "long-report"
       ],
       "tier": "deferred"
     },

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PAGE_TITLE}}</title>
+    <!-- {{CDN_DEPENDENCIES}} — Chart.js / D3 / Mermaid as needed -->
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-dark: #1d4ed8;
+            --color-bg: #ffffff;
+            --color-bg-secondary: #f8fafc;
+            --color-border: #e2e8f0;
+            --color-text: #0f172a;
+            --color-text-secondary: #475569;
+            --color-text-muted: #94a3b8;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-size-base: clamp(0.95rem, 2.5vw, 1.0625rem);
+            --font-size-2xl: clamp(1.6rem, 4vw, 2rem);
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --max-width: 1200px;
+            --toc-width: 16rem;
+            --content-max: 42rem;
+        }
+        [data-theme="dark"] {
+            --color-bg: #0f172a;
+            --color-bg-secondary: #1e293b;
+            --color-border: #334155;
+            --color-text: #f1f5f9;
+            --color-text-secondary: #94a3b8;
+            --color-text-muted: #64748b;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-sans); font-size: var(--font-size-base); line-height: 1.65; color: var(--color-text); background: var(--color-bg); }
+        a { color: var(--color-primary); }
+        :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+        .skip-link {
+            position: absolute; left: -9999px; z-index: 200;
+            padding: var(--space-4); background: var(--color-primary); color: #fff;
+        }
+        .skip-link:focus { left: var(--space-4); top: var(--space-4); }
+
+        .reading-progress {
+            position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 150;
+            background: var(--color-border);
+        }
+        .reading-progress__bar {
+            height: 100%; width: 0%; background: var(--color-primary);
+            transition: width 0.1s linear;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .reading-progress__bar { transition: none; }
+        }
+
+        .top-bar {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--space-4) var(--space-6);
+            border-bottom: 1px solid var(--color-border);
+            background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+            backdrop-filter: blur(8px);
+        }
+        .toc-toggle {
+            display: none;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-secondary);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font: inherit;
+        }
+        .theme-toggle {
+            border: 1px solid var(--color-border);
+            background: transparent;
+            padding: 0.5rem;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: var(--toc-width) 1fr;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            min-height: calc(100vh - 4rem);
+        }
+        .toc {
+            position: sticky;
+            top: 4rem;
+            align-self: start;
+            max-height: calc(100vh - 5rem);
+            overflow-y: auto;
+            padding: var(--space-6) var(--space-4);
+            border-right: 1px solid var(--color-border);
+            scroll-target-group: auto;
+        }
+        .toc__title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: var(--space-4); }
+        .toc ol { list-style: none; }
+        .toc a {
+            display: block;
+            padding: 0.35rem 0;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+        }
+        .toc a:target-current,
+        .toc a.active { color: var(--color-primary); font-weight: 600; }
+
+        .main-wrap { padding: var(--space-8) var(--space-6); }
+        #main { max-width: var(--content-max); }
+        section[id] {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 500px;
+            margin-bottom: var(--space-12);
+            scroll-margin-top: 5rem;
+        }
+        h1 { font-size: var(--font-size-2xl); margin-bottom: var(--space-4); }
+        h2 { font-size: 1.35rem; margin-bottom: var(--space-4); }
+        h2[data-confidence="high"]::after { content: " · HIGH"; font-size: 0.65em; color: var(--color-success); }
+        h2[data-confidence="medium"]::after { content: " · MEDIUM"; font-size: 0.65em; color: var(--color-warning); }
+        h2[data-confidence="low"]::after { content: " · LOW"; font-size: 0.65em; color: var(--color-text-muted); }
+
+        .toc-backdrop {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgb(0 0 0 / 0.4);
+            z-index: 110;
+        }
+        .toc-drawer.open + .toc-backdrop,
+        .toc-backdrop.open { display: block; }
+
+        @media (max-width: 1023px) {
+            .layout { grid-template-columns: 1fr; }
+            .toc-toggle { display: inline-block; }
+            .toc {
+                position: fixed;
+                top: 0; left: 0; bottom: 0;
+                width: min(18rem, 85vw);
+                z-index: 120;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                background: var(--color-bg);
+                box-shadow: 4px 0 24px rgb(0 0 0 / 0.15);
+            }
+            .toc.open { transform: translateX(0); }
+        }
+
+        @media print {
+            .top-bar, .toc, .reading-progress, .toc-toggle { display: none !important; }
+            .layout { display: block; }
+            section[id] { content-visibility: visible; }
+        }
+
+        /* {{COMPONENT_STYLES}} */
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="reading-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Reading progress">
+        <div class="reading-progress__bar" id="reading-progress-bar"></div>
+    </div>
+
+    <header class="top-bar">
+        <button type="button" class="toc-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc">Contents</button>
+        <strong>{{PAGE_TITLE}}</strong>
+        <button type="button" class="theme-toggle" aria-label="Toggle dark mode" id="theme-toggle">Theme</button>
+    </header>
+
+    <div class="layout">
+        <nav class="toc" id="toc" aria-label="Table of contents">
+            <p class="toc__title">On this page</p>
+            <ol id="toc-list">
+                <!-- {{TOC_LINKS}} — <li><a href="#section-id">Title</a></li> -->
+            </ol>
+        </nav>
+        <div class="toc-backdrop" id="toc-backdrop" hidden></div>
+
+        <div class="main-wrap">
+            <main id="main">
+                <!-- {{CONTENT_SECTIONS}} — each <section id="..."> with stable ids matching TOC -->
+            </main>
+            <footer style="margin-top: var(--space-12); color: var(--color-text-muted); font-size: 0.875rem;">
+                <p>Generated with web-visual</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const html = document.documentElement;
+            const saved = localStorage.getItem('theme');
+            if (saved) html.setAttribute('data-theme', saved);
+            document.getElementById('theme-toggle')?.addEventListener('click', () => {
+                const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+
+            const toc = document.getElementById('toc');
+            const toggle = document.getElementById('toc-toggle');
+            const backdrop = document.getElementById('toc-backdrop');
+            const closeToc = () => {
+                toc?.classList.remove('open');
+                backdrop?.classList.remove('open');
+                toggle?.setAttribute('aria-expanded', 'false');
+            };
+            toggle?.addEventListener('click', () => {
+                const open = toc?.classList.toggle('open');
+                backdrop?.classList.toggle('open', open);
+                toggle.setAttribute('aria-expanded', String(!!open));
+            });
+            backdrop?.addEventListener('click', closeToc);
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeToc(); });
+
+            const bar = document.getElementById('reading-progress-bar');
+            const progress = document.querySelector('.reading-progress');
+            window.addEventListener('scroll', () => {
+                const doc = document.documentElement;
+                const pct = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100 || 0;
+                if (bar) bar.style.width = pct + '%';
+                if (progress) progress.setAttribute('aria-valuenow', String(Math.round(pct)));
+            }, { passive: true });
+
+            if (!CSS.supports('scroll-target-group', 'auto')) {
+                const sections = document.querySelectorAll('section[id]');
+                const links = document.querySelectorAll('#toc-list a[href^="#"]');
+                const obs = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        const id = entry.target.id;
+                        links.forEach((a) => {
+                            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+                        });
+                    });
+                }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+                sections.forEach((s) => obs.observe(s));
+            }
+
+            document.querySelectorAll('#toc-list a[href^="#"]').forEach((link) => {
+                link.addEventListener('click', () => { if (window.innerWidth < 1024) closeToc(); });
+            });
+
+            // {{COMPONENT_SCRIPTS}} — lazy chart init, Mermaid.run(), etc.
+        });
+    </script>
+</body>
+</html>

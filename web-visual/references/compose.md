@@ -16,6 +16,16 @@ One of:
 
 ## Workflow Steps
 
+### Stage 0: Long-Report Gate (before Stage 1)
+
+If any trigger in `references/long-report.md` applies, follow that file end-to-end (single source of truth). Minimum gate:
+
+1. Approved blueprint with **Report Spec** exists (or run `blueprint` first).
+2. deep-research input → `references/deep-research-handoff.md` read.
+3. Start from `assets/long-report-shell.html`; batch content into `{{CONTENT_SECTIONS}}` / `{{TOC_LINKS}}`.
+
+Skip batching only when the user explicitly requests a short single-pass page.
+
 ### Stage 1: Structural Analysis (skip if blueprint exists)
 
 Parse the source content into a structured representation:
@@ -30,7 +40,7 @@ Output: Internal content model (not saved to file)
 
 ### Stage 2: Intent-to-Interface Mapping (skip if blueprint exists)
 
-Select visual components using `references/component-map.md`:
+Use **`references/markdown-patterns.md`** (prose signals) then **`references/component-map.md`** (HTML patterns):
 
 1. **Map each content block** to a visual component type
 2. **Determine layout**: Section order, grid structure, responsive breakpoints
@@ -40,6 +50,15 @@ Select visual components using `references/component-map.md`:
 Output: Internal design plan (not saved to file)
 
 ### Stage 3: Code Generation
+
+**Shell selection:**
+
+| Page type | Start from |
+|-----------|------------|
+| Short page / dashboard | `assets/base-template.html` |
+| Long report / dossier | `assets/long-report-shell.html` |
+
+Copy tokens from `assets/design-tokens.md` when not already in the shell. Replace `{{PAGE_TITLE}}`, `{{CONTENT_SECTIONS}}`, `{{TOC_LINKS}}`, `{{CDN_DEPENDENCIES}}`, `{{COMPONENT_STYLES}}`, `{{COMPONENT_SCRIPTS}}`.
 
 Generate the HTML file following these strict rules:
 
@@ -95,6 +114,8 @@ Generate the HTML file following these strict rules:
 5. **Link text**: Descriptive labels, never "click here"
 6. **Language attribute**: `<html lang="en">` (adjust to content language)
 
+Long-report chrome is defined in `assets/long-report-shell.html`. Extend only when the blueprint requires extra behavior.
+
 #### JavaScript Rules
 
 1. **Vanilla JS only** (except for chart libraries loaded via CDN)
@@ -105,7 +126,7 @@ Generate the HTML file following these strict rules:
 6. **No console.log** in production output
 7. **Error handling**: Wrap chart/data operations in try-catch
 
-#### Chart Library Usage
+#### Chart and Diagram Libraries
 
 When data visualization is needed:
 
@@ -123,6 +144,17 @@ When data visualization is needed:
 ```
 - Use for: force-directed graphs, treemaps, custom SVG visualizations
 - Prefer Chart.js when a standard chart type suffices
+
+**Mermaid** (flows / architecture from prose patterns):
+```html
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+```
+- Use for: 3+ node flows, sequence-style explanations (see `markdown-patterns.md`)
+- Cap at **5 diagrams** per long report; prefer CSS `flow-diagram` for simple steps
+- Render inside `<pre class="mermaid">` blocks
 
 **No library needed** for:
 - Simple metric cards, progress bars, comparison grids
@@ -147,6 +179,13 @@ Quality Checklist:
 - [ ] Print stylesheet hides nav, forces light theme
 - [ ] Scroll animations are smooth (prefer CSS transitions over JS)
 - [ ] File size reasonable (< 500KB without images)
+
+Long-report additions (when Stage 0 active):
+
+- [ ] TOC matches all section IDs; scroll spy works (CSS or IO fallback)
+- [ ] Executive content visible without deep scroll on desktop
+- [ ] `content-visibility: auto` on sections; charts lazy-init
+- [ ] Citation appendix matches inline `[n]` if present
 ```
 
 Fix any issues found before proceeding to output.
@@ -156,13 +195,13 @@ Fix any issues found before proceeding to output.
 1. **Resolve output directory** using the Output Convention in `SKILL.md` (explicit path → source-adjacent → task context → ask once if still ambiguous). Do **not** assume a fixed folder such as `web-visuals/`.
 2. **Create parent directories** if they do not exist for the chosen path.
 3. **Save HTML file**: `{resolved-dir}/{slug}.html`
-4. **Preview in browser**: Use `cursor-ide-browser` tools to open and verify the result
+4. **Preview**: Open the `.html` in a browser or IDE preview
 5. **Report to user**: Summarize what was generated, key design decisions, and the **full** file path
 
 ## Post-Compose
 
 After generation, inform the user they can:
-- **Preview**: Open in Cursor's browser panel
+- **Preview**: Open the file in any browser
 - **Audit**: Run the audit workflow for detailed quality analysis
 - **Refine**: Request specific changes via the refine workflow
 - **Export**: Copy the HTML file anywhere — it's fully self-contained
