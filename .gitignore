@@ -7,6 +7,13 @@ __pycache__/
 debug.log
 *.log
 
+# OpenSpace local runtime artifacts
+.openspace/
+logs/
+recordings/
+**/.upload_meta.json
+**/.skill_id
+
 # OS/editor noise
 .DS_Store
 Thumbs.db
