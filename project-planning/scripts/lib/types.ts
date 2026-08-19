@@ -15,7 +15,7 @@ export type PlanningManifest = {
     story_prefix?: string;
     task_prefix?: string;
   };
-  /** Backlog SSOT: omit or `files` = markdown; `linear`, etc. = external tracker */
+  /** Backlog SSOT: omit or `files` = markdown; else load references/<value>-adoption.md */
   delivery_tracker?: string | null;
   /** Optional path to URL-only index when using a tracker */
   tracker_index?: string | null;

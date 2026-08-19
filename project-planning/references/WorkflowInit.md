@@ -7,12 +7,12 @@
 ## Steps
 
 1. Choose **context**: legacy `--project <name>`, `--root <dir>`, `--config <manifest.yaml>`, or cwd with `.project-planning.yaml`.
-2. Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot) (`delivery_tracker` in manifest).
+2. Resolve backlog SSOT, then load that platform file ([SKILL.md § Platform guides](../SKILL.md#platform-guides)).
 3. Run **WorkflowInit** with `--brief`:
-   - **`files`** — creates `Epics/`, `Stories/`, `brief.md`, manifest if missing.
-   - **Tracker** (e.g. `linear`) — creates `brief.md`, `specs/`, manifest; **does not** create markdown backlog dirs. Record tracker in `brief.md`; optional [tracker-index.md](tracker-index.md).
+   - **`files`** — creates `Epics/`, `Stories/`, `brief.md`, manifest if missing — [files-adoption.md](files-adoption.md).
+   - **Tracker** — creates `brief.md`, `specs/`, manifest; **does not** create markdown backlog dirs. Record tracker in `brief.md`; optional [tracker-index.md](tracker-index.md).
 4. Add or generate PRD/spec; [artifact-discovery.md](artifact-discovery.md) / **ScanSources.ts** as needed.
-5. Shard per SSOT: [ShardFromSources.md](ShardFromSources.md).
+5. Shard per the platform file: [ShardFromSources.md](ShardFromSources.md).
 
 ## CLI
 

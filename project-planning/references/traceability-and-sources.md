@@ -3,10 +3,10 @@
 | Layer | Where links live |
 |-------|------------------|
 | Requirements (PRD, ADR, spec) | Repo files — always |
-| Backlog (`files`) | `traces_to` in epic/story frontmatter |
-| Backlog (tracker) | “Sources” in milestone/issue descriptions; optional [tracker-index.md](tracker-index.md) |
+| Backlog (`files`) | `traces_to` in epic/story frontmatter — [files-adoption.md](files-adoption.md) |
+| Backlog (tracker) | “Sources” (or equivalent) on the **native** items; optional [tracker-index.md](tracker-index.md) |
 
-How to choose backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot).
+How to choose backlog SSOT: [SKILL.md § Platform guides](../SKILL.md#platform-guides).
 
 ## traces_to (file-based backlog only)
 
@@ -23,7 +23,7 @@ Use `{ path, anchor }` when a heading anchor exists for stable references.
 - **PRD** — What the product should do for users and business.
 - **ADR** — Why a technical choice was made, alternatives, consequences.
 
-Planning items should link to **both** when relevant; avoid duplicating full spec text in epics—summarize and link.
+Planning items should link to **both** when relevant; avoid duplicating full spec text in backlog items—summarize and link.
 
 ## As-built vs to-be
 

@@ -8,7 +8,7 @@ An **epic** should have:
 
 - One clear outcome or theme (one-sentence goal).
 - A bounded context: reasoning and tooling fit in one “chunk” for humans and agents.
-- Links to sources via `traces_to` (markdown backlog) or a “Sources” section in tracker descriptions (PRD sections, ADRs, architecture).
+- Links to sources via `traces_to` (markdown backlog) or a “Sources” section on the **native** tracker item (PRD sections, ADRs, architecture).
 
 Avoid epics that are “the entire product” unless you immediately decompose to stories.
 
@@ -24,11 +24,11 @@ When a story is too large or crosses many risks, split using one or more pattern
 
 ## BMAD-style sharding
 
-**BMAD** (break PRD into epics/stories) remains a valid *pattern*: map PRD sections to epics, then to INVEST-sized stories. It is one decomposition style among several—not the only workflow. Prefer vertical slices when the PRD describes user outcomes.
+**BMAD** (break PRD into themed outcomes then INVEST-sized slices) remains a valid *pattern*. Create those slices as the **platform's native types** — do not treat `EPIC-`/`STORY-` prefixes as a cross-platform language. It is one decomposition style among several—not the only workflow. Prefer vertical slices when the PRD describes user outcomes.
 
 ## Tasks (optional)
 
-Use **task**-kind files for sub-story work that still benefits from dependencies and traceability (see [frontmatter-schema.md](frontmatter-schema.md)). Do not replace stories with dozens of tasks unless the team needs that granularity.
+Use **task**-kind files for sub-story work that still benefits from dependencies and traceability (see [frontmatter-schema.md](frontmatter-schema.md)) when SSOT is `files`. On a tracker, use that platform's split type (sub-issue, sub-task, subitem). Do not replace deliverables with dozens of tasks unless the team needs that granularity.
 
 ## Walking skeleton
 

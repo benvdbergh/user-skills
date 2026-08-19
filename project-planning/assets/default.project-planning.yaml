@@ -1,5 +1,6 @@
 # Copy to your project root as `.project-planning.yaml` and adjust.
-# See references/frontmatter-schema.md for work-item YAML in epic/story files.
+# Files-platform work-item YAML: references/frontmatter-schema.md
+# Tracker native types: references/<delivery_tracker>-adoption.md
 
 version: 1
 
@@ -13,12 +14,14 @@ source_globs:
   - "docs/**/*.md"
   - "**/adr/**/*.md"
 
+# Files platform only — ignored when delivery_tracker is a tracker
 naming:
   epic_prefix: Epic-
   story_prefix: Story-
   task_prefix: Task-
 
-# Backlog SSOT (omit = files = markdown Epics/ and Stories/)
-# delivery_tracker: files   # default — use EpicManager, StoryManager, LintPlan
-# delivery_tracker: linear  # backlog in Linear only — references/linear-adoption.md
-# tracker_index: planning/tracker-index.md   # optional URL pointers when using a tracker
+# Backlog SSOT (omit = files). Then load references/<value>-adoption.md
+# delivery_tracker: files           # markdown Epics/Stories — files-adoption.md
+# delivery_tracker: linear          # Linear Project / Milestone / Issue
+# delivery_tracker: jira            # Jira Epic / Feature / Story
+# tracker_index: planning/tracker-index.md   # optional URL pointers (native ids)

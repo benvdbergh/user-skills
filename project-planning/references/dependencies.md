@@ -1,6 +1,6 @@
 # Optional integrations (not `depends_on`)
 
-> **Not** [dependencies-and-sequencing.md](dependencies-and-sequencing.md) — that file covers epic/story **blockers** (`depends_on` or tracker relations).
+> **Not** [dependencies-and-sequencing.md](dependencies-and-sequencing.md) — that file covers work-item **blockers** (`depends_on` or tracker relations).
 
 ## Optional workflow dependencies
 

@@ -1,9 +1,9 @@
 # project-planning quick start
 
-Check **backlog SSOT** in `.project-planning.yaml` → `delivery_tracker` ([SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot)).
+Check **backlog SSOT** in `.project-planning.yaml` → `delivery_tracker`, then load that platform file ([SKILL.md § Platform guides](../SKILL.md#platform-guides)).
 
-- **Omitted or `files`** — commands below (markdown backlog).
-- **`linear`** (or other tracker) — plan in the tracker; see [linear-adoption.md](linear-adoption.md). Do **not** run Shard/EpicManager/StoryManager/LintPlan for backlog items.
+- **Omitted or `files`** — commands below; prefixes and scripts: [files-adoption.md](files-adoption.md).
+- **Any tracker** — plan with that platform's native types. Do **not** run Shard/EpicManager/StoryManager/LintPlan for backlog items.
 
 ## Manifest
 
@@ -25,14 +25,14 @@ bun run $PAI_DIR/skills/project-planning/scripts/StoryManager.ts --root . --acti
 bun run $PAI_DIR/skills/project-planning/scripts/LintPlan.ts --root .
 ```
 
-## Commands (tracker SSOT, e.g. `linear`)
+## Commands (tracker SSOT)
 
 ```bash
 bun run $PAI_DIR/skills/project-planning/scripts/WorkflowInit.ts --root . --brief "My product"
 # Skips Epics/Stories dirs when delivery_tracker is not files
 
 bun run $PAI_DIR/skills/project-planning/scripts/ScanSources.ts --root .
-# Then create milestones/issues via Linear MCP — linear-adoption.md
+# Then create native items per references/<tracker>-adoption.md
 ```
 
 ## Legacy profile (`--project`)

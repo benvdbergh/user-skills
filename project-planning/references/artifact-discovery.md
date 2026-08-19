@@ -1,6 +1,6 @@
 # Artifact discovery
 
-Run **before** creating or sharding epics/stories. Goal: list specifications, architecture, and constraints already in the workspace.
+Run **before** creating or sharding backlog items. Goal: list specifications, architecture, and constraints already in the workspace.
 
 ## Inputs
 
@@ -25,7 +25,7 @@ Run **before** creating or sharding epics/stories. Goal: list specifications, ar
 2. Run `ScanSources.ts` to expand `source_globs` from the manifest.
 3. Build a **source inventory** table: path, inferred type, one-line relevance.
 4. Read the highest-signal documents first (PRD, architecture index, recent ADRs).
-5. Only then run [ShardFromSources.md](ShardFromSources.md) or ad-hoc epic/story creation.
+5. Only then run [ShardFromSources.md](ShardFromSources.md) or create native items per the platform file.
 
 ## CLI
 

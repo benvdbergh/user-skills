@@ -2,9 +2,9 @@
 
 ## Modeling dependencies
 
-**`delivery_tracker: files`** — use frontmatter `depends_on: [STORY-1, EPIC-2]` for **hard** prerequisites: the item should not start until those ids are done.
+**`delivery_tracker: files`** — use frontmatter `depends_on: [STORY-1, EPIC-2]` for **hard** prerequisites: the item should not start until those ids are done. Those ids are files-platform only ([files-adoption.md](files-adoption.md)).
 
-**Tracker SSOT (e.g. `linear`)** — use issue **relations** (`blocks` / `blocked by`) for the same semantics; map planning ids in descriptions if needed. See [linear-adoption.md](linear-adoption.md).
+**Tracker SSOT** — use that platform's native relations (e.g. Linear `blocks` / `blockedBy`, Jira issue links). Do not copy `EPIC-`/`STORY-` prefixes into the tracker. See the loaded `<tracker>-adoption.md`.
 
 - **Upstream** — Items listed in `depends_on`.
 - **Downstream** — Items that list this id in their `depends_on` (can be derived by `LintPlan.ts` / graph output).

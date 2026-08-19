@@ -1,136 +1,138 @@
-# Adopting project-planning on Linear
+# Linear platform
 
-**Load only when** `delivery_tracker: linear` (manifest or user). Linear is the **backlog SSOT** — do not create parallel `Epic-*.md` / `Story-*.md`. Otherwise see [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot).
+**Related:** [../SKILL.md](../SKILL.md) · [files-adoption.md](files-adoption.md) · [jira-adoption.md](jira-adoption.md)
 
-Repo **requirements** (`PRD.md`, specs, ADRs) remain SSOT in the repository; link them from milestone and issue descriptions.
+**Load only when** `delivery_tracker: linear` (manifest or user). Linear is the **backlog SSOT**. Do not create parallel markdown backlog files. Do not invent `EPIC-` / `STORY-` ids — Linear identifiers (`BEN-123`, project slugs, milestone names) are the ids.
 
-Guide for [Linear](https://linear.app/) via **official Linear MCP** (`plugin-linear-linear` in Cursor; `https://mcp.linear.app/mcp` per [Linear MCP docs](https://linear.app/docs/mcp)).
+Repo **requirements** (`PRD.md`, specs, ADRs) remain SSOT in git; link them from Linear descriptions.
 
-## Concept mapping
+Guide for [Linear](https://linear.app/) via **official Linear MCP** (`plugin-linear-linear`; `https://mcp.linear.app/mcp` per [Linear MCP docs](https://linear.app/docs/mcp)).
 
-| Planning concept | Linear (SSOT) | Notes |
-|------------------|---------------|--------|
-| **Epic** | **Project milestone** | One milestone per epic |
-| **Story** | **Issue** | One issue per story; link to milestone |
-| **Task** | **Sub-issue** | Optional under story issue |
-| **PRD / spec / ADR** | Repo files + links in descriptions | Requirements SSOT stays in git |
-| **Dependencies** | Issue relations (`blocks` / `blocked by`) | Only real blockers |
-| **DoR / `ready`** | Issue state (e.g. Backlog / Todo) | Review in Linear, not markdown |
-| **Cycle** | **Cycle** (team) | When pulling into iteration |
+## Usage
 
-**Upstream:** `product-roadmap` → Linear **Initiatives**; link initiative URLs in milestone descriptions when relevant.
+Plan in Linear: a **Project** holds dated **Milestones**; **Issues** belong to a milestone (and project). Use official Linear MCP. Optional [tracker-index.md](tracker-index.md) may list Linear URLs only.
 
-## Linear hierarchy
+## Native breakdown
 
 ```text
-Initiative (strategy)     ← product-roadmap
-  └── Project             ← delivery container
-        └── Milestone     ← epic (SSOT)
-              └── Issue   ← story (SSOT)
-                    └── Sub-issue  ← optional task
+Initiative          ← strategy / horizon (product-roadmap)
+  └── Project       ← delivery container for this effort
+        └── Milestone   ← themed / dated outcome
+              └── Issue     ← INVEST-sized deliverable with acceptance criteria
+                    └── Sub-issue  ← optional split (`parentId`)
+Cycle               ← team iteration (pull issues in when scheduling)
 ```
 
-## MCP prerequisites
+| Need | Linear type | Notes |
+|------|-------------|--------|
+| Strategy / horizon | **Initiative** | Owned with `product-roadmap`; link from the Project |
+| Delivery container | **Project** | One per product/effort; record URL in `brief.md` |
+| Themed / dated outcome | **Milestone** | Name + description + optional target date; belongs to a Project |
+| INVEST-sized work | **Issue** | Title, markdown description (AC checklist), `milestone`, `project`, `team` |
+| Optional split | **Sub-issue** | `parentId` on `save_issue` |
+| Blockers | Issue relations | `blocks` / `blockedBy` on `save_issue` |
+| Source links | Description **Sources** | Repo paths; optional `links` |
+| Ready | Issue **state** | Team workflow (e.g. Backlog / Todo) — not markdown `status` |
+| Iteration | **Cycle** | When pulling into a sprint |
 
-1. Connect Linear MCP ([Cursor MCP directory](https://cursor.com/docs/context/mcp/directory) or `https://mcp.linear.app/mcp`).
-2. Authenticate: `mcp_auth` with `{}` on `plugin-linear-linear` if tools are missing.
-3. **Discover tools at runtime** — read MCP descriptors or list tools after auth.
-4. Prefer **official** tools per [Linear MCP for product management](https://linear.app/changelog/2026-02-05-linear-mcp-for-product-management).
+Discover actual teams, projects, and states at runtime (`list_teams`, `list_projects`, `list_issue_statuses`).
 
 ## MCP dependencies
 
-| Item | Value |
-|------|--------|
-| **Server** | `plugin-linear-linear` |
-| **Auth** | OAuth via `mcp_auth` or Bearer per [Linear MCP docs](https://linear.app/docs/mcp) |
+- **Server:** `plugin-linear-linear`
+- **Auth:** OAuth via `mcp_auth` with `{}` if tools are missing, or Bearer per [Linear MCP docs](https://linear.app/docs/mcp)
+- **Primary tools:** `list_teams`, `list_projects`, `save_project`, `list_milestones`, `save_milestone`, `get_milestone`, `list_issues`, `save_issue`, `get_issue`, `list_issue_statuses`, `list_cycles`
+
+Discover tool schemas at runtime — do not assume parameter names from memory.
 
 ## Tool usage mapping
 
-| Step | MCP intent | Safety |
-|------|------------|--------|
-| Resolve team/project | List/get teams, projects | Safe |
-| Create epic | Create/edit **milestone** | Safe |
-| Create story | Create **issue** on milestone | Safe |
-| Dependencies | Issue **blocks** relations | Safe |
-| Plan review | List milestone + issues, check AC in descriptions | Safe |
-| Project/initiative update | Create **project/initiative update** | Confirm |
-| Delete/archive | Archive milestone/issue | User must confirm |
+| Workflow step | MCP tool | Purpose | Safety |
+|---------------|----------|---------|--------|
+| Resolve team / project | `list_teams`, `list_projects`, `get_project` | Find containers | Safe |
+| Create / update project | `save_project` | Delivery container | Safe |
+| Create themed outcome | `save_milestone` | Milestone on a project (`name`, `description`, `targetDate`) | Safe |
+| Create deliverable | `save_issue` | Issue with `title`, `team`, `project`, `milestone`, description | Safe |
+| Split work | `save_issue` (`parentId`) | Sub-issue | Safe |
+| Blockers | `save_issue` (`blocks` / `blockedBy`) | Relations (append-only) | Safe |
+| Plan review | `list_milestones`, `list_issues`, `get_issue` | AC, orphans, blocker chains | Safe |
+| Status update | `save_status_update` | Project/initiative update | Confirm |
+| Archive / delete | (Linear UI or archive flows) | Destructive | User must confirm |
 
-## End-to-end workflow (Linear as SSOT)
+## Tool safety policy
+
+- **Safe:** list/get; create/update project, milestone, issue; set relations and source links.
+- **Requires confirmation:** project/initiative status updates; changing team-wide workflow; archive.
+- **Never allowed:** deleting workspace data without an explicit user request; writing markdown `Epic-*.md` / `Story-*.md` as a second backlog.
+
+## End-to-end workflow
 
 ### 1. Discover requirements (repo)
 
-- [artifact-discovery.md](artifact-discovery.md), **ScanSources.ts**, PRD/spec/ADRs.
-- Apply [agile-foundations.md](agile-foundations.md) and [decomposition-patterns.md](decomposition-patterns.md) before creating tracker items.
+[artifact-discovery.md](artifact-discovery.md), **ScanSources.ts**. Apply [agile-foundations.md](agile-foundations.md) and [decomposition-patterns.md](decomposition-patterns.md) before creating Linear items.
 
-### 2. Prepare Linear containers
+### 2. Project
 
-1. Ensure a **Project** exists (create via MCP if needed).
-2. Link to an **Initiative** when roadmap context exists.
-3. Record project URL in `brief.md` or optional [tracker-index.md](tracker-index.md).
+Ensure a **Project** exists (`list_projects` / `save_project`). Link an **Initiative** when roadmap context exists. Record the project URL in `brief.md` or optional [tracker-index.md](tracker-index.md).
 
-### 3. Create epics → milestones (not markdown)
+### 3. Milestones
 
-For each epic, create one **milestone** with:
+For each themed outcome, `save_milestone` with:
 
-| Planning field | Where in Linear |
-|----------------|-----------------|
-| Title | Milestone name |
-| Outcome / scope | Milestone description |
-| Target date | Milestone target date |
-| `EPIC-n` id | Description line: `Planning ID: EPIC-n` |
-| PRD/ADR links | Description “Sources” section |
+- `project` — name, id, or slug
+- `name` — outcome title
+- `description` — scope plus a **Sources** section (repo paths)
+- `targetDate` — optional
 
-### 4. Create stories → issues (not markdown)
+Use Linear's milestone identity. Do not add `Planning ID: EPIC-n`.
 
-For each story, create one **issue**:
+### 4. Issues
 
-| Planning field | Where in Linear |
-|----------------|-----------------|
-| Title | Issue title |
-| Acceptance criteria | Issue description (checklist) |
-| Parent epic | Issue **milestone** (+ project) |
-| Priority | Issue priority |
-| `depends_on` | Blocking relations after issues exist |
-| `STORY-n-m` id | Description: `Planning ID: STORY-n-m` |
-| `traces_to` sources | Description “Sources” links to repo paths |
+For each INVEST-sized slice, `save_issue` with:
 
-Use labels for filters (e.g. `slice:vertical`) if helpful. Optional [tracker-index.md](tracker-index.md) for URLs only.
+- `title`, `team` (required on create)
+- `project`, `milestone`
+- `description` — acceptance-criteria checklist and **Sources** links
+- `priority`, `labels` as needed
+- `blocks` / `blockedBy` after related issues exist
 
-**Sub-issues** for tasks under the parent story issue.
+Use the Linear identifier (`TEAM-123`) as the stable id. Optional sub-issues via `parentId`.
 
 ### 5. Plan review
 
-- Use the **tracker** section of [plan-quality-review.md](plan-quality-review.md).
-- Fetch milestones/issues via MCP; flag missing AC, orphan issues, or broken blocker chains.
+[plan-quality-review.md](plan-quality-review.md) tracker checklist, plus:
+
+- Every in-scope issue has a milestone (or an explicit reason it does not)
+- AC present in the issue description
+- Blocker relations are acyclic
+- No parallel markdown backlog for the same work
 
 ### 6. Agents and intake
 
-Put acceptance criteria, source links, and repo/`AGENTS.md` paths in the **issue description** so agents and humans have one contract.
+Put acceptance criteria, source links, and repo/`AGENTS.md` paths in the **issue description**.
 
 ## Anti-patterns (Linear-specific)
 
-- Issues for epics without **milestones** — use milestones for epics.
-- Using Linear **Project** as an epic — projects are containers; **milestones** are epics.
-- Copying full PRD text into every issue — link to repo paths instead.
-
-Dual SSOT and markdown-backlog rules: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot).
+- Treating a **Project** as the themed outcome — projects contain milestones; milestones group issues.
+- Creating issues with no project/milestone when the team uses that hierarchy.
+- Copying full PRD text into every issue — link to repo paths.
+- Re-using files-platform prefixes (`EPIC-1`, `STORY-1-1`) as Linear ids.
 
 ## Migration from `files`
 
-1. User confirms switch to `delivery_tracker: linear`.
-2. Create milestones/issues from existing markdown (or start fresh).
-3. Optional [tracker-index.md](tracker-index.md) with URLs.
-4. Archive or remove `Epics/` / `Stories/` markdown backlog after confirmation — do not maintain both.
+1. User confirms `delivery_tracker: linear`.
+2. Create Project / Milestones / Issues from existing markdown (or start fresh). Linear ids replace markdown ids.
+3. Optional [tracker-index.md](tracker-index.md) with Linear URLs.
+4. Archive `Epics/` / `Stories/` after confirmation — do not maintain both.
 
 ## Escalation
 
-| Need | Skill |
-|------|--------|
+| Need | Skill / file |
+|------|----------------|
 | Initiative / horizon | `product-roadmap` |
 | PRD / spec | `specification` |
 | Architecture | `software-architecture` |
-| File-based backlog | [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot) |
+| Markdown backlog | [files-adoption.md](files-adoption.md) |
 
 ## References
 

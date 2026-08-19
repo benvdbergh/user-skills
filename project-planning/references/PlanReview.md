@@ -4,18 +4,19 @@
 
 - "review plan", "validate planning", "planning review"
 
-Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot). Use the matching checklist in [plan-quality-review.md](plan-quality-review.md).
+Resolve backlog SSOT, then **load that platform's file** ([SKILL.md § Platform guides](../SKILL.md#platform-guides)). Use the matching checklist in [plan-quality-review.md](plan-quality-review.md).
 
 ## Steps (`delivery_tracker: files`)
 
 1. **WorkflowInit** `--action review` (checks dirs when `files`).
 2. **LintPlan.ts** on markdown backlog.
 3. [plan-quality-review.md](plan-quality-review.md) — **files** section.
+4. [files-adoption.md](files-adoption.md) for prefix/id conventions.
 
-## Steps (tracker SSOT, e.g. `linear`)
+## Steps (tracker SSOT)
 
-1. Load [linear-adoption.md](linear-adoption.md).
-2. Review milestones/issues via MCP — **files** section of plan-quality-review does not apply.
+1. Load `references/<tracker>-adoption.md`.
+2. Review native items via that platform's MCP/API — **files** section of plan-quality-review does not apply.
 3. [plan-quality-review.md](plan-quality-review.md) — **tracker** section.
 4. Optional [tracker-index.md](tracker-index.md).
 

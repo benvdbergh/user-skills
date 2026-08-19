@@ -1,8 +1,8 @@
 # Frontmatter schema (normative)
 
-**Scope:** Epic/story/task **markdown** work items when `delivery_tracker: files` (or omitted). When a delivery tracker is backlog SSOT, do not create parallel markdown backlog files — use tracker fields per [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot) and the platform guide (e.g. [linear-adoption.md](linear-adoption.md)).
+**Scope:** Epic/story/task **markdown** when `delivery_tracker: files` (or omitted). Prefixes (`Epic-`, `EPIC-3`, `STORY-2-1`) are **files-platform only** — [files-adoption.md](files-adoption.md). When a tracker is backlog SSOT, do not create parallel markdown backlog files; use that platform's native types and ids ([SKILL.md § Platform guides](../SKILL.md#platform-guides)).
 
-Manifest keys at the end of this file apply to all modes.
+Manifest keys at the end of this file apply to all modes (`delivery_tracker`, `source_globs`). `naming.*` and epic/story dirs apply to **files** only.
 
 Work items are Markdown files with YAML frontmatter. Scripts (`LintPlan.ts`, managers) use these fields. **`kind` + `id` + `title` are required** for lint validation of new content.
 
@@ -94,10 +94,10 @@ Stored at the **project root** (or path passed via `--config`). Keys:
 | `defaults.stories_dir` | string | Relative dir for story files |
 | `defaults.tasks_dir` | string? | Optional tasks directory |
 | `source_globs` | string[] | Globs for `ScanSources.ts` (relative to root) |
-| `naming.epic_prefix` | string | Filename prefix (default `Epic-`) |
-| `naming.story_prefix` | string | Filename prefix (default `Story-`) |
-| `naming.task_prefix` | string | Filename prefix for tasks (default `Task-`) |
-| `delivery_tracker` | string | **Backlog SSOT.** `files` (default) = epic/story markdown; `linear`, `jira`, `github-issues`, `monday` = backlog in tracker only — no parallel markdown. See [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot). |
+| `naming.epic_prefix` | string | **Files only.** Filename prefix (default `Epic-`) — [files-adoption.md](files-adoption.md) |
+| `naming.story_prefix` | string | **Files only.** Filename prefix (default `Story-`) |
+| `naming.task_prefix` | string | **Files only.** Filename prefix for tasks (default `Task-`) |
+| `delivery_tracker` | string | **Backlog SSOT.** `files` (default) or `linear` / `jira` / `github-issues` / `monday`. Load `references/<value>-adoption.md`. No parallel markdown when a tracker is set. |
 | `tracker_index` | string | Optional path to URL-only index (e.g. `planning/tracker-index.md`) when using a tracker; not backlog SSOT. |
 
 Obsolete keys in older manifests (e.g. `prompt_files`) are ignored by scripts.

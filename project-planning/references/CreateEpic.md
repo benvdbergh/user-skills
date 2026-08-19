@@ -2,21 +2,17 @@
 
 ## When to use
 
-- "create epic", "new epic", "add epic"
+- "create epic", "new epic", "add epic", "add a themed outcome"
 
-Resolve backlog SSOT: [SKILL.md § Delivery tracker](../SKILL.md#delivery-tracker-ssot).
+Resolve backlog SSOT, then **load that platform's file** ([SKILL.md § Platform guides](../SKILL.md#platform-guides)). Create the native item that file uses for a themed / large outcome. Do not apply files-platform prefixes unless the SSOT is `files`.
 
-- **`files`** — steps below.
-- **`linear`** — create a **project milestone** via [linear-adoption.md](linear-adoption.md) (no `Epic-*.md`).
-- **Other trackers** — platform guide when available.
+## Steps
 
-## Steps (`files` only)
+1. Resolve `delivery_tracker`.
+2. Load `references/<tracker>-adoption.md` (`files` → [files-adoption.md](files-adoption.md)).
+3. Follow that file's create steps for the large-outcome type.
 
-1. Resolve planning context (`--project`, `--root`, or `--config`).
-2. Gather epic name, description, priority.
-3. Run **EpicManager** `create`.
-4. Edit epic `.md` (`traces_to`, etc.).
-5. Run **LintPlan.ts** before `ready`.
+When SSOT is `files`, that means EpicManager + epic markdown ([files-adoption.md](files-adoption.md) scripts).
 
 ## CLI (`files` only)
 
@@ -30,4 +26,4 @@ bun run $PAI_DIR/skills/project-planning/scripts/EpicManager.ts \
 
 ## Integration
 
-- **specification** — PRD/spec in `traces_to` (markdown) or milestone description (tracker).
+- **specification** — PRD/spec in `traces_to` (files) or the native item's description (tracker).
