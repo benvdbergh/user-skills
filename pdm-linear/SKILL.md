@@ -97,7 +97,7 @@ Initiative (PM)
 
 | Area | Tools |
 |------|--------|
-| Initiatives | `list_initiatives`, `get_initiative`, `save_initiative`, `list_initiative_labels`, `save_initiative_label`, `create_initiative_label` (deprecated—prefer `save_initiative_label`), retire/restore initiative labels as exposed |
+| Initiatives | `list_initiatives`, `get_initiative`, `save_initiative`, `list_initiative_labels`, `save_initiative_label`, retire/restore initiative labels as exposed |
 | Projects | `list_projects`, `get_project`, `save_project`, `list_project_labels`, `save_project_label` |
 | Milestones | `list_milestones`, `get_milestone`, `save_milestone` |
 | Documents | `list_documents`, `get_document`, `save_document` |

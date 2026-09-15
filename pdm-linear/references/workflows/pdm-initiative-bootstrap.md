@@ -23,6 +23,7 @@ Create or refresh the **Initiative** and/or **Project shell** so later PRD publi
 - Name, one-line outcome, and owner/lead if known.
 - Optional inputs from `value-propositions` / `product-roadmap` for description quality.
 - Workspace context: Initiatives may be empty; ~7 projects may already exist; Agent Hub may already be an empty shell—**discover before create**.
+- **Name hint:** The live Linear project name for Agent Hub is **Voice-Native Agent Hub**—search for it first to avoid duplicates.
 
 ## Steps
 

@@ -13,6 +13,7 @@ Ensure a Linear **Project** exists (or is correctly framed), publish the PRD as 
 - PRD content available (repo path such as `PRD.md`, or paste). Prefer quality via `specification` if the draft is thin.
 - Linear MCP authenticated; tool schemas discovered at runtime.
 - Know target project name/slug (e.g. Agent Hub / Voice-Native Agent Hub).
+- **Name hint:** The live Linear project name for Agent Hub is **Voice-Native Agent Hub**—discover first to avoid duplicates.
 
 ## Steps
 

@@ -13,6 +13,7 @@ Define **outcome milestones with exit criteria** on a project that already has (
 - Target project identified (`list_projects` / `get_project`).
 - PRD available as repo file and/or Linear document (`list_documents` / `get_document`).
 - Prefer Life-Hub milestone *shape*: outcome name + exit criteria (+ optional `targetDate`).
+- **Name hint:** The live Linear project name for Agent Hub is **Voice-Native Agent Hub**—use for discovery and comparisons.
 
 ## Steps
 
