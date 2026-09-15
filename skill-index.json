@@ -1,8 +1,8 @@
 {
-  "generated": "2026-05-27T10:58:06.041538Z",
-  "totalSkills": 43,
+  "generated": "2026-09-15T18:33:49.067955Z",
+  "totalSkills": 47,
   "alwaysLoadedCount": 0,
-  "deferredCount": 43,
+  "deferredCount": 47,
   "skills": {
     "banner-design": {
       "name": "banner-design",
@@ -80,6 +80,27 @@
         "diagrams",
         "wants to trace features to code artifacts",
         "requests documentation-aware change impact for a branch"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "code-review-skill": {
+      "name": "code-review-skill",
+      "path": "code-review-skill/SKILL.md",
+      "fullDescription": "Provides comprehensive code review guidance for React 19, Vue 3, Angular 17+, Svelte 5, Rust, TypeScript, Java, Java 8, PHP, Ruby, Rails, Python, Django, FastAPI, Go, C#/.NET, Kotlin, Swift, Dart, Flutter, NestJS, C/C++, Zig, CSS/Less/Sass, Qt, and more. Covers architecture review, performance review, security audit, code quality anti-patterns, and common bugs across all ecosystems. Use when: reviewing pull requests, conducting PR reviews, code review, reviewing code changes, establishing review standards, mentoring developers, architecture reviews, security audits, performance reviews, checking code quality, finding bugs, giving feedback on code.",
+      "triggers": [
+        "reviewing pull requests",
+        "conducting PR reviews",
+        "code review",
+        "reviewing code changes",
+        "establishing review standards",
+        "mentoring developers",
+        "architecture reviews",
+        "security audits",
+        "performance reviews",
+        "checking code quality",
+        "finding bugs",
+        "giving feedback on code"
       ],
       "workflows": [],
       "tier": "deferred"
@@ -226,6 +247,24 @@
         "tweak DOCX structure",
         "run post-processing on generated documents",
         "while keeping Markdown as canonical. For PDF-to-Markdown ingestion use the pdf-to-markdown skill instead"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
+    "e2e-testing": {
+      "name": "e2e-testing",
+      "path": "e2e-testing/SKILL.md",
+      "fullDescription": "Designs and implements resilient end-to-end tests focused on critical user journeys, preferring Playwright with accessible locators, isolation, web-first assertions, traces, and CI sharding. Use when the user asks for E2E tests, Playwright or Cypress suites, browser journey coverage, flake reduction, visual/a11y checks in E2E, or demoting misplaced E2E to lower layers. Does not own unit-test authoring, load testing, or CI governance policy.",
+      "triggers": [
+        "the user asks for E2E tests",
+        "Playwright",
+        "Cypress suites",
+        "browser journey coverage",
+        "flake reduction",
+        "visual/a11y checks in E2E",
+        "demoting misplaced E2E to lower layers. Does not own unit-test authoring",
+        "load testing",
+        "CI governance policy"
       ],
       "workflows": [],
       "tier": "deferred"
@@ -481,19 +520,20 @@
     "project-planning": {
       "name": "project-planning",
       "path": "project-planning/SKILL.md",
-      "fullDescription": "Applies agile decomposition, traceability, and dependency-aware planning with a single source of truth per project: markdown epics/stories by default, or a delivery tracker (e.g. Linear, Jira) when configured—never both. Discovers specs/ADRs, shards into epics and stories, and validates plans. Use when agile planning, epic/story breakdown, shard PRD or spec, dependency ordering, Definition of Ready, story mapping, workflow init, LintPlan, ScanSources, manifest-driven planning paths, or planning review.",
+      "fullDescription": "Applies agile decomposition, traceability, and dependency-aware planning with one backlog SSOT per project: markdown files by default, or a delivery tracker (Linear, Jira, and others) when configured—never both. Discovers specs/ADRs, shards work using the configured platform's native types, and validates plans. Use when agile planning, epic/story breakdown, shard PRD or spec, Linear or Jira backlog, dependency ordering, Definition of Ready, story mapping, workflow init, LintPlan, ScanSources, or planning review.",
       "triggers": [
         "agile planning",
         "epic/story breakdown",
         "shard PRD",
         "spec",
+        "Linear",
+        "Jira backlog",
         "dependency ordering",
         "Definition of Ready",
         "story mapping",
         "workflow init",
         "LintPlan",
         "ScanSources",
-        "manifest-driven planning paths",
         "planning review"
       ],
       "workflows": [],
@@ -714,6 +754,23 @@
       "workflows": [],
       "tier": "deferred"
     },
+    "test-strategy": {
+      "name": "test-strategy",
+      "path": "test-strategy/SKILL.md",
+      "fullDescription": "Designs risk-based test strategies across unit, integration, E2E, and specialized lanes (API, performance, accessibility, chaos) with pyramid health, entry/exit criteria, quality gates, and measurable KPIs. Use when the user asks for a test strategy, QA strategy, testing approach, test pyramid rebalance, release quality gates, or where to put coverage for a feature or system. Does not own writing individual unit/E2E scripts or CI workflow YAML.",
+      "triggers": [
+        "the user asks for a test strategy",
+        "QA strategy",
+        "testing approach",
+        "test pyramid rebalance",
+        "release quality gates",
+        "where to put coverage for a feature",
+        "system. Does not own writing individual unit/E2E scripts",
+        "CI workflow YAML"
+      ],
+      "workflows": [],
+      "tier": "deferred"
+    },
     "ui-styling": {
       "name": "ui-styling",
       "path": "ui-styling/SKILL.md",
@@ -771,6 +828,23 @@
         "app-interaction-rules",
         "skill-escalation"
       ],
+      "tier": "deferred"
+    },
+    "unit-testing": {
+      "name": "unit-testing",
+      "path": "unit-testing/SKILL.md",
+      "fullDescription": "Writes and reviews fast, isolated unit and focused integration tests using Arrange-Act-Assert, behavior-focused naming, appropriate test doubles, and pyramid placement. Use when the user asks for unit tests, Jest/Vitest/pytest/JUnit coverage, mocking strategy, test smells, TDD red-green-refactor, or moving misplaced E2E/UI assertions down. Does not own browser E2E suites, load/chaos testing, or CI governance.",
+      "triggers": [
+        "the user asks for unit tests",
+        "Jest/Vitest/pytest/JUnit coverage",
+        "mocking strategy",
+        "test smells",
+        "TDD red-green-refactor",
+        "moving misplaced E2E/UI assertions down. Does not own browser E2E suites",
+        "load/chaos testing",
+        "CI governance"
+      ],
+      "workflows": [],
       "tier": "deferred"
     },
     "ux-designer": {
