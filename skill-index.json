@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-15T18:33:49.067955Z",
+  "generated": "2026-09-15T19:21:16.239268Z",
   "totalSkills": 47,
   "alwaysLoadedCount": 0,
   "deferredCount": 47,
@@ -80,27 +80,6 @@
         "diagrams",
         "wants to trace features to code artifacts",
         "requests documentation-aware change impact for a branch"
-      ],
-      "workflows": [],
-      "tier": "deferred"
-    },
-    "code-review-skill": {
-      "name": "code-review-skill",
-      "path": "code-review-skill/SKILL.md",
-      "fullDescription": "Provides comprehensive code review guidance for React 19, Vue 3, Angular 17+, Svelte 5, Rust, TypeScript, Java, Java 8, PHP, Ruby, Rails, Python, Django, FastAPI, Go, C#/.NET, Kotlin, Swift, Dart, Flutter, NestJS, C/C++, Zig, CSS/Less/Sass, Qt, and more. Covers architecture review, performance review, security audit, code quality anti-patterns, and common bugs across all ecosystems. Use when: reviewing pull requests, conducting PR reviews, code review, reviewing code changes, establishing review standards, mentoring developers, architecture reviews, security audits, performance reviews, checking code quality, finding bugs, giving feedback on code.",
-      "triggers": [
-        "reviewing pull requests",
-        "conducting PR reviews",
-        "code review",
-        "reviewing code changes",
-        "establishing review standards",
-        "mentoring developers",
-        "architecture reviews",
-        "security audits",
-        "performance reviews",
-        "checking code quality",
-        "finding bugs",
-        "giving feedback on code"
       ],
       "workflows": [],
       "tier": "deferred"
@@ -455,6 +434,22 @@
       "workflows": [
         "workflows"
       ],
+      "tier": "deferred"
+    },
+    "pdm-linear": {
+      "name": "pdm-linear",
+      "path": "pdm-linear/SKILL.md",
+      "fullDescription": "Operates Linear as Product Manager (PDM) on initiatives, projects, milestones, documents, labels, status updates, and handoff comments—never issues, cycles CRUD, or releases. Use when bootstrapping an initiative or project shell, turning a PRD into a Linear project and PRD document, planning outcome milestones after a PRD, syncing roadmap initiatives, posting initiative/project health updates, or handing framed work to the Product Owner for issue/cycle packing via project-planning.",
+      "triggers": [
+        "bootstrapping an initiative",
+        "project shell",
+        "turning a PRD into a Linear project and PRD document",
+        "planning outcome milestones after a PRD",
+        "syncing roadmap initiatives",
+        "posting initiative/project health updates",
+        "handing framed work to the Product Owner for issue/cycle packing via project-planning"
+      ],
+      "workflows": [],
       "tier": "deferred"
     },
     "physio-fitness-coach": {

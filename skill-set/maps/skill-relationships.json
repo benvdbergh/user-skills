@@ -1,7 +1,7 @@
 {
   "title": "Skill Relationship Map",
   "version": 2,
-  "updated": "2026-09-15T18:33:49.091507Z",
+  "updated": "2026-09-15T19:21:51.769875Z",
   "description": "Machine-readable map of relationships and dependencies between user-level and Ai-Vault project-level skills. Includes relationship types required by Story-01-05 and maps each to candidate Agent Graph edge types, with notes when the mapping is approximate (because the Agent Graph spec does not yet define skill→skill edge types beyond tool/workflow/agent usage). Curators should treat each skill's references/skill-escalation.md as primary boundary evidence when present.",
   "sources": {
     "user_level_skill_index": "/workspace/skill-index.json",
@@ -75,7 +75,6 @@
       "brand",
       "ci-cd-governance",
       "code-discovery-for-docs",
-      "code-review-skill",
       "deep-research",
       "design",
       "design-system",
@@ -94,6 +93,7 @@
       "office-xlsx",
       "open-source-community",
       "pdf-to-markdown",
+      "pdm-linear",
       "physio-fitness-coach",
       "product-knowledge-catalog",
       "product-roadmap",
@@ -960,129 +960,59 @@
     },
     {
       "id": "rel-0059",
-      "from_skill": "test-strategy",
-      "to_skill": "ci-cd-governance",
+      "from_skill": "pdm-linear",
+      "to_skill": "product-roadmap",
       "relationship_type": "may_call_or_wrap",
       "candidate_agent_graph_edge_type": "depends_on",
       "mapping_is_approximate": true,
       "evidence": {
-        "source_file": "/workspace/test-strategy/references/skill-escalation.md",
-        "quote": "CI/CD workflow YAML, required checks, permissions → `ci-cd-governance`."
+        "source_file": "pdm-linear/references/skill-escalation.md",
+        "quote": "If the user needs a **roadmap** (horizons, commitment vs forecast), run or cite `product-roadmap` first; then `pdm-roadmap-sync`."
       },
       "confidence_score": 0.9,
-      "notes": "test-strategy designs gates and quality criteria; ci-cd-governance implements pipeline enforcement."
+      "notes": "pdm-linear syncs product-roadmap horizons into Linear initiatives via pdm-roadmap-sync workflow; roadmap decides what horizons, this skill mirrors into Linear."
     },
     {
       "id": "rel-0060",
-      "from_skill": "test-strategy",
-      "to_skill": "minimalist-coding",
+      "from_skill": "pdm-linear",
+      "to_skill": "specification",
       "relationship_type": "may_call_or_wrap",
       "candidate_agent_graph_edge_type": "depends_on",
       "mapping_is_approximate": true,
       "evidence": {
-        "source_file": "/workspace/test-strategy/references/skill-escalation.md",
-        "quote": "Authoring unit/integration test code → `unit-testing` (and `minimalist-coding` for production code under test)."
+        "source_file": "pdm-linear/references/skill-escalation.md",
+        "quote": "If the user needs a **PRD written or sharpened**, use `specification`; then `pdm-prd-to-project`."
       },
-      "confidence_score": 0.85,
-      "notes": "test-strategy defines what to test; minimalist-coding implements the production code being tested."
+      "confidence_score": 0.9,
+      "notes": "pdm-linear publishes PRD content as Linear documents via pdm-prd-to-project workflow; specification owns PRD authoring, this skill attaches/links approved PRDs."
     },
     {
       "id": "rel-0061",
-      "from_skill": "test-strategy",
-      "to_skill": "code-review-skill",
+      "from_skill": "pdm-linear",
+      "to_skill": "value-propositions",
       "relationship_type": "may_call_or_wrap",
       "candidate_agent_graph_edge_type": "depends_on",
       "mapping_is_approximate": true,
       "evidence": {
-        "source_file": "/workspace/test-strategy/references/skill-escalation.md",
-        "quote": "PR critique process → `code-review-skill` (vendor)."
+        "source_file": "pdm-linear/references/skill-escalation.md",
+        "quote": "If the user needs **why this product wins**, use `value-propositions` before or beside initiative bootstrap."
       },
       "confidence_score": 0.85,
-      "notes": "test-strategy may escalate to code-review-skill for PR quality/security review aspects."
+      "notes": "pdm-linear may compose with value-propositions for value framing before bootstrapping initiatives; value-propositions feeds outcomes into initiative descriptions."
     },
     {
       "id": "rel-0062",
-      "from_skill": "e2e-testing",
-      "to_skill": "ci-cd-governance",
+      "from_skill": "pdm-linear",
+      "to_skill": "project-planning",
       "relationship_type": "may_call_or_wrap",
       "candidate_agent_graph_edge_type": "depends_on",
       "mapping_is_approximate": true,
       "evidence": {
-        "source_file": "/workspace/e2e-testing/references/skill-escalation.md",
-        "quote": "GitHub Actions permissions, reusable workflows, required-check policy → `ci-cd-governance`."
+        "source_file": "pdm-linear/references/skill-escalation.md",
+        "quote": "When milestones + PRD doc + framing are done, run `pdm-hand-to-po` and **stop**. Do not create issues \"to be helpful.\""
       },
-      "confidence_score": 0.9,
-      "notes": "e2e-testing implements journey tests; ci-cd-governance wires them as merge gates."
-    },
-    {
-      "id": "rel-0063",
-      "from_skill": "e2e-testing",
-      "to_skill": "minimalist-coding",
-      "relationship_type": "may_call_or_wrap",
-      "candidate_agent_graph_edge_type": "depends_on",
-      "mapping_is_approximate": true,
-      "evidence": {
-        "source_file": "/workspace/e2e-testing/references/skill-escalation.md",
-        "quote": "Production feature implementation → `minimalist-coding`."
-      },
-      "confidence_score": 0.85,
-      "notes": "e2e-testing automates user journeys; minimalist-coding implements/fixes application features discovered via E2E."
-    },
-    {
-      "id": "rel-0064",
-      "from_skill": "e2e-testing",
-      "to_skill": "code-review-skill",
-      "relationship_type": "may_call_or_wrap",
-      "candidate_agent_graph_edge_type": "depends_on",
-      "mapping_is_approximate": true,
-      "evidence": {
-        "source_file": "/workspace/e2e-testing/references/skill-escalation.md",
-        "quote": "PR review rubric → `code-review-skill`."
-      },
-      "confidence_score": 0.85,
-      "notes": "e2e-testing may escalate to code-review-skill for PR review aspects."
-    },
-    {
-      "id": "rel-0065",
-      "from_skill": "unit-testing",
-      "to_skill": "ci-cd-governance",
-      "relationship_type": "may_call_or_wrap",
-      "candidate_agent_graph_edge_type": "depends_on",
-      "mapping_is_approximate": true,
-      "evidence": {
-        "source_file": "/workspace/unit-testing/references/skill-escalation.md",
-        "quote": "CI workflow security/governance → `ci-cd-governance`."
-      },
-      "confidence_score": 0.9,
-      "notes": "unit-testing produces green checks; ci-cd-governance enforces them as gates."
-    },
-    {
-      "id": "rel-0066",
-      "from_skill": "unit-testing",
-      "to_skill": "minimalist-coding",
-      "relationship_type": "may_call_or_wrap",
-      "candidate_agent_graph_edge_type": "depends_on",
-      "mapping_is_approximate": true,
-      "evidence": {
-        "source_file": "/workspace/unit-testing/references/skill-escalation.md",
-        "quote": "Implementing feature code beyond what tests require → `minimalist-coding` (pair: tests here, design there)."
-      },
-      "confidence_score": 0.9,
-      "notes": "unit-testing and minimalist-coding work together during TDD/implementation cycles."
-    },
-    {
-      "id": "rel-0067",
-      "from_skill": "unit-testing",
-      "to_skill": "code-review-skill",
-      "relationship_type": "may_call_or_wrap",
-      "candidate_agent_graph_edge_type": "depends_on",
-      "mapping_is_approximate": true,
-      "evidence": {
-        "source_file": "/workspace/unit-testing/references/skill-escalation.md",
-        "quote": "Human/agent PR review process → `code-review-skill`."
-      },
-      "confidence_score": 0.85,
-      "notes": "unit-testing may escalate to code-review-skill for overall PR quality review."
+      "confidence_score": 0.95,
+      "notes": "pdm-linear explicitly hands framed work to project-planning (PO) via pdm-hand-to-po workflow; PM never creates issues/cycles, PO owns issue backlog and cycle packing."
     }
   ],
   "high_risk_refactor_sequences": [
