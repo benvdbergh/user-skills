@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: PAI
-  version: 2.8.0
+  version: 2.8.1
 ---
 
 # skill-set
@@ -124,6 +124,7 @@ The skill-set **catalog** (`catalog/`) and **relationship map** (`maps/`) are th
 | `catalog/` | `ai-vault-skill-inventory.json` | Project-level skill inventory for Ai-Vault (name, path, purpose, triggers, workflows, tier, indication). Canonical list for this vault. |
 | `catalog/` | `scope-and-conventions.md` | User-level vs project-based scope rules and functional clusters (hubs) for Agent Graph mapping. Do not redefine scope elsewhere; reference this. |
 | `catalog/` | `third-party-skills.json` | Upstream skills (git clone/submodule) with sidecar paths under `vendor/`. |
+| `catalog/` | `plugin-packs.json` | Plugin pack membership for the Cursor/Agent marketplace overlay. Edit this file, then run `scripts/sync_plugin_packs.py`. |
 | `catalog/` | `README.md` | Catalog schema and usage. Read before creating or updating any catalog file. |
 | `vendor/` | `<folder>/` | Ecosystem-only files (`skill-escalation.md`, `integration.md`) for third-party skills; safe across upstream pulls. |
 | `maps/` | `skill-relationships.json` | Skill Relationship Map: relationships (e.g. may_call_or_wrap, shares_mcp_tool_script, overlaps, specialized_version_of) and high-risk refactor sequences. |
@@ -162,6 +163,7 @@ python scripts/update_relationship_map.py -s C:/path/to/.claude/skills -p C:/pat
 - **Before classifying a skill’s scope (user vs project):** Read `catalog/scope-and-conventions.md`. Use it when adding skills to an inventory or when documenting scope.
 - **Before refactoring or reordering skills:** Read `maps/skill-relationships.json` for dependency edges and high-risk refactor sequences. Use it to plan move/split/merge order.
 - **When adding or removing an environment:** Update `catalog/environment-skill-index-map.json` (add/remove entry, bump `updated`).
+- **When adding a skill or changing plugin membership:** Update `catalog/plugin-packs.json` so the new folder belongs to exactly one domain pack, then run `scripts/sync_plugin_packs.py`.
 
 ### Catalog and map workflow triggers
 
@@ -173,6 +175,7 @@ python scripts/update_relationship_map.py -s C:/path/to/.claude/skills -p C:/pat
 | "Update relationship map", "document skill dependencies", "update skill relationships" | Add or change relationships or high-risk sequences. | Read inventories and skill-indexes as needed; edit `maps/skill-relationships.json`. |
 | "Regenerate skill index", "refresh skill-index.json" | Rebuild `skill-index.json` from all `*/SKILL.md` frontmatter. | Run `scripts/update_skill_index.py` (optional `--skills-root` for project-level trees). |
 | "Sync relationship map skill lists", "refresh skill-relationships lists" | Align `maps/skill-relationships.json` skill ID lists with indexes; validate edges. | Run `scripts/update_relationship_map.py` (`--check-only` to validate without writing). |
+| "Sync plugin packs", "update marketplace", "split skills into plugins" | Rebuild the Cursor/Agent plugin overlay from pack membership. | Edit `plugin-packs.json`; run `scripts/sync_plugin_packs.py` (or `--check`). |
 
 ## Examples
 

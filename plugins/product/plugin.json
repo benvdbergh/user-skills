@@ -1,0 +1,16 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "user-skills-product",
+  "description": "Specs, roadmaps, planning, value propositions, and Linear PM workflows. Does not bundle Linear MCP; install Cursor's official Linear plugin alongside this pack.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "product",
+    "specs",
+    "roadmap",
+    "linear"
+  ]
+}

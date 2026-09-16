@@ -1,0 +1,12 @@
+{
+  "name": "user-skills-personal",
+  "description": "Personal-life skills that should stay off coding agents. Requires Notion MCP on the host for physio-fitness-coach persistence.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "personal"
+  ]
+}

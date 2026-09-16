@@ -1,0 +1,15 @@
+{
+  "name": "user-skills-documents",
+  "description": "Office files, PDF conversion, technical writing, and documentation governance. Word/Excel MCPs stay host-configured when those skills need them.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "docs",
+    "pdf",
+    "office",
+    "writing"
+  ]
+}

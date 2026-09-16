@@ -12,6 +12,7 @@ This directory is the **skill-set catalog**: the canonical place for skill-setâ€
 | `ai-vault-skill-inventory.json` | Project-level skill inventory for Ai-Vault: name, path, purpose, triggers, workflows, tier, indication. Canonical list for this vault. |
 | `scope-and-conventions.md` | Scope and project-based skill conventions: user-level vs project-based placement, functional clusters (hubs), and Agent Graph Skill/Context mapping. Reference this when classifying scope; do not redefine elsewhere. |
 | `third-party-skills.json` | Upstream/vendor skills installed at the skills root: repo URL, folder vs YAML name, sidecar path, last synced commit. See `references/vendor-skills.md`. |
+| `plugin-packs.json` | Maps root-level skills onto Cursor/Agent plugin packs. Source of truth for `.cursor-plugin/marketplace.json`; regenerate the overlay with `scripts/sync_plugin_packs.py`. |
 | `README.md` | This file; documents schema and usage. |
 
 **Relationship map** (in `skills/skill-set/maps/`):
@@ -53,6 +54,19 @@ Paths are stored as absolute paths so that tooling can resolve them without extr
 - **Story 01-02, 01-06** and skill-set workflows (e.g. inventory refresh) **MUST** read this file to discover all environments and their skill indexes.
 - To add an environment: add a new object to `environments` with `id`, `path`, and `skill_index_path` (and optionally `scope`, `display_name`).
 - To remove an environment: delete its entry from `environments` and bump `updated`.
+
+## Schema: `plugin-packs.json`
+
+Maps each root-level skill folder onto one Cursor/Agent plugin pack. Skill bodies stay at the repository root; `scripts/sync_plugin_packs.py` writes `.cursor-plugin/` and `plugins/`.
+
+| Field | Description |
+|------|-------------|
+| `marketplace` | Cursor marketplace `name`, `owner`, and `metadata` copied into `.cursor-plugin/marketplace.json`. |
+| `packs[]` | One plugin. `kind: catch-all` is the repo-root plugin (`source: "."`) covering every discovered `*/SKILL.md`. Other packs are exclusive subsets materialized under `plugins/<name>/`. |
+| `packs[].skills` | Skill folder names, or `["*"]` for the catch-all. Every discovered skill must belong to exactly one domain pack. |
+| `packs[].mcp` | Optional `mcp.json` payload. Bundle a server only when it lives in this repo. Host-provided MCPs (Linear, Notion, Figma) are listed under `companion_mcps` instead. |
+
+After editing this file, run `python skill-set/scripts/sync_plugin_packs.py` and commit the generated overlay. Use `--check` in CI or before a PR.
 
 ## Standardized Escalation Artifact
 

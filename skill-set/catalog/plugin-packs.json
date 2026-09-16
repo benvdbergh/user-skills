@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "updated": "2026-09-16T00:00:00Z",
+  "description": "Maps root-level Agent Skills onto Cursor/Agent plugin packs. Canonical skill bodies stay at the repository root; plugin directories under plugins/ are a packaging overlay so Cursor can import this repo as a team marketplace and Auto Refresh from git.",
+  "marketplace": {
+    "name": "user-skills",
+    "owner": {
+      "name": "Ben van den Bergh"
+    },
+    "metadata": {
+      "description": "Personal Agent Skills for Cursor, Claude, Codex, and other Agent Skills hosts. Install the full user-skills plugin, or pick domain packs. Companion MCPs are bundled only when the server lives in this repo.",
+      "version": "1.0.0"
+    }
+  },
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "packs": [
+    {
+      "name": "user-skills",
+      "source": ".",
+      "kind": "catch-all",
+      "description": "Every user-level skill in this repository, plus the skill-lab MCP when Node deps are installed. Use this for a single Cursor install that tracks git. Prefer domain packs when you want independent enable/disable.",
+      "keywords": ["skills", "agent-skills", "personal"],
+      "skills": ["*"],
+      "mcp": {
+        "mcpServers": {
+          "skill-lab": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+              "-y",
+              "tsx",
+              "${CURSOR_PLUGIN_ROOT}/skill-set/mcp-server/src/cli.ts",
+              "mcp"
+            ],
+            "cwd": "${CURSOR_PLUGIN_ROOT}/skill-set/mcp-server",
+            "env": {
+              "SKILL_LAB_SKILLS_ROOT": "${CURSOR_PLUGIN_ROOT}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "user-skills-engineering",
+      "source": "plugins/engineering",
+      "kind": "pack",
+      "description": "Git, CI/CD, testing, repo operations, and software architecture skills. No MCP bundled; use host git/CI tools. Pair with user-skills-skill-lab when authoring skills.",
+      "keywords": ["git", "ci", "testing", "architecture"],
+      "skills": [
+        "ci-cd-governance",
+        "e2e-testing",
+        "fork-management",
+        "minimalist-coding",
+        "open-source-community",
+        "prompting",
+        "release-versioning",
+        "repo-docs",
+        "repo-security-compliance",
+        "repo-triage-pr-ops",
+        "software-architecture",
+        "test-strategy",
+        "unit-testing",
+        "version-control",
+        "workflow-engine-mcp-design"
+      ]
+    },
+    {
+      "name": "user-skills-product",
+      "source": "plugins/product",
+      "kind": "pack",
+      "description": "Specs, roadmaps, planning, value propositions, and Linear PM workflows. Does not bundle Linear MCP; install Cursor's official Linear plugin alongside this pack.",
+      "keywords": ["product", "specs", "roadmap", "linear"],
+      "skills": [
+        "enterprise-architecture",
+        "pdm-linear",
+        "product-knowledge-catalog",
+        "product-roadmap",
+        "project-planning",
+        "specification",
+        "value-propositions"
+      ],
+      "companion_mcps": [
+        "Install the official Linear plugin when using pdm-linear."
+      ]
+    },
+    {
+      "name": "user-skills-design",
+      "source": "plugins/design",
+      "kind": "pack",
+      "description": "Brand, design systems, UI/UX, diagrams, slides, and visual generation skills. Does not bundle Figma or image-model MCPs; those stay host-configured.",
+      "keywords": ["design", "brand", "ui", "ux"],
+      "skills": [
+        "banner-design",
+        "brand",
+        "design",
+        "design-system",
+        "diagram",
+        "low-poly-gen-mcp",
+        "slides",
+        "ui-styling",
+        "ui-ux-pro-max",
+        "ux-designer",
+        "web-visual"
+      ]
+    },
+    {
+      "name": "user-skills-documents",
+      "source": "plugins/documents",
+      "kind": "pack",
+      "description": "Office files, PDF conversion, technical writing, and documentation governance. Word/Excel MCPs stay host-configured when those skills need them.",
+      "keywords": ["docs", "pdf", "office", "writing"],
+      "skills": [
+        "code-discovery-for-docs",
+        "document-deep-merge",
+        "documentation-governance",
+        "docx-documentation",
+        "office-docx",
+        "office-pdf",
+        "office-pptx",
+        "office-xlsx",
+        "pdf-to-markdown",
+        "tech-documentation"
+      ]
+    },
+    {
+      "name": "user-skills-research",
+      "source": "plugins/research",
+      "kind": "pack",
+      "description": "Deep research and research-analysis workflows. Uses host web/fetch tools; no extra MCP bundled.",
+      "keywords": ["research"],
+      "skills": ["deep-research", "research-analysis"]
+    },
+    {
+      "name": "user-skills-skill-lab",
+      "source": "plugins/skill-lab",
+      "kind": "pack",
+      "description": "Skill authoring, validation, and catalog workflows (skill-set). Prefer the full user-skills plugin if you also want the in-repo skill-lab MCP, which must see the whole skills tree.",
+      "keywords": ["skills", "authoring", "catalog"],
+      "skills": ["skill-set"]
+    },
+    {
+      "name": "user-skills-personal",
+      "source": "plugins/personal",
+      "kind": "pack",
+      "description": "Personal-life skills that should stay off coding agents. Requires Notion MCP on the host for physio-fitness-coach persistence.",
+      "keywords": ["personal"],
+      "skills": ["physio-fitness-coach"],
+      "companion_mcps": [
+        "Install Notion MCP when using physio-fitness-coach."
+      ]
+    }
+  ]
+}
