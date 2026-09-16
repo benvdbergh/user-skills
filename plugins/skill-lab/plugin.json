@@ -1,0 +1,15 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "user-skills-skill-lab",
+  "description": "Skill authoring, validation, and catalog workflows (skill-set). Prefer the full user-skills plugin if you also want the in-repo skill-lab MCP, which must see the whole skills tree.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "authoring",
+    "catalog"
+  ]
+}

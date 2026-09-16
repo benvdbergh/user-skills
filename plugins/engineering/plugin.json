@@ -1,0 +1,16 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "user-skills-engineering",
+  "description": "Git, CI/CD, testing, repo operations, and software architecture skills. No MCP bundled; use host git/CI tools. Pair with user-skills-skill-lab when authoring skills.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "ci",
+    "testing",
+    "architecture"
+  ]
+}

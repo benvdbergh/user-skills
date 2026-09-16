@@ -1,0 +1,149 @@
+{
+  "name": "user-skills",
+  "owner": {
+    "name": "Ben van den Bergh"
+  },
+  "metadata": {
+    "description": "Personal Agent Skills for Cursor, Claude, Codex, and other Agent Skills hosts. Install the full user-skills plugin, or pick domain packs. Companion MCPs are bundled only when the server lives in this repo.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "user-skills",
+      "source": ".",
+      "description": "Every user-level skill in this repository, plus the skill-lab MCP when Node deps are installed. Use this for a single Cursor install that tracks git. Prefer domain packs when you want independent enable/disable.",
+      "version": "1.0.0",
+      "keywords": [
+        "skills",
+        "agent-skills",
+        "personal"
+      ],
+      "skills": [
+        "banner-design",
+        "brand",
+        "ci-cd-governance",
+        "code-discovery-for-docs",
+        "deep-research",
+        "design",
+        "design-system",
+        "diagram",
+        "document-deep-merge",
+        "documentation-governance",
+        "docx-documentation",
+        "e2e-testing",
+        "enterprise-architecture",
+        "fork-management",
+        "low-poly-gen-mcp",
+        "minimalist-coding",
+        "office-docx",
+        "office-pdf",
+        "office-pptx",
+        "office-xlsx",
+        "open-source-community",
+        "pdf-to-markdown",
+        "pdm-linear",
+        "physio-fitness-coach",
+        "product-knowledge-catalog",
+        "product-roadmap",
+        "project-planning",
+        "prompting",
+        "release-versioning",
+        "repo-docs",
+        "repo-security-compliance",
+        "repo-triage-pr-ops",
+        "research-analysis",
+        "skill-set",
+        "slides",
+        "software-architecture",
+        "specification",
+        "tech-documentation",
+        "test-strategy",
+        "ui-styling",
+        "ui-ux-pro-max",
+        "unit-testing",
+        "ux-designer",
+        "value-propositions",
+        "version-control",
+        "web-visual",
+        "workflow-engine-mcp-design"
+      ]
+    },
+    {
+      "name": "user-skills-engineering",
+      "source": "plugins/engineering",
+      "description": "Git, CI/CD, testing, repo operations, and software architecture skills. No MCP bundled; use host git/CI tools. Pair with user-skills-skill-lab when authoring skills.",
+      "version": "1.0.0",
+      "keywords": [
+        "git",
+        "ci",
+        "testing",
+        "architecture"
+      ]
+    },
+    {
+      "name": "user-skills-product",
+      "source": "plugins/product",
+      "description": "Specs, roadmaps, planning, value propositions, and Linear PM workflows. Does not bundle Linear MCP; install Cursor's official Linear plugin alongside this pack.",
+      "version": "1.0.0",
+      "keywords": [
+        "product",
+        "specs",
+        "roadmap",
+        "linear"
+      ]
+    },
+    {
+      "name": "user-skills-design",
+      "source": "plugins/design",
+      "description": "Brand, design systems, UI/UX, diagrams, slides, and visual generation skills. Does not bundle Figma or image-model MCPs; those stay host-configured.",
+      "version": "1.0.0",
+      "keywords": [
+        "design",
+        "brand",
+        "ui",
+        "ux"
+      ]
+    },
+    {
+      "name": "user-skills-documents",
+      "source": "plugins/documents",
+      "description": "Office files, PDF conversion, technical writing, and documentation governance. Word/Excel MCPs stay host-configured when those skills need them.",
+      "version": "1.0.0",
+      "keywords": [
+        "docs",
+        "pdf",
+        "office",
+        "writing"
+      ]
+    },
+    {
+      "name": "user-skills-research",
+      "source": "plugins/research",
+      "description": "Deep research and research-analysis workflows. Uses host web/fetch tools; no extra MCP bundled.",
+      "version": "1.0.0",
+      "keywords": [
+        "research"
+      ]
+    },
+    {
+      "name": "user-skills-skill-lab",
+      "source": "plugins/skill-lab",
+      "description": "Skill authoring, validation, and catalog workflows (skill-set). Prefer the full user-skills plugin if you also want the in-repo skill-lab MCP, which must see the whole skills tree.",
+      "version": "1.0.0",
+      "keywords": [
+        "skills",
+        "authoring",
+        "catalog"
+      ]
+    },
+    {
+      "name": "user-skills-personal",
+      "source": "plugins/personal",
+      "description": "Personal-life skills that should stay off coding agents. Requires Notion MCP on the host for physio-fitness-coach persistence.",
+      "version": "1.0.0",
+      "keywords": [
+        "personal"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "skill-lab": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "tsx",
+        "${CURSOR_PLUGIN_ROOT}/skill-set/mcp-server/src/cli.ts",
+        "mcp"
+      ],
+      "cwd": "${CURSOR_PLUGIN_ROOT}/skill-set/mcp-server",
+      "env": {
+        "SKILL_LAB_SKILLS_ROOT": "${CURSOR_PLUGIN_ROOT}"
+      }
+    }
+  }
+}

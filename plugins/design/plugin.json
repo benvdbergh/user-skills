@@ -1,0 +1,16 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "user-skills-design",
+  "description": "Brand, design systems, UI/UX, diagrams, slides, and visual generation skills. Does not bundle Figma or image-model MCPs; those stay host-configured.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ben van den Bergh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "brand",
+    "ui",
+    "ux"
+  ]
+}
